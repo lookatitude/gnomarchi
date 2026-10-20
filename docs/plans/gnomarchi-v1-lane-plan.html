@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gnomarchi v1 — lane plan (approval)</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1d21; --muted: #5b6570; --border: #e4e7ec;
+    --card: #f7f8fa; --accent: #2563eb; --accent-soft: #eff4ff;
+    --code-bg: #f4f5f7; --code-fg: #1a1d21;
+    --note: #2563eb; --tip: #059669; --warn: #d97706; --success: #059669;
+    --shadow: 0 1px 3px rgba(16,24,40,.08), 0 1px 2px rgba(16,24,40,.04);
+    --maxw: 60rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216; --fg: #e6e8eb; --muted: #9aa4b0; --border: #232a33;
+      --card: #161b22; --accent: #6ea8ff; --accent-soft: #16233a;
+      --code-bg: #161b22; --code-fg: #e6e8eb;
+      --note: #6ea8ff; --tip: #34d399; --warn: #fbbf24; --success: #34d399;
+      --shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .layout { display: grid; grid-template-columns: 14rem minmax(0,1fr); max-width: 82rem; margin: 0 auto; }
+  aside {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 2rem 1.25rem; border-right: 1px solid var(--border); font-size: .9rem;
+  }
+  aside .toc-title { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; }
+  aside nav a { display: block; color: var(--muted); text-decoration: none; padding: .28rem 0; border-left: 2px solid transparent; padding-left: .6rem; }
+  aside nav a:hover, aside nav a.active { color: var(--accent); border-left-color: var(--accent); }
+  main { padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem); max-width: var(--maxw); }
+  .doc-title { font-size: 2rem; line-height: 1.15; margin: 0 0 .4rem; letter-spacing: -.02em; }
+  .doc-subtitle { font-size: 1.05rem; color: var(--muted); margin: 0 0 1rem; }
+  .doc-meta { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .chip { font-size: .78rem; padding: .22rem .6rem; border-radius: 999px; background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+  .chip.status-review { color: var(--note); border-color: color-mix(in srgb, var(--note) 40%, transparent); }
+  .chip.status-final { color: var(--success); border-color: color-mix(in srgb, var(--success) 40%, transparent); }
+  h2 { font-size: 1.4rem; margin: 2.25rem 0 1rem; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.1rem; margin: 1.5rem 0 .6rem; scroll-margin-top: 1rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .88em; background: var(--code-bg); padding: .12em .38em; border-radius: 4px; }
+  .table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th { background: var(--card); font-weight: 600; border-bottom: 2px solid var(--border); }
+  .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .6rem; margin: 1.25rem 0;
+    padding: .85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--card); }
+  .callout.warn { border-left: 3px solid var(--warn); }
+  .callout.tip { border-left: 3px solid var(--tip); }
+  .callout p:first-child { margin-top: 0; } .callout p:last-child { margin-bottom: 0; }
+  .dag { font-family: ui-monospace, Menlo, monospace; font-size: .85rem; background: var(--code-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); white-space: pre; overflow-x: auto; }
+  ul.checklist { list-style: none; padding-left: 0; }
+  ul.checklist li { padding-left: 1.9rem; position: relative; margin: .35rem 0; }
+  ul.checklist li::before { content: "☐"; position: absolute; left: 0; color: var(--muted); }
+  @media (max-width: 52rem) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="toc-title">On this page</div>
+    <nav id="toc">
+      <a href="#gate">Approval gate</a>
+      <a href="#dag">DAG</a>
+      <a href="#lanes">Lanes</a>
+      <a href="#artifacts">Artifacts</a>
+    </nav>
+  </aside>
+  <main>
+    <header class="doc">
+      <h1 class="doc-title">gnomarchi v1 — lane plan</h1>
+      <p class="doc-subtitle">Plan approved. Execute-plan may dispatch lanes (T1-researcher first).</p>
+      <div class="doc-meta">
+        <span class="chip status-final">● Plan approved</span>
+        <span class="chip">approved: true · 2026-10-20T14:56:00Z</span>
+        <span class="chip">backend: subagent</span>
+        <span class="chip">7 lanes · 1 parallel-eligible</span>
+        <span class="chip">G-plan broker: skipped (review=local)</span>
+      </div>
+    </header>
+
+    <section id="gate">
+      <h2>Approval gate</h2>
+      <div class="callout warn">
+        <div class="ico">!</div>
+        <div>
+          <p>Reply with an explicit affirmative: <strong>approved</strong>, <strong>go</strong>, or <strong>ship it</strong>.</p>
+          <p>“Sounds fine” / “ok” do not flip the gate. On approval, frontmatter becomes <code>approved: true</code> and dispatch can proceed.</p>
+        </div>
+      </div>
+      <div class="callout tip">
+        <div class="ico">→</div>
+        <div>
+          <p>Authoritative machine plan: <code>.guild/plan/gnomarchi-v1.md</code> · standalone PRD: <code>.guild/prd/gnomarchi-v1.md</code> · team: <code>.guild/team/gnomarchi-v1.plan.yaml</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dag">
+      <h2>DAG</h2>
+      <div class="dag">T1-researcher
+    └─ T2-architect (spine)
+         ├─ T3-backend  ─┐
+         ├─ T4-frontend ─┼─ T7-qa
+         ├─ T5-devops   ─┘
+         └─ T6-security</div>
+      <p>Spines (non-waivable verify at fan-out): T1, T2, T3, T4, T5. Parallel after architect: backend / frontend / devops / security.</p>
+    </section>
+
+    <section id="lanes">
+      <h2>Lanes</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>task-id</th><th>owner / pid</th><th>depends-on</th><th>scope</th><th>success criteria</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>T1-researcher</code></td>
+              <td>researcher<br><code>researcher-1</code></td>
+              <td>[]</td>
+              <td>D7 license/branding evidence; registry fidelity vs upstream.</td>
+              <td>
+                <ul class="checklist">
+                  <li><code>docs/research/omarchy-theme-license.md</code> go/no-go</li>
+                  <li>Registry gaps as triage rows or confirmed none</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><code>T2-architect</code></td>
+              <td>architect<br><code>architect-1</code></td>
+              <td>T1</td>
+              <td>Module boundaries + IPC contracts; registry completeness.</td>
+              <td>
+                <ul class="checklist">
+                  <li><code>docs/architecture/module-boundaries.md</code></li>
+                  <li>Every registry row has status+phase</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><code>T3-backend</code></td>
+              <td>backend<br><code>backend-1</code></td>
+              <td>T2</td>
+              <td>CLI, bus, plugin/theme stubs, skills, registry helpers.</td>
+              <td>
+                <ul class="checklist">
+                  <li><code>theme validate|set</code> + <code>plugin validate|scaffold</code></li>
+                  <li>Skills present; manifest smoke green</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><code>T4-frontend</code></td>
+              <td>frontend<br><code>frontend-1</code></td>
+              <td>T2</td>
+              <td>GTK menu, theme picker, Agents window via bus.</td>
+              <td>
+                <ul class="checklist">
+                  <li>Menu summon documented</li>
+                  <li>Picker applies pack; Agents window placeholders</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><code>T5-devops</code></td>
+              <td>devops<br><code>devops-1</code></td>
+              <td>T2</td>
+              <td>Overlay install, packaging stubs, D6 defaults; ISO stub.</td>
+              <td>
+                <ul class="checklist">
+                  <li>Overlay + VM procedure works</li>
+                  <li><code>packaging/</code> repo+AUR layout</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><code>T6-security</code></td>
+              <td>security<br><code>security-1</code></td>
+              <td>T2</td>
+              <td>Plugin trust, packaging integrity, theme attribution.</td>
+              <td>
+                <ul class="checklist">
+                  <li><code>docs/security/plugin-trust.md</code> + signing checklist</li>
+                  <li>Findings if confirm-on-add missing</li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td><code>T7-qa</code></td>
+              <td>qa<br><code>qa-1</code></td>
+              <td>T3, T4, T5</td>
+              <td>Acceptance: overlay, registry, theme, plugin, Make-something.</td>
+              <td>
+                <ul class="checklist">
+                  <li><code>tests/acceptance/</code> or automatable checklist</li>
+                  <li>Failures block build completion</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="artifacts">
+      <h2>Artifacts</h2>
+      <ul>
+        <li>Spec: <code>.guild/spec/gnomarchi-v1.md</code></li>
+        <li>Team decision: <code>.guild/runs/run-20261020-144240-plan/team-plan/plan.decision.666dac2b54c5.yaml</code> (approve)</li>
+        <li>Product SoT: <code>docs/plans/gnomarchi-consolidated-plan.html</code></li>
+      </ul>
+    </section>
+  </main>
+</div>
+<script>
+  (function () {
+    var links = [].slice.call(document.querySelectorAll('#toc a'));
+    var map = {};
+    links.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) map[id] = a;
+    });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          if (map[e.target.id]) map[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { obs.observe(s); });
+  })();
+</script>
+</body>
+</html>

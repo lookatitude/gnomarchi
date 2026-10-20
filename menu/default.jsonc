@@ -1,0 +1,84 @@
+// gnomarchi default menu tree (JSONC).
+// Loaded by menu/palette.py (GTK4/libadwaita when available; stub otherwise).
+// Modules register additional fragments via the menu-module adapter.
+{
+  "version": 1,
+  "id": "default",
+  "label": "gnomarchi",
+  "entries": [
+    {
+      "id": "install",
+      "label": "Install",
+      "children": [
+        {
+          "id": "install.packages",
+          "label": "Packages…",
+          "action": { "type": "cli", "argv": ["gnomarchi", "install", "--help"] }
+        },
+        {
+          "id": "install.ai",
+          "label": "AI apps (placeholder)",
+          "action": { "type": "stub", "message": "Install > AI — P5" }
+        },
+        {
+          "id": "install.dev",
+          "label": "Dev languages via mise (placeholder)",
+          "action": { "type": "stub", "message": "Install > Dev — P5" }
+        }
+      ]
+    },
+    {
+      "id": "setup",
+      "label": "Setup",
+      "children": [
+        {
+          "id": "setup.defaults",
+          "label": "Default apps",
+          "action": { "type": "stub", "message": "Setup > Default apps — wire Ghostty/nvim/Chromium" }
+        },
+        {
+          "id": "setup.keybindings",
+          "label": "Keybindings help",
+          "action": { "type": "open", "path": "docs/menu-super-space.md" }
+        }
+      ]
+    },
+    {
+      "id": "style",
+      "label": "Style",
+      "children": [
+        {
+          "id": "style.theme-picker",
+          "label": "Theme picker",
+          "action": { "type": "cli", "argv": ["gnomarchi-theme-picker"] }
+        },
+        {
+          "id": "style.theme-list",
+          "label": "List themes",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "list"] }
+        }
+      ]
+    },
+    {
+      "id": "trigger",
+      "label": "Trigger",
+      "children": [
+        {
+          "id": "trigger.agents",
+          "label": "Agents window",
+          "action": { "type": "cli", "argv": ["gnomarchi-agents-window"] }
+        },
+        {
+          "id": "trigger.menu-reload",
+          "label": "Reload menu",
+          "action": { "type": "cli", "argv": ["gnomarchi", "menu", "reload"] }
+        },
+        {
+          "id": "trigger.make-something",
+          "label": "Make something…",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "make-something"] }
+        }
+      ]
+    }
+  ]
+}

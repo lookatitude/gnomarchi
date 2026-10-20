@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.local-state/
+*.egg-info/
+.venv/
+venv/

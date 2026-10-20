@@ -1,0 +1,6 @@
+{
+  // menu-module fragment scaffold
+  "id": "PLUGIN_ID",
+  "label": "Plugin",
+  "items": []
+}

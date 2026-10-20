@@ -1,0 +1,72 @@
+schema_version: guild.team_file.v1
+spec: .guild/spec/gnomarchi-v1.md
+phase: plan
+backend: subagent
+proposal_ref: .guild/runs/run-20261020-144240-plan/team-plan/plan.proposal.v1.yaml
+decision_ref: .guild/runs/run-20261020-144240-plan/team-plan/plan.decision.666dac2b54c5.yaml
+proposal_hash: 9daa9db0186eac310a0579bc6187776585d58af05305dc74a62adcebeda38079
+specialists:
+  - name: researcher
+    participant_id: researcher-1
+    participation_kind: worker
+    scope: "Omarchy theme license/branding evidence (D7); registry fidelity vs upstream release notes."
+    depends-on: []
+    definition: .guild/agents/researcher.md
+    definition_source: project
+    default_tier: mid
+  - name: architect
+    participant_id: architect-1
+    participation_kind: worker
+    scope: "Module boundaries, consumed contracts, feature-registry completeness, plan synthesis."
+    depends-on: [researcher]
+    definition: .guild/agents/architect.md
+    definition_source: project
+    default_tier: powerful
+    implied-by: multi-component
+  - name: backend
+    participant_id: backend-1
+    participation_kind: worker
+    scope: "gnomarchi CLI, gnomarchi-bus, plugin lifecycle/adapters, skills/templates, registry tooling."
+    depends-on: [architect]
+    definition: .guild/agents/backend.md
+    definition_source: project
+    default_tier: mid
+  - name: frontend
+    participant_id: frontend-1
+    participation_kind: worker
+    scope: "GTK4/libadwaita menu palette, theme picker, Agents window."
+    depends-on: [architect]
+    definition: .guild/agents/frontend.md
+    definition_source: project
+    default_tier: mid
+  - name: devops
+    participant_id: devops-1
+    participation_kind: worker
+    scope: "Overlay installer, pacman repo+AUR, GNOME session packaging, ISO later."
+    depends-on: [architect]
+    definition: .guild/agents/devops.md
+    definition_source: project
+    default_tier: mid
+  - name: security
+    participant_id: security-1
+    participation_kind: worker
+    scope: "Plugin trust UX, packaging/signing, theme attribution, no official-Omarchy claim."
+    depends-on: [architect]
+    definition: .guild/agents/security.md
+    definition_source: project
+    default_tier: powerful
+    implied-by: auth-touched
+  - name: qa
+    participant_id: qa-1
+    participation_kind: worker
+    scope: "Acceptance harness: overlay boot, registry completeness, Make-something flows."
+    depends-on: [backend, frontend, devops]
+    definition: .guild/agents/qa.md
+    definition_source: project
+    default_tier: mid
+    implied-by: backend-present
+excluded:
+  - {role: mobile, reason: "No mobile surface."}
+  - {role: marketing/sales/seo/social-media/copywriter, reason: "Not a launch/commercial phase."}
+  - {role: developer, reason: "Domain lanes cover implementation."}
+  - {role: advisor, reason: "On-demand escalation only."}

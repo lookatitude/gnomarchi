@@ -1,0 +1,124 @@
+{
+  "schema_version": "guild.resolved_settings.v1",
+  "source_chain": {
+    "rigor": "project",
+    "auto_approve": "project",
+    "review": "project",
+    "host": "project",
+    "host_mode": "project",
+    "roles": "project",
+    "host_profiles": "project",
+    "initiative_default": "project",
+    "index": "project",
+    "record_status_runs": "project",
+    "codex_skip_enforcement": "project",
+    "agent_mode": "project",
+    "workspace": "project",
+    "models": "project",
+    "security": "project",
+    "secrets_policy": "project",
+    "mcp": "project",
+    "capability": "project",
+    "statusline": "project",
+    "adversarial_review_provider": "project",
+    "loops": "rigor",
+    "loop_cap": "project",
+    "codex_cap": "project",
+    "model_policy": "project",
+    "defaults": "project",
+    "workspace.mode": "project"
+  },
+  "effective": {
+    "agent_mode": "auto",
+    "host": "auto",
+    "review": "local",
+    "rigor": "standard",
+    "loops": "spec,plan",
+    "loop_cap": 16,
+    "block_unmarked_lanes": false
+  },
+  "providers": {
+    "authorHost": "unknown",
+    "authorTrust": "asserted",
+    "detected": [
+      {
+        "id": "claude",
+        "kind": "host",
+        "family": "claude",
+        "detected": true,
+        "authed": false,
+        "selectable": false,
+        "detail": "current author host"
+      },
+      {
+        "id": "codex-plugin",
+        "kind": "plugin-adapter",
+        "family": "codex",
+        "detected": true,
+        "authed": true,
+        "selectable": true,
+        "detail": "native plugin adapter 'codex-plugin' installed; codex on PATH (version ok); authed"
+      },
+      {
+        "id": "codex-cli",
+        "kind": "cli",
+        "family": "codex",
+        "detected": true,
+        "authed": true,
+        "selectable": true,
+        "detail": "codex on PATH (version ok); authed"
+      },
+      {
+        "id": "pi",
+        "kind": "cli",
+        "family": "pi",
+        "detected": false,
+        "authed": false,
+        "selectable": false,
+        "detail": "not detected; detect-only (no adapter yet — not selectable)"
+      },
+      {
+        "id": "antigravity",
+        "kind": "cli",
+        "family": "antigravity",
+        "detected": false,
+        "authed": false,
+        "selectable": false,
+        "detail": "not detected; detect-only (no adapter yet — not selectable)"
+      }
+    ],
+    "recommended": null
+  },
+  "roles": {
+    "schema_version": "guild.role_resolution.v1",
+    "host": {
+      "role": "host",
+      "substrate": "codex-cli",
+      "strength": "strong",
+      "reason": "strongest <HIGH_ENTROPY_REDACTED>_selectable substrate (codex-cli)"
+    },
+    "advisory": {
+      "role": "advisory",
+      "substrate": "codex-cli",
+      "strength": "strong",
+      "reason": "advisory defaults to the host substrate (codex-cli, local advisor)"
+    },
+    "adversarial": {
+      "role": "adversarial",
+      "substrate": "codex-cli",
+      "strength": "weak",
+      "reason": "only a same-family result_adapter (codex-cli) — independence lost (weak)"
+    }
+  },
+  "dispatch": {
+    "backend": "tmux",
+    "reason": "agent_mode=auto + tmux on PATH → tmux team panes",
+    "facts": {
+      "cmux_workspace_present": false,
+      "tmux_on_path": true,
+      "agent_mode": "auto"
+    }
+  },
+  "communication_contract": "review_result.v1",
+  "resolved_at_ref": "run-20261020-143729-ideate"
+}

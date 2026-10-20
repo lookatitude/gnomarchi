@@ -1,0 +1,31 @@
+# Maintainer: gnomarchi contributors
+# AUR fallback stub — keep in sync with packaging/repo version scheme.
+# shellcheck disable=SC2034
+pkgname=gnomarchi
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Stock GNOME omakase overlay — CLI, theme, menu, plugins"
+arch=('any')
+url="https://github.com/example/gnomarchi"
+license=('MIT')
+depends=('bash' 'python' 'gnome-shell' 'gdm')
+optdepends=(
+  'ghostty: default terminal'
+  'neovim: default editor'
+  'chromium: default browser'
+)
+makedepends=('git')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/example/gnomarchi/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -Dm755 bin/gnomarchi "${pkgdir}/usr/bin/gnomarchi"
+  if [[ -d theme/packs ]]; then
+    install -d "${pkgdir}/usr/share/gnomarchi/themes"
+    cp -a theme/packs/. "${pkgdir}/usr/share/gnomarchi/themes/"
+  fi
+  if [[ -f install/overlay.sh ]]; then
+    install -Dm755 install/overlay.sh "${pkgdir}/usr/share/gnomarchi/install/overlay.sh"
+  fi
+}

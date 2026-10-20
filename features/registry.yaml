@@ -1,0 +1,111 @@
+# gnomarchi feature registry — parity tracker vs Omarchy
+# status: native | port | adapt | rebuild | defer | triage | done
+# Sync process: docs/plans/gnomarchi-consolidated-plan.html §Future improvements
+schema_version: gnomarchi.feature_registry.v1
+last_full_review: "2026-10-20"
+upstream: omarchy
+features:
+  - id: omarchy.install.iso
+    title: Guided ISO install
+    status: rebuild
+    phase: P8
+    gnomarchi_path: "iso/ + install/ stages"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.install.overlay
+    title: Overlay / curl|bash install
+    status: adapt
+    phase: P6
+    gnomarchi_path: "install/overlay.sh"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.update.alpm
+    title: omarchy update + ALPM guard
+    status: adapt
+    phase: P6
+    gnomarchi_path: "gnomarchi update → custom repo"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.session.hyprland
+    title: Hyprland compositor session
+    status: rebuild
+    phase: P6
+    gnomarchi_path: "GNOME Shell + GDM"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.quickshell
+    title: Unified Quickshell desktop shell
+    status: rebuild
+    phase: P2
+    gnomarchi_path: "GNOME + GTK menu + overlays + gnomarchi-bus"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.plugin-system
+    title: Shell plugin add/clone/validate
+    status: rebuild
+    phase: P3
+    gnomarchi_path: "multi-runtime plugin lifecycle"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.bar-drag
+    title: Drag bar to any edge
+    status: defer
+    phase: P9
+    defer_reason: "D1 stock GNOME — use StatusNotifier instead"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.wm.tiling-layouts
+    title: Dwindle / scroll / scratchpad tiling
+    status: defer
+    phase: P9
+    defer_reason: "D1 stock GNOME identity; optional PaperWM profile later"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.theme.system
+    title: Whole-desktop themes + carousel
+    status: adapt
+    phase: P1
+    gnomarchi_path: "theme engine; D7 license gate for Omarchy packs"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.menu.unified
+    title: Nested menu + launcher
+    status: rebuild
+    phase: P2
+    gnomarchi_path: "GTK command palette + JSONC"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.agents.stack
+    title: Agents, Make something, crash diagnose
+    status: rebuild
+    phase: P5
+    gnomarchi_path: "mise + skills + GTK Agents window"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.capture.suite
+    title: Screenshot/OCR/QR/record
+    status: adapt
+    phase: P4
+    gnomarchi_path: "GNOME Screenshot + wrappers"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.dev.tooling
+    title: mise/docker/nvim/tmux/herdr
+    status: port
+    phase: P5
+    gnomarchi_path: "unchanged tooling; Ghostty default terminal"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.apps.oma-*
+    title: Omawrite/Omacut/Omacalc
+    status: adapt
+    phase: P5
+    gnomarchi_path: "keep if licensed or gnomarchi-app replacements"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.gaming.windows-vm
+    title: Gaming setup + Windows VM
+    status: port
+    phase: P9
+    gnomarchi_path: "Install menu modules"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.theme.backgrounds-provenance
+    title: Theme wallpaper/background asset licenses
+    status: triage
+    phase: P1
+    gnomarchi_path: "Do not vendor Omarchy backgrounds; original packs only until CREDITS"
+    last_reviewed: "2026-10-20"
+    triage_note: "T1 D7 — no per-theme CREDITS in upstream tree; discussion #11459"
+  - id: omarchy.apps.icons-marks
+    title: Bundled third-party application icons
+    status: triage
+    phase: P4
+    gnomarchi_path: "Use system/app icons; never redistribute Omarchy-shipped marks"
+    last_reviewed: "2026-10-20"
+    triage_note: "T1 D7 — product marks without clearance"

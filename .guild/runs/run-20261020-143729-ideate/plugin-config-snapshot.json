@@ -1,0 +1,72 @@
+{
+  "schema_version": "guild.plugin_config_snapshot.v1",
+  "run_id": "run-20261020-143729-ideate",
+  "captured_at": "2026-10-20T14:37:29.285Z",
+  "effective": {
+    "agent_mode": "auto",
+    "host": "auto",
+    "review": "local",
+    "rigor": "standard",
+    "loops": "spec,plan",
+    "loop_cap": 16,
+    "block_unmarked_lanes": false
+  },
+  "config_source_layers": {
+    "rigor": "project",
+    "auto_approve": "project",
+    "review": "project",
+    "host": "project",
+    "host_mode": "project",
+    "roles": "project",
+    "host_profiles": "project",
+    "initiative_default": "project",
+    "index": "project",
+    "record_status_runs": "project",
+    "codex_skip_enforcement": "project",
+    "agent_mode": "project",
+    "workspace": "project",
+    "models": "project",
+    "security": "project",
+    "secrets_policy": "project",
+    "mcp": "project",
+    "capability": "project",
+    "statusline": "project",
+    "adversarial_review_provider": "project",
+    "loops": "rigor",
+    "loop_cap": "project",
+    "codex_cap": "project",
+    "model_policy": "project",
+    "defaults": "project",
+    "workspace.mode": "project"
+  },
+  "plugin": {
+    "version": "3.1.0",
+    "ref": "sha256:ce0d005e906bb8be8661cf9d1e82223573c5c072986e637e00bcf70c411ad511"
+  },
+  "host_adapter": {
+    "requested": "auto",
+    "resolved": "unknown",
+    "capabilities_ref": null
+  },
+  "registry_hashes": {
+    "skills": null,
+    "agents": null
+  },
+  "command_surface_version": "sha256:1bec21c227f1ffff27b596ae44a46f002f83ddfc38ccdd184c1fda559c318cd4",
+  "redaction_policy": "scrubbed-config-v1",
+  "environment_capabilities": {
+    "dispatch": {
+      "backend": "tmux",
+      "reason": "agent_mode=auto + tmux on PATH → tmux team panes",
+      "facts": {
+        "cmux_workspace_present": false,
+        "tmux_on_path": true,
+        "agent_mode": "auto"
+      }
+    },
+    "execution_target": null,
+    "native_adapter": null,
+    "handshake": null,
+    "active_model": null
+  }
+}

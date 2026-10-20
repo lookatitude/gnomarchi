@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gnomarchi — Agentic integrations plan</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1d21; --muted: #5b6570; --border: #e4e7ec;
+    --card: #f7f8fa; --accent: #2563eb; --accent-soft: #eff4ff;
+    --code-bg: #f4f5f7; --code-fg: #1a1d21;
+    --note: #2563eb; --tip: #059669; --warn: #d97706; --danger: #dc2626; --success: #059669;
+    --shadow: 0 1px 3px rgba(16,24,40,.08), 0 1px 2px rgba(16,24,40,.04);
+    --maxw: 60rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216; --fg: #e6e8eb; --muted: #9aa4b0; --border: #232a33;
+      --card: #161b22; --accent: #6ea8ff; --accent-soft: #16233a;
+      --code-bg: #161b22; --code-fg: #e6e8eb;
+      --note: #6ea8ff; --tip: #34d399; --warn: #fbbf24; --danger: #f87171; --success: #34d399;
+      --shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb;
+    --accent-soft:#eff4ff;--code-bg:#f4f5f7;--code-fg:#1a1d21;--note:#2563eb;--tip:#059669;
+    --warn:#d97706;--danger:#dc2626;--success:#059669;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;
+    --accent-soft:#16233a;--code-bg:#161b22;--code-fg:#e6e8eb;--note:#6ea8ff;--tip:#34d399;
+    --warn:#fbbf24;--danger:#f87171;--success:#34d399;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .layout { display: grid; grid-template-columns: 16rem minmax(0,1fr); max-width: 82rem; margin: 0 auto; }
+  aside {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 2rem 1.25rem; border-right: 1px solid var(--border); font-size: .9rem;
+  }
+  aside .toc-title { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; }
+  aside nav a { display: block; color: var(--muted); text-decoration: none; padding: .28rem 0; border-left: 2px solid transparent; padding-left: .6rem; }
+  aside nav a:hover { color: var(--fg); }
+  aside nav a.lvl-3 { padding-left: 1.4rem; font-size: .85rem; }
+  aside nav a.active { color: var(--accent); border-left-color: var(--accent); }
+  main { padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem); max-width: var(--maxw); }
+  .doc-title { font-size: 2.1rem; line-height: 1.15; margin: 0 0 .4rem; letter-spacing: -.02em; }
+  .doc-subtitle { font-size: 1.1rem; color: var(--muted); margin: 0 0 1rem; }
+  .doc-meta { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .chip { font-size: .78rem; padding: .22rem .6rem; border-radius: 999px; background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+  .chip.status-review { color: var(--note); border-color: color-mix(in srgb, var(--note) 40%, transparent); }
+  h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.15rem; margin: 1.75rem 0 .75rem; scroll-margin-top: 1rem; }
+  h4 { font-size: 1rem; margin: 1.25rem 0 .5rem; }
+  a { color: var(--accent); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; background: var(--code-bg); padding: .12em .38em; border-radius: 4px; }
+  pre { background: var(--code-bg); padding: 1rem 1.15rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); line-height: 1.5; }
+  pre code { background: none; padding: 0; font-size: .85rem; }
+  .table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  th, td { text-align: left; padding: .55rem .75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th { background: var(--card); font-weight: 600; border-bottom: 2px solid var(--border); }
+  .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .6rem; margin: 1.25rem 0; padding: .85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--card); }
+  .callout .ico { font-weight: 700; color: var(--muted); }
+  .callout.note { border-left: 3px solid var(--note); }
+  .callout.tip { border-left: 3px solid var(--tip); }
+  .callout.warn { border-left: 3px solid var(--warn); }
+  .callout.danger { border-left: 3px solid var(--danger); }
+  details { border: 1px solid var(--border); border-radius: 8px; padding: .4rem 1rem; margin: 1rem 0; background: var(--card); }
+  summary { cursor: pointer; font-weight: 600; padding: .5rem 0; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸"; margin-right: .5rem; color: var(--muted); }
+  details[open] > summary::before { content: "▾"; }
+  ul.checklist { list-style: none; padding-left: 0; }
+  ul.checklist li { padding-left: 1.9rem; position: relative; margin: .4rem 0; }
+  ul.checklist li::before { content: "☐"; position: absolute; left: 0; color: var(--muted); }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin: 1.25rem 0; }
+  .card { border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.25rem; background: var(--card); }
+  .card h3 { margin-top: 0; font-size: 1rem; }
+  .flow {
+    display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; margin: 1rem 0 1.5rem;
+    font-size: .88rem;
+  }
+  .flow span {
+    background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+    padding: .35rem .65rem;
+  }
+  .flow .arr { border: none; background: transparent; color: var(--muted); padding: 0 .1rem; }
+  .theme-toggle { position: fixed; top: 1rem; right: 1rem; z-index: 10; background: var(--card);
+    border: 1px solid var(--border); color: var(--fg); border-radius: 8px; padding: .4rem .6rem; cursor: pointer; }
+  @media (max-width: 52rem) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="(function(){var r=document.documentElement;var d=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.setAttribute('data-theme',d==='dark'?'light':'dark');})()">Theme</button>
+
+<div class="layout">
+  <aside>
+    <div class="toc-title">On this page</div>
+    <nav id="toc">
+      <a href="#verdict">Verdict</a>
+      <a href="#omarchy-model">Omarchy integration model</a>
+      <a href="#surfaces">Artifact surfaces</a>
+      <a href="#gnomarchi-map">Gnomarchi surface map</a>
+      <a href="#contracts">Shared contracts</a>
+      <a href="#skills">Agent skills pack</a>
+      <a href="#make-something">Make something flows</a>
+      <a href="#wiring">Cross-tool wiring</a>
+      <a href="#cli">CLI and IPC</a>
+      <a href="#trust">Trust and safety</a>
+      <a href="#repo">Repo layout</a>
+      <a href="#phases">Implementation phases</a>
+      <a href="#acceptance">Acceptance tests</a>
+      <a href="#sources">Sources</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header class="doc">
+      <h1 class="doc-title">Agentic integrations plan</h1>
+      <p class="doc-subtitle">How Omarchy wires agents, skills, plugins, themes, apps, and the menu — and how Gnomarchi mirrors those concepts on stock GNOME (slightly omakase’d).</p>
+      <div class="doc-meta">
+        <span class="chip status-review">Plan</span>
+        <span class="chip">Updated 2026-10-20</span>
+        <span class="chip">Q1: stock GNOME</span>
+        <span class="chip">Companion to omarchy-to-gnome-comparison</span>
+      </div>
+    </header>
+
+    <section id="verdict">
+      <h2>Verdict</h2>
+      <p><strong>D1:</strong> Gnomarchi keeps Omarchy’s <em>integration shape</em> (skills → agents → typed artifacts → CLI lifecycle → menu “Make something”), but swaps Quickshell QML plugins for a multi-runtime plugin model that fits GNOME: Shell extensions, status indicators, menu modules, themes, GTK apps, and user services.</p>
+      <p>The product promise is the same: an agent can create, install, enable, validate, and ship an extension of the desktop without the user learning the plumbing. The runtime is different; the contracts must stay agent-legible.</p>
+
+      <div class="callout tip"><span class="ico">✓</span><div>
+        <p><strong>F1:</strong> Omarchy’s power is not QML itself. It is (1) one manifest schema, (2) one CLI for add/clone/enable/validate, (3) skills that teach agents the schema, (4) theme-as-data separate from code-as-plugin, (5) starter prompts that hand the agent a finished brief.</p>
+      </div></div>
+    </section>
+
+    <section id="omarchy-model">
+      <h2>Omarchy integration model (reference)</h2>
+      <div class="flow">
+        <span>User intent</span><span class="arr">→</span>
+        <span>Menu / hotkey / <code>a</code></span><span class="arr">→</span>
+        <span>Default agent</span><span class="arr">→</span>
+        <span>Skill (theme / plugin / app / OS)</span><span class="arr">→</span>
+        <span>Artifact on disk</span><span class="arr">→</span>
+        <span><code>omarchy *</code> lifecycle</span><span class="arr">→</span>
+        <span>Shell IPC / theme state</span>
+      </div>
+
+      <h3>What Omarchy actually integrates</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Piece</th><th>Role</th><th>Talks to</th></tr></thead>
+        <tbody>
+          <tr><td>Agents panel + mise wrappers</td><td>Pick default agent, usage, accounts</td><td>CLIs, bar widget, notifications</td></tr>
+          <tr><td>Agent skills (symlinked to every harness)</td><td>Teach how to edit OS / build theme / plugin / app</td><td>Filesystem under <code>~/.config</code> and <code>$OMARCHY_PATH</code></td></tr>
+          <tr><td>“Make something” starters</td><td>Preset prompts for theme, plugin, app</td><td>Default agent with skill attached</td></tr>
+          <tr><td>Quickshell plugins (<code>manifest.json</code> + QML)</td><td>Bar widgets, panels, overlays, menus, services, bars</td><td><code>omarchy-shell</code> IPC</td></tr>
+          <tr><td>Themes (<code>colors.toml</code> + templates)</td><td>Color only; filtered staging</td><td>Shell, terminal, nvim, btop, Chromium, agents’ skins</td></tr>
+          <tr><td>Apps (<code>omarchy-app</code> skill)</td><td>C++/Qt Quick single-binary apps</td><td>Theme watcher, portals, pacman package</td></tr>
+          <tr><td>Menu JSONC</td><td>Install / Setup / Style / Trigger tree</td><td>Shell scripts + CLI verbs</td></tr>
+          <tr><td>Crash capture</td><td>coredump → notify → agent + diagnose skill</td><td>systemd-coredump, default agent</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Omarchy plugin kinds (must have Gnomarchi analogues)</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Kind</th><th>Omarchy</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>bar-widget</code></td><td>Item in the bar</td><td>Status / click → panel</td></tr>
+          <tr><td><code>panel</code></td><td>Floating surface</td><td>Settings-like popout</td></tr>
+          <tr><td><code>overlay</code></td><td>Fullscreen</td><td>Emoji, clipboard, theme carousel</td></tr>
+          <tr><td><code>menu</code></td><td>Summoned menu</td><td>Command palette branches</td></tr>
+          <tr><td><code>service</code></td><td>Headless singleton</td><td>Watchers, state, IPC backends</td></tr>
+          <tr><td><code>bar</code></td><td>Full bar replacement</td><td>Rare; whole chrome swap</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="callout note"><span class="ico">i</span><div>
+        <p><strong>F2 — Theme vs plugin:</strong> Themes change colour/token. Plugins change behaviour/structure. Themes cannot install plugins. Gnomarchi must keep this split — it is what makes agent edits safe to auto-apply for themes and gated for plugins.</p>
+      </div></div>
+    </section>
+
+    <section id="surfaces">
+      <h2>Artifact surfaces Gnomarchi must support</h2>
+      <p>On stock GNOME there is no single QML host. Agents still need <em>typed</em> targets. Gnomarchi defines a unified <code>gnomarchi.plugin</code> manifest that declares one or more <strong>runtimes</strong>:</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Runtime</th><th>Omarchy kind(s)</th><th>On-disk shape</th><th>Enable path</th></tr></thead>
+        <tbody>
+          <tr><td><code>gnome-shell-extension</code></td><td>bar-widget, overlay, panel (deep)</td><td><code>extension.js</code> + <code>metadata.json</code></td><td><code>gnome-extensions enable</code> via CLI</td></tr>
+          <tr><td><code>status-indicator</code></td><td>bar-widget (light)</td><td>AppIndicator / Ayatana or GNOME StatusNotifier</td><td>autostart + D-Bus</td></tr>
+          <tr><td><code>menu-module</code></td><td>menu</td><td>JSONC fragment + optional script</td><td>merge into menu tree</td></tr>
+          <tr><td><code>overlay-app</code></td><td>overlay / panel</td><td>GTK4/libadwaita window</td><td>desktop file + hotkey + D-Bus activate</td></tr>
+          <tr><td><code>user-service</code></td><td>service</td><td>systemd --user unit + binary/script</td><td><code>systemctl --user enable --now</code></td></tr>
+          <tr><td><code>theme-pack</code></td><td>(theme, not plugin)</td><td><code>colors.toml</code> + emitters</td><td><code>gnomarchi theme set</code></td></tr>
+          <tr><td><code>desktop-app</code></td><td>omarchy-app analogue</td><td>GTK4 or Qt6 app + PKGBUILD</td><td>local pacman / <code>gnomarchi app install</code></td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="callout warn"><span class="ico">!</span><div>
+        <p><strong>R1:</strong> Do not force every plugin to be a GNOME Shell extension. Shell API churn every release will break the agentic promise. Prefer GTK overlay apps + menu modules + user services for most “Make something” output; reserve Shell extensions for chrome that must live in the panel/overview.</p>
+      </div></div>
+    </section>
+
+    <section id="gnomarchi-map">
+      <h2>Concept map: Omarchy → Gnomarchi</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Omarchy concept</th><th>Gnomarchi equivalent</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>omarchy plugin add &lt;git&gt;</code></td><td><code>gnomarchi plugin add &lt;git&gt;</code></td><td>Same UX: warn unsandboxed → clone → validate → optional enable</td></tr>
+          <tr><td><code>omarchy plugin clone omarchy.clock</code></td><td><code>gnomarchi plugin clone gnomarchi.agents</code></td><td>Copy first-party into <code>~/.config/gnomarchi/plugins/$USER.$name</code></td></tr>
+          <tr><td>Quickshell live reload on save</td><td>Per-runtime: extension reload via looking glass / <code>gnome-extensions</code>; GTK apps via restart; services via unit restart</td><td>CLI wraps reload</td></tr>
+          <tr><td><code>omarchy-shell</code> IPC</td><td><code>gnomarchi-bus</code> (D-Bus session service)</td><td>summon/hide/toggle overlays, rescan plugins, theme-changed signal</td></tr>
+          <tr><td>Agents bar panel + “Make something”</td><td>GTK “Agents” window + menu entries (stock GNOME: no custom bar host required)</td><td>Optional StatusNotifier icon</td></tr>
+          <tr><td><code>omarchy-app</code> skill (Qt)</td><td><code>gnomarchi-app</code> skill (GTK4/libadwaita preferred; Qt optional)</td><td>Matches stock GNOME; still theme-watched</td></tr>
+          <tr><td>Theme sync to Claude/Pi/OpenCode/Hermes</td><td>Same: write agent theme files on <code>theme set</code></td><td>DE-agnostic</td></tr>
+          <tr><td>Marketplace plugins.omarchy.org</td><td>Later: plugins.gnomarchi.org or GitHub topic <code>gnomarchi-plugin</code></td><td>Phase 6+</td></tr>
+          <tr><td>Menu extensions JSONC</td><td>Identical idea under <code>~/.config/gnomarchi/extensions/</code></td><td>Agents append Install/Trigger entries safely</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="contracts">
+      <h2>Shared contracts (agent-legible)</h2>
+
+      <h3>1. Unified plugin manifest</h3>
+      <p>One schema agents always write. Runtime adapters do the GNOME-specific install.</p>
+<pre><code>{
+  "schemaVersion": 1,
+  "id": "io.github.alice.weather",
+  "name": "Weather",
+  "version": "0.1.0",
+  "author": "Alice",
+  "license": "MIT",
+  "description": "Shows weather in a panel overlay.",
+  "kinds": ["overlay-app", "menu-module", "user-service"],
+  "entryPoints": {
+    "overlayApp": "app/",
+    "menuModule": "menu/weather.jsonc",
+    "userService": "service/weather.service"
+  },
+  "requires": {
+    "gnomarchi": "&gt;=0.1",
+    "commands": ["curl", "jq"]
+  },
+  "dbus": {
+    "name": "org.gnomarchi.plugins.weather",
+    "path": "/org/gnomarchi/plugins/weather"
+  }
+}</code></pre>
+
+      <h3>2. Theme pack contract</h3>
+      <p>Unchanged from the comparison doc: <code>colors.toml</code> (24 semantic colours) + emitters for GTK, GNOME Shell (User Themes), terminal, nvim, btop, Chromium, agent skins. Theme install never runs plugin code.</p>
+
+      <h3>3. Menu module contract</h3>
+      <p>Agents extend the omakase menu without forking the UI:</p>
+<pre><code>{
+  "id": "trigger.weather.refresh",
+  "path": ["Trigger", "Weather", "Refresh"],
+  "command": "gnomarchi-bus call weather.refresh",
+  "keywords": ["weather", "forecast"]
+}</code></pre>
+
+      <h3>4. State directory</h3>
+<pre><code>~/.local/state/gnomarchi/current/
+  theme/           # active theme symlink + generated files
+  agent/           # default agent id, usage cache
+  plugins.json     # enabled set + placements
+~/ .config/gnomarchi/
+  plugins/         # third-party + clones
+  extensions/      # menu JSONC fragments
+  shell.toml       # machine overrides (fonts, not colours)
+/usr/share/gnomarchi/
+  plugins/         # first-party
+  skills/          # agent skills source
+  themes/</code></pre>
+    </section>
+
+    <section id="skills">
+      <h2>Agent skills pack (first-class product)</h2>
+      <p>Symlink into every harness path Omarchy already targets: <code>~/.claude/skills</code>, <code>~/.codex/skills</code>, <code>~/.pi/agent/skills</code>, <code>~/.gemini/config/skills</code>, <code>~/.hermes/skills</code>, <code>~/.agents/skills</code>.</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Skill</th><th>When agents use it</th><th>Must teach</th></tr></thead>
+        <tbody>
+          <tr><td><code>gnomarchi-os</code></td><td>Tweak defaults, keybinds, GSettings, extensions list</td><td>dconf keys, safe rollback, <code>gnomarchi reinstall configs</code></td></tr>
+          <tr><td><code>gnomarchi-theme</code></td><td>New theme from scratch or from wallpaper</td><td>colors.toml schema, emitters, validate, <code>theme set</code>, never touch plugins</td></tr>
+          <tr><td><code>gnomarchi-plugin</code></td><td>New behaviour / widget / overlay / service</td><td>manifest schema, pick runtime, clone template, validate, enable, D-Bus optional</td></tr>
+          <tr><td><code>gnomarchi-app</code></td><td>Standalone desktop app</td><td>GTK4/libadwaita scaffold, theme watcher, portal file picker, PKGBUILD, desktop file</td></tr>
+          <tr><td><code>gnomarchi-menu</code></td><td>Add Install/Setup/Trigger entries</td><td>JSONC merge rules, no collisions, script permissions</td></tr>
+          <tr><td><code>gnomarchi-diagnose-crash</code></td><td>Crash notification click</td><td>coredumpctl, symbolize, mute, optional upstream report</td></tr>
+          <tr><td><code>gnomarchi-extension-gnome</code></td><td>Only when Shell chrome is required</td><td>metadata.json, ESM for current Shell, reload, version floors</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="callout tip"><span class="ico">✓</span><div>
+        <p><strong>A1:</strong> Ship <strong>templates</strong> next to each skill (<code>templates/</code>): minimal overlay-app, status-indicator, menu-module, user-service, theme pack, GTK app. Agents clone templates; they should not invent project layout.</p>
+      </div></div>
+
+      <h3>Skill quality bar (match Omarchy’s experimental honesty)</h3>
+      <ul>
+        <li>Skills say: prefer plan mode first; expect rollback.</li>
+        <li>Skills forbid editing <code>/usr/share/gnomarchi</code>; only <code>~/.config</code> and clone dirs.</li>
+        <li>Skills require <code>gnomarchi plugin validate</code> / <code>theme validate</code> before enable.</li>
+        <li>Skills document the trust prompt text the CLI shows on <code>plugin add</code>.</li>
+      </ul>
+    </section>
+
+    <section id="make-something">
+      <h2>Make something flows</h2>
+      <p>Omarchy’s agents panel offers starter prompts for theme, plugin, and app. Gnomarchi exposes the same three (plus menu module) from <strong>Menu → Make</strong> and the Agents window.</p>
+
+      <h3>Flow A — New theme</h3>
+      <ol>
+        <li>User: “Make a theme like Tokyo Night but greener.”</li>
+        <li>Menu launches <code>gnomarchi agent prompt --skill gnomarchi-theme "…"</code>.</li>
+        <li>Agent writes pack under <code>~/.config/gnomarchi/themes/…</code>.</li>
+        <li>Runs <code>gnomarchi theme validate</code> then <code>gnomarchi theme set</code>.</li>
+        <li>Theme-changed D-Bus signal updates GTK apps, terminal configs, agent skins.</li>
+      </ol>
+
+      <h3>Flow B — New plugin (typical: overlay-app + menu-module)</h3>
+      <ol>
+        <li>Starter: “Build a plugin that shows reminders.”</li>
+        <li>Skill forces runtime choice: prefer overlay-app + user-service, not Shell extension.</li>
+        <li><code>gnomarchi plugin scaffold reminders --kinds overlay-app,user-service,menu-module</code>.</li>
+        <li>Agent fills templates; <code>validate</code>; <code>enable</code>.</li>
+        <li>Hotkey / menu entry summon via <code>gnomarchi-bus summon io.github.user.reminders</code>.</li>
+      </ol>
+
+      <h3>Flow C — New desktop app</h3>
+      <ol>
+        <li>Starter uses <code>gnomarchi-app</code>.</li>
+        <li>Scaffold in <code>~/Work/&lt;name&gt;</code> with git init.</li>
+        <li>Theme class watches <code>~/.local/state/gnomarchi/current/theme/colors.toml</code>.</li>
+        <li><code>bin/install</code> → local package → appears in GNOME app grid + optional menu Launch entry.</li>
+      </ol>
+
+      <h3>Flow D — Clone and modify first-party</h3>
+      <p>Parity with <code>omarchy plugin clone</code>:</p>
+<pre><code>gnomarchi plugin clone gnomarchi.agents --edit
+# → ~/.config/gnomarchi/plugins/$USER.agents
+# routes IPC id gnomarchi.agents → clone
+</code></pre>
+    </section>
+
+    <section id="wiring">
+      <h2>Cross-tool wiring (the integrations that matter)</h2>
+
+      <h3>W1 — Theme fan-out</h3>
+      <p><code>gnomarchi theme set</code> is the hub. One command updates:</p>
+      <ul>
+        <li>GTK color-scheme + optional CSS</li>
+        <li>GNOME Shell theme (if User Themes enabled)</li>
+        <li>Foot/Ghostty/Kitty config snippets</li>
+        <li>Neovim / btop generated files</li>
+        <li>Chromium theme extension data if present</li>
+        <li>Claude Code / Pi / OpenCode / Hermes skin files</li>
+        <li>Emits <code>org.gnomarchi.Theme.Changed</code> for running GTK apps and plugins</li>
+      </ul>
+
+      <h3>W2 — Agent ↔ desktop</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Event</th><th>Integration</th></tr></thead>
+        <tbody>
+          <tr><td>Pick default agent</td><td>Writes state; next <code>a</code> / hotkey / menu uses it; mise installs if missing</td></tr>
+          <tr><td>Theme change</td><td>Agent harness theme files rewritten</td></tr>
+          <tr><td>Process crash</td><td>user service watches coredump → notification action → <code>gnomarchi agent crash &lt;pid&gt;</code></td></tr>
+          <tr><td>Make something</td><td>Pre-baked prompt + skill + cwd <code>~/Work</code></td></tr>
+          <tr><td>Usage refresh</td><td>Timer updates cache; Agents window reads JSON (no Quickshell required)</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>W3 — Menu ↔ scripts ↔ plugins</h3>
+      <p>Menu entries never embed logic. They call <code>gnomarchi</code> verbs or plugin D-Bus methods. Agents that add menu modules only add declarations + scripts under the plugin tree.</p>
+
+      <h3>W4 — Capture / hardware helpers</h3>
+      <p>Screenshot/OCR/QR wrappers remain CLI. Menu Trigger → Capture calls them. Plugins may subscribe to <code>gnomarchi-bus</code> signals (e.g. “screenshot taken”) without owning grim/slurp.</p>
+
+      <h3>W5 — Install path ↔ skills</h3>
+      <p>On overlay install and ISO first-boot, skills are symlinked once. <code>gnomarchi update</code> refreshes skill content from the package without wiping user-added skills in <code>~/.agents/skills</code>.</p>
+
+      <h3>W6 — Stock GNOME surfaces used as hosts</h3>
+      <div class="grid">
+        <div class="card"><h3>Quick Settings / panel</h3><p>Stock. Plugins add StatusNotifier icons instead of inventing a bar.</p></div>
+        <div class="card"><h3>Overview search</h3><p>Apps from <code>gnomarchi-app</code> appear automatically via <code>.desktop</code>.</p></div>
+        <div class="card"><h3>Notifications</h3><p>Actions for crash diagnosis and agent headroom switching.</p></div>
+        <div class="card"><h3>Settings</h3><p>Deep-link from menu instead of rebuilding Audio/BT/Network panels.</p></div>
+      </div>
+    </section>
+
+    <section id="cli">
+      <h2>CLI surface (parity list)</h2>
+<pre><code>gnomarchi menu [path]                 # open GTK command palette
+gnomarchi theme set|list|validate|get
+gnomarchi plugin list|add|remove|enable|disable|clone|update|validate|scaffold
+gnomarchi app scaffold|install        # desktop app helpers
+gnomarchi agent [prompt|crash|account|usage-update|…]
+gnomarchi default agent|terminal|editor|browser
+gnomarchi update                      # system + skills + plugins git ff
+gnomarchi reinstall configs           # rescue after agent mess
+gnomarchi-bus summon|hide|toggle|call|rescan
+</code></pre>
+      <p>Plugin enable is runtime-aware: extension → <code>gnome-extensions</code>; service → systemd; overlay → desktop+autostart registration; menu-module → symlink into extensions dir + rescan.</p>
+    </section>
+
+    <section id="trust">
+      <h2>Trust and safety (copy Omarchy’s honesty)</h2>
+      <ul>
+        <li><strong>Themes</strong> are data-filtered (colours/tokens only).</li>
+        <li><strong>Plugins</strong> are unsandboxed user code. <code>plugin add</code> always confirms; never runs install hooks; never sudo.</li>
+        <li>Validate before enable; refuse reserved <code>gnomarchi.*</code> ids for third parties.</li>
+        <li>No symlinks inside plugin trees (same as Omarchy validate).</li>
+        <li>Clone built-ins instead of editing <code>/usr/share</code>.</li>
+        <li>Document: Shell extensions have higher blast radius than overlay apps; skills bias agents away from them.</li>
+      </ul>
+    </section>
+
+    <section id="repo">
+      <h2>Repo layout (integrations-focused)</h2>
+<pre><code>gnomarchi/
+  bin/gnomarchi                 # CLI dispatcher
+  bus/                          # D-Bus service (gnomarchi-bus)
+  menu/                         # GTK palette + JSONC tree
+  theme/                        # apply/validate/emitters
+  plugin/                       # lifecycle + runtime adapters
+    adapters/
+      gnome_shell_extension.py
+      overlay_app.py
+      menu_module.py
+      user_service.py
+      status_indicator.py
+  skills/
+    gnomarchi-os/
+    gnomarchi-theme/
+    gnomarchi-plugin/
+    gnomarchi-app/
+    gnomarchi-menu/
+    gnomarchi-diagnose-crash/
+    gnomarchi-extension-gnome/
+  templates/                    # scaffolds for agents
+  plugins/                      # first-party (agents window, etc.)
+  themes/                       # shipped packs
+  install/                      # overlay installer + package lists
+  iso/                          # archiso profile (later)
+  docs/
+</code></pre>
+    </section>
+
+    <section id="phases">
+      <h2>Implementation phases (integrations first)</h2>
+      <p>Installability (overlay then ISO) rides on top of these contracts so agents work the day the first image boots.</p>
+
+      <ul class="checklist">
+        <li><strong>P0 — Contracts:</strong> manifest schema, theme schema, state dirs, CLI stubs that validate/list only</li>
+        <li><strong>P1 — Theme engine + gnomarchi-theme skill:</strong> set/list/validate + fan-out to GTK/terminal/nvim; agent can create a theme end-to-end</li>
+        <li><strong>P2 — Menu + menu-module runtime:</strong> GTK palette; agent can add a Trigger entry via skill</li>
+        <li><strong>P3 — Plugin lifecycle + overlay-app + user-service adapters:</strong> add/clone/enable/validate; scaffold templates; gnomarchi-plugin skill</li>
+        <li><strong>P4 — Agents stack:</strong> mise wrappers, default agent, Agents GTK window with Make something, crash skill, theme sync to harnesses</li>
+        <li><strong>P5 — gnomarchi-app skill + one reference app</strong> (e.g. simple calculator or notes) proving theme live-update</li>
+        <li><strong>P6 — Overlay installer</strong> on existing Arch+GNOME: packages, skills symlink, dconf defaults (stock GNOME omakase)</li>
+        <li><strong>P7 — Optional Shell-extension adapter + skill</strong> (narrow, version-pinned)</li>
+        <li><strong>P8 — ISO</strong> (archiso + offline mirror) wrapping the same overlay stage</li>
+        <li><strong>P9 — Marketplace / discoverability</strong> (git topic + validate in CI)</li>
+      </ul>
+
+      <div class="callout note"><span class="ico">i</span><div>
+        <p><strong>D2 — Install order:</strong> Build overlay installer before ISO. Omarchy’s own escape hatch is <code>curl | bash</code> on vanilla Arch; ISO is the polished path. Same split: Path A existing system, Path B ISO calling the same <code>install/</code> stages.</p>
+      </div></div>
+
+      <details>
+        <summary>Path A — Existing system (what it takes)</summary>
+        <ol>
+          <li>Prereq: Arch (or Arch-based) with working network; prefer already-on GNOME Wayland, or installer installs <code>gnome</code> + GDM.</li>
+          <li><code>curl -fsSL …/install | bash</code> or clone repo and run <code>install/overlay.sh</code>.</li>
+          <li>Stages: keyring/repo (optional) → package list → enable GDM/graphical → dconf omakase dump → symlink skills → enable first-party plugins → first-login Agents invite.</li>
+          <li>Non-goals for v1: converting Hyprland Omarchy in-place; migrating Quickshell plugins automatically.</li>
+          <li>Rollback: <code>gnomarchi uninstall overlay</code> removes packages it marked, restores dconf backup.</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>Path B — ISO (what it takes)</summary>
+        <ol>
+          <li>Separate <code>gnomarchi-iso</code> or <code>iso/</code>: fork archiso releng, offline mirror of base + gnomarchi packages (Omarchy pattern).</li>
+          <li>Live env runs guided installer (disk/LUKS/user) then chroots into the same <code>install/</code> stages as Path A.</li>
+          <li>Build via containerized <code>mkarchiso</code>; CI publishes ISO + checksum.</li>
+          <li>Heavier: GPU firmware choices, dual-boot free-space flow, deferred first-boot — after overlay is proven.</li>
+        </ol>
+      </details>
+    </section>
+
+    <section id="acceptance">
+      <h2>Acceptance tests (agentic promise)</h2>
+      <ul class="checklist">
+        <li>Agent with only <code>gnomarchi-theme</code> skill creates a theme; <code>theme set</code> changes GTK + terminal without manual edits</li>
+        <li>Agent scaffolds plugin via template; <code>plugin validate</code> passes; enable makes menu entry and summon work</li>
+        <li><code>plugin clone</code> of a first-party plugin survives <code>gnomarchi update</code> of the package</li>
+        <li>Make something → app builds, installs, follows theme accent live</li>
+        <li>Crash notification action opens default agent with diagnose skill context</li>
+        <li>Theme switch updates at least one agent harness skin file</li>
+        <li>Overlay install on clean Arch+GNOME reaches Agents invite without Hyprland packages</li>
+      </ul>
+    </section>
+
+    <section id="sources">
+      <h2>Sources</h2>
+      <ul>
+        <li><a href="https://omarchy.org/manual/ai/">Omarchy AI manual</a> (skills, Make something, crash, theme sync)</li>
+        <li><a href="http://omarchy.org/manual/shell-plugins/">Omarchy shell plugins manual</a></li>
+        <li><a href="https://plugins.omarchy.org/develop.html">Develop a plugin</a></li>
+        <li><a href="https://omarchythemes.dev/docs/plugins">Theme vs plugin boundary</a></li>
+        <li><a href="https://skillsmp.com/creators/omacom/omarchy/default-agents-skills-omarchy-app">omarchy-app skill summary</a></li>
+        <li><a href="https://learn.omacom.io/2/the-omarchy-manual/96/manual-installation">Omarchy manual install / overlay path</a></li>
+        <li><a href="../omarchy-to-gnome-comparison.html">Prior comparison doc</a></li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<script>
+  (function () {
+    var links = [].slice.call(document.querySelectorAll('#toc a'));
+    var map = {};
+    links.forEach(function (a) {
+      var el = document.getElementById(a.getAttribute('href').slice(1));
+      if (el) map[a.getAttribute('href').slice(1)] = a;
+    });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          if (map[e.target.id]) map[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { obs.observe(s); });
+  })();
+</script>
+</body>
+</html>

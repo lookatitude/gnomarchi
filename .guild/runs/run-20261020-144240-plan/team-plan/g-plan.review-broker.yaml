@@ -1,0 +1,7 @@
+schema_version: guild.review_broker_result.v1
+gate: G-plan
+artifact_path: .guild/plan/gnomarchi-v1.md
+run_id: run-20261020-144240-plan
+status: skipped
+reason: "review=local in .guild/settings.json; cross-family broker not required"
+decided_at: "2026-10-20T15:50:00Z"

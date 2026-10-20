@@ -1,0 +1,207 @@
+#!/usr/bin/env python3
+"""gnomarchi CLI — theme / plugin entry (P0–P3 stubs)."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+
+def cmd_theme_validate(args: argparse.Namespace) -> int:
+    from theme.engine import validate_theme
+    from theme.paths import find_pack
+
+    pack = Path(args.path) if args.path else find_pack(args.id) if args.id else None
+    if pack is None and args.id:
+        print(f"error: theme not found: {args.id}", file=sys.stderr)
+        return 1
+    if pack is None:
+        print("error: provide --path or --id", file=sys.stderr)
+        return 2
+    errors = validate_theme(pack)
+    if errors:
+        for err in errors:
+            print(f"invalid: {err}", file=sys.stderr)
+        return 1
+    print(f"ok: {pack}")
+    return 0
+
+
+def cmd_theme_set(args: argparse.Namespace) -> int:
+    from theme.engine import set_theme
+
+    try:
+        active = set_theme(args.id)
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"active theme → {args.id} ({active})")
+    return 0
+
+
+def cmd_theme_list(_args: argparse.Namespace) -> int:
+    from theme.engine import list_themes
+
+    themes = list_themes()
+    if not themes:
+        print("(no themes)")
+        return 0
+    for t in themes:
+        print(f"{t['id']}\t{t['name']}\t{t['path']}")
+    return 0
+
+
+def cmd_plugin_validate(args: argparse.Namespace) -> int:
+    from plugin.lifecycle import validate_plugin
+
+    errors = validate_plugin(args.path)
+    if errors:
+        for err in errors:
+            print(f"invalid: {err}", file=sys.stderr)
+        return 1
+    print(f"ok: {args.path}")
+    return 0
+
+
+def cmd_plugin_scaffold(args: argparse.Namespace) -> int:
+    from plugin.lifecycle import scaffold_plugin
+
+    try:
+        target = scaffold_plugin(args.id, runtime=args.runtime, dest_root=args.dest)
+    except (ValueError, FileExistsError, FileNotFoundError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"scaffolded: {target}")
+    return 0
+
+
+def cmd_plugin_list(_args: argparse.Namespace) -> int:
+    from plugin.lifecycle import list_plugins
+
+    plugins = list_plugins()
+    if not plugins:
+        print("(no plugins)")
+        return 0
+    for p in plugins:
+        print(f"{p['id']}\t{p['runtime']}\t{p['path']}")
+    return 0
+
+
+def cmd_plugin_add(args: argparse.Namespace) -> int:
+    from plugin.lifecycle import add_plugin
+
+    try:
+        target = add_plugin(
+            args.path,
+            confirm=bool(args.confirm),
+            dest_root=args.dest,
+        )
+    except PermissionError as exc:
+        print(f"refused: {exc}", file=sys.stderr)
+        return 2
+    except (ValueError, FileNotFoundError, FileExistsError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"added: {target}")
+    return 0
+
+
+def cmd_plugin_enable(args: argparse.Namespace) -> int:
+    from plugin.lifecycle import enable_plugin, list_plugins
+    from pathlib import Path as P
+
+    path = P(args.path) if args.path else None
+    if path is None and args.id:
+        matches = [p for p in list_plugins() if p["id"] == args.id]
+        if not matches:
+            print(f"error: plugin not found: {args.id}", file=sys.stderr)
+            return 1
+        path = P(matches[0]["path"])
+    if path is None:
+        print("error: provide path or --id", file=sys.stderr)
+        return 2
+    try:
+        msg = enable_plugin(path)
+    except (ValueError, PermissionError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(msg)
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="gnomarchi",
+        description="gnomarchi — stock GNOME omakase tooling (not affiliated with Omarchy)",
+    )
+    sub = parser.add_subparsers(dest="group", required=True)
+
+    theme = sub.add_parser("theme", help="theme pack validate / set / list")
+    theme_sub = theme.add_subparsers(dest="action", required=True)
+
+    tv = theme_sub.add_parser("validate", help="validate a theme pack")
+    tv.add_argument("--path", help="path to pack directory")
+    tv.add_argument("--id", help="installed/seeded theme id")
+    tv.set_defaults(func=cmd_theme_validate)
+
+    ts = theme_sub.add_parser("set", help="activate a theme pack")
+    ts.add_argument("id", help="theme id")
+    ts.set_defaults(func=cmd_theme_set)
+
+    tl = theme_sub.add_parser("list", help="list known theme packs")
+    tl.set_defaults(func=cmd_theme_list)
+
+    plugin = sub.add_parser(
+        "plugin", help="plugin validate / scaffold / add / enable / list"
+    )
+    plugin_sub = plugin.add_subparsers(dest="action", required=True)
+
+    pv = plugin_sub.add_parser("validate", help="validate a plugin directory")
+    pv.add_argument("path", help="path to plugin directory")
+    pv.set_defaults(func=cmd_plugin_validate)
+
+    ps = plugin_sub.add_parser("scaffold", help="scaffold a plugin from template")
+    ps.add_argument("id", help="plugin id (directory name)")
+    ps.add_argument(
+        "--runtime",
+        default="overlay-app",
+        choices=["overlay-app", "menu-module", "user-service"],
+        help="adapter runtime (Shell extension not offered)",
+    )
+    ps.add_argument("--dest", help="destination parent directory")
+    ps.set_defaults(func=cmd_plugin_scaffold)
+
+    pa = plugin_sub.add_parser("add", help="install plugin from path (confirm required)")
+    pa.add_argument("path", help="source plugin directory")
+    pa.add_argument(
+        "--confirm",
+        action="store_true",
+        help="non-interactive confirm after summary is printed (default: prompt)",
+    )
+    pa.add_argument("--dest", help="destination parent directory")
+    pa.set_defaults(func=cmd_plugin_add)
+
+    pe = plugin_sub.add_parser("enable", help="validate then enable an installed plugin")
+    pe.add_argument("path", nargs="?", help="plugin directory")
+    pe.add_argument("--id", help="installed plugin id")
+    pe.set_defaults(func=cmd_plugin_enable)
+
+    pl = plugin_sub.add_parser("list", help="list installed plugins")
+    pl.set_defaults(func=cmd_plugin_list)
+
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return int(args.func(args))
+
+
+if __name__ == "__main__":
+    sys.exit(main())

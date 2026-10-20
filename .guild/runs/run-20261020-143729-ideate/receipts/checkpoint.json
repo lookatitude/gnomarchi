@@ -1,0 +1,9 @@
+{
+  "schema_version": "guild.receipt_checkpoint.v1",
+  "run_id": "run-20261020-143729-ideate",
+  "last_sequence": 1,
+  "last_event_id": "capability-start-snapshot:run-20261020-143729-ideate:d019e623368d",
+  "record_count": 1,
+  "updated_at": "2026-10-20T14:37:29.283Z",
+  "contract_version": "guild.observability.v1"
+}

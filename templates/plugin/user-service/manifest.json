@@ -1,0 +1,8 @@
+{
+  "id": "PLUGIN_ID",
+  "name": "Plugin Name",
+  "version": "0.1.0",
+  "runtime": "user-service",
+  "permissions": ["user-systemd"],
+  "hooks": {}
+}

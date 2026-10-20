@@ -1,0 +1,11 @@
+# Example Include file for /etc/pacman.conf
+# Copy to /etc/pacman.d/gnomarchi.conf and add:
+#   Include = /etc/pacman.d/gnomarchi.conf
+#
+# Replace Server URL with your hosted mirror. Do not commit private keys.
+# Signing: docs/security/packaging-signing.md
+# Dev-only Optional TrustAll — require signatures before any public mirror.
+
+[gnomarchi]
+SigLevel = Optional TrustAll
+Server = https://example.invalid/gnomarchi/repo/$arch

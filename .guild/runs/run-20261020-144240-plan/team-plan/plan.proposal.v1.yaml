@@ -1,0 +1,238 @@
+backend_capacity_evidence:
+  as_of: "2026-10-20"
+  backend: subagent
+  method: Cursor session; agent_mode auto; subagent lanes; capacity not binding for 7 workers
+  verified_capacity: 7
+excluded_roles:
+  - role_ref: templates/specialists/mobile.md
+    why_unnecessary: No mobile surface.
+  - role_ref: templates/specialists/marketing.md
+    why_unnecessary: Not a launch/marketing phase.
+  - role_ref: templates/specialists/sales.md
+    why_unnecessary: Not commercial.
+  - role_ref: templates/specialists/seo.md
+    why_unnecessary: No web marketing site in v1 plan.
+  - role_ref: templates/specialists/copywriter.md
+    why_unnecessary: Product docs covered in architect/devops READMEs.
+  - role_ref: templates/specialists/social-media.md
+    why_unnecessary: Out of scope.
+  - role_ref: agents/advisor.md
+    why_unnecessary: On-demand escalation net only; not a roster worker.
+  - role_ref: agents/developer.md
+    why_unnecessary: Domain lanes (backend/frontend/devops) cover implementation; generic developer not needed.
+obligations:
+  - disposition:
+      owners:
+        - architect-1
+    obligation_id: OB-1
+    source: success_criterion
+    text: Feature registry covers 100% of inventoried Omarchy surfaces with status and phase.
+  - disposition:
+      owners:
+        - architect-1
+    obligation_id: OB-2
+    source: plan_item
+    text: Module boundaries and consumed contracts for CLI/bus/menu/theme/plugin/install.
+  - disposition:
+      owners:
+        - researcher-1
+    obligation_id: OB-3
+    source: risk
+    text: Confirm Omarchy theme license/branding before vendoring (D7); record outcome.
+  - disposition:
+      owners:
+        - backend-1
+    obligation_id: OB-4
+    source: success_criterion
+    text: gnomarchi CLI + theme/plugin validate paths exist for P0-P3.
+  - disposition:
+      owners:
+        - backend-1
+    obligation_id: OB-5
+    source: success_criterion
+    text: Agent skills create theme and overlay-app plugin end-to-end.
+  - disposition:
+      owners:
+        - backend-1
+    obligation_id: OB-6
+    source: plan_item
+    text: features/registry.yaml sync tooling + upstream-notes field.
+  - disposition:
+      owners:
+        - frontend-1
+    obligation_id: OB-7
+    source: success_criterion
+    text: GTK menu + theme picker + Agents window under stock GNOME.
+  - disposition:
+      owners:
+        - devops-1
+    obligation_id: OB-8
+    source: success_criterion
+    text: Overlay install reaches GNOME + Ghostty/nvim/Chromium + CLI + theme + agent invite.
+  - disposition:
+      owners:
+        - devops-1
+    obligation_id: OB-9
+    source: ownership_boundary
+    text: Custom pacman repo default + AUR fallback (D4); ISO after overlay (D3).
+  - disposition:
+      owners:
+        - qa-1
+    obligation_id: OB-10
+    source: success_criterion
+    text: Acceptance tests for overlay, registry completeness, Make-something flows.
+  - disposition:
+      owners:
+        - security-1
+    obligation_id: OB-11
+    source: risk
+    text: Plugin add never sudo/install-hooks; confirm trust UX.
+  - disposition:
+      owners:
+        - security-1
+    obligation_id: OB-12
+    source: risk
+    text: Repo signing and theme attribution; no official Omarchy claim.
+  - disposition:
+      owners:
+        - architect-1
+    obligation_id: OB-14
+    source: review_gate
+    text: Plan/PRD approval gate before build dispatch.
+parent_proposal_hash: null
+participants:
+  - backend: subagent
+    capability_scope:
+      - docs/**
+      - features/**
+      - .guild/spec/**
+    depends_on:
+      - researcher-1
+    necessity_rationale: Multi-component system (CLI, bus, menu, theme, plugin, install). Owns module boundaries and consumed contracts for all implementers.
+    owned_obligations:
+      - OB-1
+      - OB-2
+      - OB-14
+    participant_id: architect-1
+    participation_kind: worker
+    purpose: planning
+    role_ref: .guild/agents/architect.md
+    tier: powerful
+  - backend: subagent
+    capability_scope:
+      - docs/**
+      - features/registry.yaml
+    depends_on: []
+    necessity_rationale: D7 theme license gate and Omarchy feature inventory fidelity require evidence from upstream LICENSE/release notes before vendoring.
+    owned_obligations:
+      - OB-3
+    participant_id: researcher-1
+    participation_kind: worker
+    purpose: research
+    role_ref: .guild/agents/researcher.md
+    tier: mid
+  - backend: subagent
+    capability_scope:
+      - bin/**
+      - bus/**
+      - plugin/**
+      - skills/**
+      - templates/**
+      - features/**
+    depends_on:
+      - architect-1
+    necessity_rationale: Owns gnomarchi CLI, gnomarchi-bus, plugin lifecycle adapters, feature registry tooling, skills scaffolding.
+    owned_obligations:
+      - OB-4
+      - OB-5
+      - OB-6
+    participant_id: backend-1
+    participation_kind: worker
+    purpose: implementation
+    role_ref: .guild/agents/backend.md
+    tier: mid
+  - backend: subagent
+    capability_scope:
+      - menu/**
+      - apps/**
+    depends_on:
+      - architect-1
+    necessity_rationale: GTK4/libadwaita menu palette, theme picker, Agents window are the user-facing rebuild of Quickshell surfaces under D1.
+    owned_obligations:
+      - OB-7
+    participant_id: frontend-1
+    participation_kind: worker
+    purpose: implementation
+    role_ref: .guild/agents/frontend.md
+    tier: mid
+  - backend: subagent
+    capability_scope:
+      - install/**
+      - iso/**
+      - packaging/**
+    depends_on:
+      - architect-1
+    necessity_rationale: Overlay installer, pacman repo+AUR (D4), ISO path, GNOME session packaging.
+    owned_obligations:
+      - OB-8
+      - OB-9
+    participant_id: devops-1
+    participation_kind: worker
+    purpose: implementation
+    role_ref: .guild/agents/devops.md
+    tier: mid
+  - backend: subagent
+    capability_scope:
+      - tests/**
+      - features/registry.yaml
+    depends_on:
+      - backend-1
+      - frontend-1
+      - devops-1
+    necessity_rationale: Backend present; owns acceptance harness for overlay boot, registry completeness, agent Make-something flows.
+    owned_obligations:
+      - OB-10
+    participant_id: qa-1
+    participation_kind: worker
+    purpose: general
+    role_ref: .guild/agents/qa.md
+    tier: mid
+  - backend: subagent
+    capability_scope:
+      - plugin/**
+      - packaging/**
+      - skills/**
+    depends_on:
+      - architect-1
+    necessity_rationale: Plugin install is unsandboxed user code; packaging repo keys; theme vendoring branding risk (D7).
+    owned_obligations:
+      - OB-11
+      - OB-12
+    participant_id: security-1
+    participation_kind: worker
+    purpose: security
+    role_ref: .guild/agents/security.md
+    tier: powerful
+phase: plan
+plan_ref:
+  path: docs/plans/gnomarchi-consolidated-plan.html
+  sha256: 1f581e01e7e91a400de6318f3376fd0e77c791691fbc4de92de991d6d883bb32
+proposal_hash: 9daa9db0186eac310a0579bc6187776585d58af05305dc74a62adcebeda38079
+proposal_hash_algorithm: sha256
+proposal_hash_scope: canonical_yaml_with_proposal_hash_field_omitted
+proposal_version: 1
+proposed_schedule:
+  waves:
+    - - researcher-1
+    - - architect-1
+    - - backend-1
+      - frontend-1
+      - devops-1
+      - security-1
+    - - qa-1
+provenance: Composed for /guild:plan after approved ideate; domains from .guild/spec/gnomarchi-v1.md and docs/plans/gnomarchi-consolidated-plan.html.
+run_id: run-20261020-144240-plan
+schema_version: guild.team_proposal.v2
+spec_ref:
+  path: .guild/spec/gnomarchi-v1.md
+  sha256: 13491f0700cd4bb5171ff233381bd6eb380fda5fdc19da613b58fd491bf58983

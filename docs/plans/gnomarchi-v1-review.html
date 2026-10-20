@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gnomarchi v1 — review / verify</title>
+<style>
+  :root { --bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb;--ok:#059669;--bad:#dc2626;--warn:#d97706; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;--ok:#34d399;--bad:#f87171;--warn:#fbbf24; }
+  }
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  main{max-width:46rem;margin:0 auto;padding:2.5rem 1.5rem}
+  h1{font-size:1.75rem;margin:0 0 .4rem}
+  .sub{color:var(--muted);margin:0 0 1.25rem}
+  .chip{display:inline-block;font-size:.75rem;padding:.2rem .55rem;border-radius:999px;border:1px solid var(--border);margin-right:.35rem}
+  .fail{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)}
+  .pass{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+  table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}
+  th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--border);vertical-align:top}
+  thead th{background:var(--card)}
+  .callout{padding:.85rem 1rem;border:1px solid var(--border);border-left:3px solid var(--warn);border-radius:8px;background:var(--card);margin:1.25rem 0}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.86em}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <h1>gnomarchi v1 — review / verify</h1>
+  <p class="sub">run-20261020-144240-plan</p>
+  <p>
+    <span class="chip pass">review: all lanes ✓</span>
+    <span class="chip fail">verify: fail</span>
+  </p>
+
+  <h2>Review</h2>
+  <p>Seven worker receipts passed Stage 1 + Stage 2 (T6 → non-blocking SigLevel follow-up). Machine report: <code>.guild/runs/run-20261020-144240-plan/review.md</code>.</p>
+  <table>
+    <thead><tr><th>Lane</th><th>S1</th><th>S2</th></tr></thead>
+    <tbody>
+      <tr><td>T1–T5, T7</td><td>✓</td><td>✓</td></tr>
+      <tr><td>T6-security</td><td>✓</td><td>→ follow-up (F4 SigLevel)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Verify</h2>
+  <div class="callout">
+    <p><strong>Overall status: fail</strong> — tests green (20), but spec product criteria lack evidence for (1) overlay boot to a usable session and (2) agent theme/plugin create-enable e2e.</p>
+  </div>
+  <p>Artifact: <code>.guild/runs/run-20261020-144240-plan/verify.md</code></p>
+
+  <h2>Decide</h2>
+  <p>Run the VM checklist + one agent Make-something pass, then re-verify — or narrow the spec success criteria to stub scope for a v0 close.</p>
+</main>
+</body>
+</html>

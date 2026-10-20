@@ -1,0 +1,9 @@
+[theme]
+id = "THEME_ID"
+name = "THEME_NAME"
+version = "0.1.0"
+description = "Describe the pack."
+
+[provenance]
+kind = "original-inspired"
+note = "Original gnomarchi pack. Not affiliated with Omarchy or Basecamp."

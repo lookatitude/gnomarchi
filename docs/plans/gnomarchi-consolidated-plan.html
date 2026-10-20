@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gnomarchi consolidated plan</title>
+<style>
+  :root {
+    --bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;
+    --accent:#2563eb;--code-bg:#f4f5f7;--note:#2563eb;--tip:#059669;--warn:#d97706;--danger:#dc2626;
+    --native:#059669;--port:#2563eb;--adapt:#d97706;--rebuild:#7c3aed;--defer:#64748b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;
+      --accent:#6ea8ff;--code-bg:#161b22;--note:#6ea8ff;--tip:#34d399;--warn:#fbbf24;--danger:#f87171;
+      --native:#34d399;--port:#6ea8ff;--adapt:#fbbf24;--rebuild:#c4b5fd;--defer:#94a3b8;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb;--code-bg:#f4f5f7;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;--code-bg:#161b22;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .layout{display:grid;grid-template-columns:15rem minmax(0,1fr);max-width:84rem;margin:0 auto}
+  aside{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:2rem 1.1rem;border-right:1px solid var(--border);font-size:.88rem}
+  aside .toc-title{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
+  aside a{display:block;color:var(--muted);text-decoration:none;padding:.25rem 0 .25rem .55rem;border-left:2px solid transparent}
+  aside a:hover{color:var(--fg)} aside a.active{color:var(--accent);border-left-color:var(--accent)}
+  main{padding:2.4rem clamp(1.2rem,4vw,3.2rem);max-width:62rem}
+  .doc-title{font-size:2rem;margin:0 0 .35rem;letter-spacing:-.02em}
+  .doc-subtitle{color:var(--muted);margin:0 0 1rem;font-size:1.05rem}
+  .chip{font-size:.75rem;padding:.2rem .55rem;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted);margin-right:.35rem}
+  h2{font-size:1.45rem;margin:2.4rem 0 .9rem;scroll-margin-top:1rem}
+  h3{font-size:1.1rem;margin:1.6rem 0 .6rem;scroll-margin-top:1rem}
+  a{color:var(--accent)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+  pre{background:var(--code-bg);padding:1rem;border-radius:8px;overflow:auto;border:1px solid var(--border);font-size:.84rem}
+  .table-wrap{overflow-x:auto;margin:1rem 0}
+  table{border-collapse:collapse;width:100%;font-size:.9rem}
+  th,td{text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--border);vertical-align:top}
+  thead th{background:var(--card);border-bottom:2px solid var(--border)}
+  .callout{margin:1.1rem 0;padding:.85rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--card);border-left:3px solid var(--note)}
+  .callout.warn{border-left-color:var(--warn)} .callout.tip{border-left-color:var(--tip)}
+  .badge{display:inline-block;font-size:.68rem;font-weight:700;text-transform:uppercase;padding:.12rem .4rem;border-radius:4px;letter-spacing:.03em}
+  .badge.native{color:var(--native);background:color-mix(in srgb,var(--native) 16%,transparent)}
+  .badge.port{color:var(--port);background:color-mix(in srgb,var(--port) 16%,transparent)}
+  .badge.adapt{color:var(--adapt);background:color-mix(in srgb,var(--adapt) 16%,transparent)}
+  .badge.rebuild{color:var(--rebuild);background:color-mix(in srgb,var(--rebuild) 16%,transparent)}
+  .badge.defer{color:var(--defer);background:color-mix(in srgb,var(--defer) 16%,transparent)}
+  .card{border:1px solid var(--border);border-radius:10px;padding:1rem 1.15rem;background:var(--card);margin:.75rem 0}
+  .card h3{margin:.1rem 0 .45rem}
+  ul.checklist{list-style:none;padding:0}
+  ul.checklist li{padding-left:1.7rem;position:relative;margin:.35rem 0}
+  ul.checklist li::before{content:"☐";position:absolute;left:0;color:var(--muted)}
+  .theme-toggle{position:fixed;top:1rem;right:1rem;z-index:10;background:var(--card);border:1px solid var(--border);color:var(--fg);border-radius:8px;padding:.35rem .55rem;cursor:pointer}
+  @media(max-width:52rem){.layout{grid-template-columns:1fr}aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<button class="theme-toggle" onclick="(function(){var r=document.documentElement;var d=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.setAttribute('data-theme',d==='dark'?'light':'dark');})()">Theme</button>
+<div class="layout">
+<aside>
+  <div class="toc-title">On this page</div>
+  <nav id="toc">
+    <a href="#verdict">Verdict</a>
+    <a href="#decisions">Locked decisions</a>
+    <a href="#parity">Parity rule</a>
+    <a href="#matrix">Feature matrix</a>
+    <a href="#registry">Future improvements</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#phases">Phases</a>
+    <a href="#acceptance">Acceptance</a>
+    <a href="#spec">Spec pointer</a>
+  </nav>
+</aside>
+<main>
+<header>
+  <h1 class="doc-title">gnomarchi consolidated plan</h1>
+  <p class="doc-subtitle">Single planning source of truth: locked decisions, full Omarchy feature port matrix, and a registry process for future upstream improvements.</p>
+  <p>
+    <span class="chip">Ideate run-20261020-143729-ideate</span>
+    <span class="chip">2026-10-20</span>
+    <span class="chip">Spec: .guild/spec/gnomarchi-v1.md</span>
+  </p>
+</header>
+
+<section id="verdict">
+  <h2>Verdict</h2>
+  <p><strong>Port every inventoried Omarchy product feature into a tracked registry row</strong> with status <span class="badge native">native</span> <span class="badge port">port</span> <span class="badge adapt">adapt</span> <span class="badge rebuild">rebuild</span> or <span class="badge defer">defer</span>. “All features” means none are silently dropped; Hyprland-identical UX is not required under the stock-GNOME decision.</p>
+  <div class="callout tip">
+    <p>Wiki ADR files under <code>.guild/wiki/decisions/</code> remain an audit trail. <strong>This HTML plan is the planning source of truth</strong>; decisions are inlined below so you do not need to open separate records to execute.</p>
+  </div>
+</section>
+
+<section id="decisions">
+  <h2>Locked decisions (inlined)</h2>
+
+  <div class="card">
+    <h3>D1 — Desktop identity</h3>
+    <p><strong>Stock GNOME, slightly omakase’d.</strong> GNOME Shell + Settings/Quick Settings; curated defaults (apps, themes, menu, agents). Not a tiling-first product. PaperWM/Forge optional later only.</p>
+  </div>
+  <div class="card">
+    <h3>D2 — Plugins</h3>
+    <p><strong>Multi-runtime plugin manifest</strong> (overlay-app, menu-module, user-service, status-indicator; optional gnome-shell-extension). Separate theme-pack and desktop-app artifacts. Shell extensions last / version-pinned. Same agent loop as Omarchy: skills → artifact → CLI lifecycle → Make something.</p>
+  </div>
+  <div class="card">
+    <h3>D3 — Install order</h3>
+    <p><strong>Overlay on existing Arch first</strong>, then ISO that reuses the same <code>install/</code> stages.</p>
+  </div>
+  <div class="card">
+    <h3>D4 — Packaging</h3>
+    <p><strong>Custom pacman repo</strong> for ISO/overlay default path; <strong>AUR PKGBUILDs</strong> as fallback.</p>
+  </div>
+  <div class="card">
+    <h3>D5 — Public name</h3>
+    <p><strong>gnomarchi</strong> everywhere (CLI, packages, git identity). Remote when first overlay is usable.</p>
+  </div>
+  <div class="card">
+    <h3>D6 — Default apps</h3>
+    <p><strong>Ghostty + Neovim + Chromium.</strong> GNOME Console/Text Editor/Epiphany installable, not defaults.</p>
+  </div>
+  <div class="card">
+    <h3>D7 — Themes</h3>
+    <p><strong>Prefer vendoring Omarchy theme packs if license/branding allow</strong> (attribute; no official claim). Else original Gnomarchi packs inspired by common schemes. Theme engine ships against a minimal original set until the license gate clears.</p>
+  </div>
+</section>
+
+<section id="parity">
+  <h2>Parity rule</h2>
+  <p>For each Omarchy feature:</p>
+  <ol>
+    <li>If GNOME already provides it → <span class="badge native">native</span> (wire menu/hotkey only).</li>
+    <li>If portable scripts/CLI → <span class="badge port">port</span>.</li>
+    <li>If same intent, different API → <span class="badge adapt">adapt</span>.</li>
+    <li>If Quickshell/Hyprland-specific → <span class="badge rebuild">rebuild</span> on Gnomarchi contracts.</li>
+    <li>If conflicts with D1 or v1 scope → <span class="badge defer">defer</span> with rationale + revisit trigger (never delete from registry).</li>
+  </ol>
+</section>
+
+<section id="matrix">
+  <h2>Feature matrix (Omarchy → gnomarchi)</h2>
+  <p>Status legend as above. Phase = earliest delivery phase (see Phases).</p>
+
+  <h3>A. Install, update, system</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Guided ISO install</td><td><span class="badge rebuild">rebuild</span></td><td>archiso + same stages as overlay</td><td>P8</td></tr>
+      <tr><td>Manual/overlay install (<code>curl|bash</code>)</td><td><span class="badge adapt">adapt</span></td><td><code>install/overlay.sh</code> → Arch+GNOME</td><td>P6</td></tr>
+      <tr><td>Dual-boot / free-space</td><td><span class="badge adapt">adapt</span></td><td>ISO installer option</td><td>P8</td></tr>
+      <tr><td>Deferred first-boot / new owner</td><td><span class="badge port">port</span></td><td>GDM first-boot wizard + scripts</td><td>P8</td></tr>
+      <tr><td>Factory reset (<code>@factory</code>)</td><td><span class="badge port">port</span></td><td>Btrfs snapshot scripts (DE-agnostic)</td><td>P6+</td></tr>
+      <tr><td><code>omarchy update</code> + ALPM guard</td><td><span class="badge adapt">adapt</span></td><td><code>gnomarchi update</code> → custom repo</td><td>P6</td></tr>
+      <tr><td>Packages under <code>/usr/share/…</code>, user in <code>~/.config</code></td><td><span class="badge port">port</span></td><td><code>/usr/share/gnomarchi</code></td><td>P0</td></tr>
+      <tr><td>Snapper / paccache / disk-space warn</td><td><span class="badge port">port</span></td><td>Same tooling</td><td>P6</td></tr>
+      <tr><td>LUKS / Plymouth unlock art</td><td><span class="badge adapt">adapt</span></td><td>Keep LUKS; themed Plymouth if packs allow</td><td>P6–P8</td></tr>
+      <tr><td>zram, power-profiles, speaker DSP</td><td><span class="badge port">port</span></td><td>Same system units</td><td>P6</td></tr>
+      <tr><td>ufw / ufw-docker</td><td><span class="badge port">port</span></td><td>Same</td><td>P6</td></tr>
+      <tr><td>NVIDIA / gaming / Steam setup</td><td><span class="badge port">port</span></td><td>Install menu modules</td><td>P6+</td></tr>
+      <tr><td>Windows 11 VM helper</td><td><span class="badge port">port</span></td><td>Install &gt; Windows scripts</td><td>P9</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>B. Session / compositor / portals</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Hyprland compositor</td><td><span class="badge rebuild">rebuild</span></td><td>Mutter / GNOME Shell</td><td>P6</td></tr>
+      <tr><td>SDDM + UWSM</td><td><span class="badge rebuild">rebuild</span></td><td>GDM + GNOME session</td><td>P6</td></tr>
+      <tr><td>xdg-desktop-portal-hyprland</td><td><span class="badge native">native</span></td><td>xdg-desktop-portal-gnome</td><td>P6</td></tr>
+      <tr><td>Hyprland Lua binds / window rules</td><td><span class="badge rebuild">rebuild</span></td><td>dconf + custom shortcuts + optional tiling profile</td><td>P4</td></tr>
+      <tr><td>Scratchpad / dwindle / scroll layouts</td><td><span class="badge defer">defer</span></td><td>Conflicts with D1; optional PaperWM profile later</td><td>P9+</td></tr>
+      <tr><td>Clamshell / monitor scaling scripts</td><td><span class="badge adapt">adapt</span></td><td>GNOME display + small helpers</td><td>P6</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>C. Shell UX (Quickshell era)</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Unified Quickshell (bar/menu/lock/OSD/panels)</td><td><span class="badge rebuild">rebuild</span></td><td>GNOME Shell + GTK menu + overlays + gnomarchi-bus</td><td>P2–P4</td></tr>
+      <tr><td>Modular bar + drag-to-edge</td><td><span class="badge defer">defer</span></td><td>Stock panel; StatusNotifier widgets instead</td><td>P9</td></tr>
+      <tr><td>Bar widgets (weather, media, battery, …)</td><td><span class="badge adapt">adapt</span></td><td>Native GNOME + status-indicator plugins</td><td>P3–P5</td></tr>
+      <tr><td>Nested Omarchy menu + launcher merge</td><td><span class="badge rebuild">rebuild</span></td><td>GTK command palette + JSONC tree</td><td>P2</td></tr>
+      <tr><td>Apps-only menu</td><td><span class="badge native">native</span></td><td>Overview / Super+Alt+Space binding</td><td>P4</td></tr>
+      <tr><td>Control panels A/B/W/D/P</td><td><span class="badge native">native</span></td><td>Quick Settings + <code>gnome-control-center</code> deep links</td><td>P4</td></tr>
+      <tr><td>Notification daemon + history replay</td><td><span class="badge adapt">adapt</span></td><td>GNOME notifications; history best-effort</td><td>P4</td></tr>
+      <tr><td>Clipboard manager + emoji picker</td><td><span class="badge adapt">adapt</span></td><td>Extension or overlay-app + Characters</td><td>P3</td></tr>
+      <tr><td>Volume/brightness OSD</td><td><span class="badge native">native</span></td><td>GNOME OSD</td><td>P6</td></tr>
+      <tr><td>Lock + fingerprint PAM</td><td><span class="badge native">native</span></td><td>GNOME lock / fprintd</td><td>P6</td></tr>
+      <tr><td>Video wallpaper / lockfeed (owe)</td><td><span class="badge defer">defer</span></td><td>Static/animated wallpaper first</td><td>P9</td></tr>
+      <tr><td>Polkit themed agent</td><td><span class="badge native">native</span></td><td>GNOME polkit</td><td>P6</td></tr>
+      <tr><td>Shell plugin add/clone/validate/marketplace</td><td><span class="badge rebuild">rebuild</span></td><td><code>gnomarchi plugin *</code> + git-add; marketplace later</td><td>P3 / P9</td></tr>
+      <tr><td>Tailscale / Dropbox bar panels</td><td><span class="badge adapt">adapt</span></td><td>Status indicators or menu modules</td><td>P5</td></tr>
+      <tr><td>Text scaling one-knob</td><td><span class="badge adapt">adapt</span></td><td>GSettings text-scaling + Ghostty + shell</td><td>P1</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>D. Theming</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Whole-desktop themes (22+)</td><td><span class="badge adapt">adapt</span></td><td>Theme packs + emitters (D7 license gate)</td><td>P1</td></tr>
+      <tr><td>24-color semantic + nvim/btop/vscode gen</td><td><span class="badge port">port</span></td><td>Reuse generator idea; GTK/Shell emitters</td><td>P1</td></tr>
+      <tr><td>Theme / background carousel UI</td><td><span class="badge rebuild">rebuild</span></td><td>GTK picker + gsettings wallpaper</td><td>P1</td></tr>
+      <tr><td>Theme sync to agents</td><td><span class="badge port">port</span></td><td>Write harness skin files on theme set</td><td>P1/P5</td></tr>
+      <tr><td><code>shell.toml</code> machine overrides</td><td><span class="badge adapt">adapt</span></td><td><code>~/.config/gnomarchi/shell.toml</code></td><td>P1</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>E. Hotkeys, menu, discoverability</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Super+Space unified menu</td><td><span class="badge rebuild">rebuild</span></td><td>GTK palette</td><td>P2</td></tr>
+      <tr><td>App launch hotkeys (terminal/browser/…)</td><td><span class="badge adapt">adapt</span></td><td>Custom shortcuts → Ghostty/Chromium/…</td><td>P4</td></tr>
+      <tr><td>Tiling navigation chord set</td><td><span class="badge defer">defer</span></td><td>D1; optional profile</td><td>P9+</td></tr>
+      <tr><td>Super+K keybinding cheatsheet</td><td><span class="badge port">port</span></td><td>Viewer from single YAML source of truth</td><td>P4</td></tr>
+      <tr><td>Unified Super+C/V clipboard</td><td><span class="badge adapt">adapt</span></td><td>Shortcuts + Ghostty config</td><td>P4</td></tr>
+      <tr><td>XCompose quick emoji / name-email</td><td><span class="badge port">port</span></td><td><code>~/.XCompose</code></td><td>P4</td></tr>
+      <tr><td>Menu JSONC extensions</td><td><span class="badge port">port</span></td><td><code>~/.config/gnomarchi/extensions/</code></td><td>P2</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>F. Capture / media / dictation</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Screenshot / region / window</td><td><span class="badge native">native</span></td><td>GNOME Screenshot + wrappers</td><td>P4</td></tr>
+      <tr><td>Screenrecord + webcam PiP</td><td><span class="badge adapt">adapt</span></td><td>GNOME recorder / OBS; PiP best-effort</td><td>P4</td></tr>
+      <tr><td>OCR / QR / color picker</td><td><span class="badge port">port</span></td><td>tesseract / zbar / Eyedropper scripts</td><td>P4</td></tr>
+      <tr><td>Dictation / push-to-talk</td><td><span class="badge port">port</span></td><td>Superwhisper/Voxtype bindings</td><td>P5</td></tr>
+      <tr><td>yt-dlp page download helper</td><td><span class="badge port">port</span></td><td>Extension or script</td><td>P5</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>G. Agents &amp; AI</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>mise lazy agent CLIs</td><td><span class="badge port">port</span></td><td>Same</td><td>P5</td></tr>
+      <tr><td>Default agent + hotkey / <code>a</code></td><td><span class="badge port">port</span></td><td><code>gnomarchi agent</code></td><td>P5</td></tr>
+      <tr><td>Agents panel + usage meters</td><td><span class="badge rebuild">rebuild</span></td><td>GTK Agents window (+ optional indicator)</td><td>P5</td></tr>
+      <tr><td>Make something (theme/plugin/app)</td><td><span class="badge rebuild">rebuild</span></td><td>Menu + skills + scaffolds</td><td>P1–P5</td></tr>
+      <tr><td>Multi-account / autoswitch</td><td><span class="badge port">port</span></td><td>Port CLI flows</td><td>P5</td></tr>
+      <tr><td>Crash → agent diagnose</td><td><span class="badge port">port</span></td><td>coredump watcher + skill</td><td>P5</td></tr>
+      <tr><td>Omarchy OS / app / plugin skills</td><td><span class="badge adapt">adapt</span></td><td><code>gnomarchi-*</code> skills for GNOME paths</td><td>P1–P5</td></tr>
+      <tr><td>Desktop AI apps menu (ChatGPT, …)</td><td><span class="badge port">port</span></td><td>Install &gt; AI entries</td><td>P5</td></tr>
+      <tr><td>Local LLM (Ollama / LM Studio)</td><td><span class="badge port">port</span></td><td>Install menu</td><td>P5</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>H. Dev tools &amp; apps</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Omarchy feature</th><th>Status</th><th>Gnomarchi path</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Neovim / LazyVim stack</td><td><span class="badge port">port</span></td><td>Default editor (D6)</td><td>P6</td></tr>
+      <tr><td>mise languages / Install &gt; Dev</td><td><span class="badge port">port</span></td><td>Menu modules</td><td>P5</td></tr>
+      <tr><td>Docker / lazygit / tmux / herdr</td><td><span class="badge port">port</span></td><td>Same</td><td>P5</td></tr>
+      <tr><td>Foot terminal</td><td><span class="badge adapt">adapt</span></td><td>Ghostty default; Foot optional</td><td>P6</td></tr>
+      <tr><td>Nautilus + sushi</td><td><span class="badge native">native</span></td><td>Already GNOME</td><td>P6</td></tr>
+      <tr><td>Omawrite / Omacut / Omacalc</td><td><span class="badge adapt">adapt</span></td><td>Keep if usable/licensed or GTK replacements via gnomarchi-app</td><td>P5</td></tr>
+      <tr><td>omarchy-app Qt skill</td><td><span class="badge adapt">adapt</span></td><td>gnomarchi-app GTK4/libadwaita (Qt optional)</td><td>P5</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="registry">
+  <h2>Future improvements — mapping path</h2>
+  <p>Omarchy will keep shipping features. Gnomarchi tracks them without guessing:</p>
+
+  <h3>1. Living registry (source of truth for parity)</h3>
+  <p>Add <code>features/registry.yaml</code> (generated table in docs optional). Each row:</p>
+<pre><code>- id: omarchy.shell.plugin-system
+  omarchy_refs: ["manual/shell-plugins", "v4.0.0"]
+  title: Shell plugin add/clone/validate
+  status: rebuild          # native|port|adapt|rebuild|defer
+  gnomarchi_path: "plugin/ lifecycle + adapters"
+  phase: P3
+  defer_reason: null
+  last_reviewed: 2026-10-20
+  upstream_notes: ""
+</code></pre>
+
+  <h3>2. Sync process (every Omarchy release)</h3>
+  <ol>
+    <li>Read Omarchy release notes / manual changelog.</li>
+    <li>Diff against <code>features/registry.yaml</code> ids.</li>
+    <li>Add rows for new features (<code>status: triage</code> → then assign).</li>
+    <li>Bump <code>last_reviewed</code>; open plan tasks for <code>port|adapt|rebuild</code>.</li>
+    <li>Never delete rows; mark <code>defer</code> or <code>wont</code> with reason tied to D1–D7.</li>
+  </ol>
+
+  <h3>3. Agent-assisted sync</h3>
+  <p>Skill <code>gnomarchi-upstream-sync</code> (post-P5): given release notes URL/text, propose registry diffs; human confirms before merge.</p>
+
+  <h3>4. Improvement backlog buckets</h3>
+  <ul>
+    <li><strong>Parity gap</strong> — Omarchy has it; our status ≠ native/port done.</li>
+    <li><strong>GNOME-native win</strong> — we inherit upstream GNOME improvements “for free”; note in registry.</li>
+    <li><strong>D1-blocked</strong> — tiling/bar chrome; revisit only if identity decision changes.</li>
+  </ul>
+</section>
+
+<section id="architecture">
+  <h2>Architecture (execution shape)</h2>
+<pre><code>gnomarchi/
+  bin/gnomarchi
+  bus/                 # gnomarchi-bus (D-Bus)
+  menu/                # GTK palette + JSONC
+  theme/               # apply/validate/emitters
+  plugin/adapters/     # overlay, menu, service, indicator, extension
+  skills/ + templates/
+  features/registry.yaml
+  install/             # overlay stages
+  iso/                 # later
+  packaging/           # repo + AUR
+</code></pre>
+</section>
+
+<section id="phases">
+  <h2>Phases</h2>
+  <ul class="checklist">
+    <li>P0 — Contracts: manifest, theme schema, state dirs, CLI stubs, seed <code>features/registry.yaml</code> from this matrix</li>
+    <li>P1 — Theme engine + skill + minimal packs (license gate for Omarchy vendoring)</li>
+    <li>P2 — Menu + menu-module runtime</li>
+    <li>P3 — Plugin lifecycle (overlay-app + user-service + validate/clone/add)</li>
+    <li>P4 — Hotkeys, cheatsheet, capture wrappers, Settings deep links</li>
+    <li>P5 — Agents stack, Make something, gnomarchi-app, crash skill</li>
+    <li>P6 — Overlay installer + pacman repo wiring + defaults (Ghostty/nvim/Chromium)</li>
+    <li>P7 — Optional Shell-extension adapter (narrow)</li>
+    <li>P8 — ISO</li>
+    <li>P9 — Marketplace, Windows VM, deferred chrome (bar/tiling/video wallpaper), upstream-sync skill</li>
+  </ul>
+</section>
+
+<section id="acceptance">
+  <h2>Acceptance (ideate → plan ready)</h2>
+  <ul class="checklist">
+    <li>Every matrix row has status + phase (no silent omissions)</li>
+    <li>D1–D7 appear in this plan and in <code>.guild/spec/gnomarchi-v1.md</code></li>
+    <li>Registry sync process documented (this section)</li>
+    <li>Next command: <code>/guild:plan</code> to turn P0–P6 into executable tasks</li>
+  </ul>
+</section>
+
+<section id="spec">
+  <h2>Spec pointer</h2>
+  <p>Guild planning contract: <code>.guild/spec/gnomarchi-v1.md</code>. Assumptions: <code>.guild/runs/run-20261020-143729-ideate/assumptions.md</code>.</p>
+  <div class="callout warn">
+    <p><strong>Approve this ideate output</strong> to proceed to <code>/guild:plan</code>. If you want tiling-first or Quickshell hybrid after all, that reopens D1 and reshapes the matrix.</p>
+  </div>
+</section>
+</main>
+</div>
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#toc a')), map={};
+  links.forEach(function(a){var el=document.getElementById(a.getAttribute('href').slice(1)); if(el) map[a.getAttribute('href').slice(1)]=a;});
+  var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){links.forEach(function(l){l.classList.remove('active')}); if(map[e.target.id]) map[e.target.id].classList.add('active');}});},{rootMargin:'-10% 0px -80% 0px'});
+  document.querySelectorAll('main section[id]').forEach(function(s){obs.observe(s);});
+})();
+</script>
+</body>
+</html>

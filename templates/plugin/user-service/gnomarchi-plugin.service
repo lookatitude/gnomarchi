@@ -1,0 +1,10 @@
+[Unit]
+Description=gnomarchi plugin PLUGIN_ID
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/true
+RemainAfterExit=yes
+
+[Install]
+WantedBy=default.target

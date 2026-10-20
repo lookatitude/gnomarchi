@@ -1,0 +1,19 @@
+schema_version: guild.learning_checkpoint.v1
+phase: planning
+run_id: run-20261020-144240-plan
+evidence_ref: .guild/plan/gnomarchi-v1.md
+decided_at: "2026-10-20T14:56:00Z"
+targets:
+  skill_gap: none
+  skill_drift: none
+  agent_gap: none
+  agent_drift: none
+  hook_gap: none
+  command_gap: none
+  wiki_candidate: none
+  decision_candidate: none
+  index_stale: none
+  capability_candidate: none
+  eval_gap: none
+  reflection_note: none
+knowledge_links: []

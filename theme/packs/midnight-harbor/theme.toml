@@ -1,0 +1,9 @@
+[theme]
+id = "midnight-harbor"
+name = "Midnight Harbor"
+version = "0.1.0"
+description = "Original gnomarchi pack: deep coastal night, cool accents."
+
+[provenance]
+kind = "original-inspired"
+note = "Palette inspired by coastal night schemes; not derived from Omarchy theme files. Not affiliated with Omarchy or Basecamp."

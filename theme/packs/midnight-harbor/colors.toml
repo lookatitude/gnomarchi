@@ -1,0 +1,8 @@
+[colors]
+background = "#0b1220"
+foreground = "#e8eef7"
+accent = "#3d8bfd"
+surface = "#121a2b"
+muted = "#8b9bb4"
+danger = "#e35d6a"
+success = "#3ecf8e"
