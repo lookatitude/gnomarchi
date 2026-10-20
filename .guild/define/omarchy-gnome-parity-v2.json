@@ -1,0 +1,63 @@
+{
+  "schema_version": "guild.define.v1",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "text": "Feature registry lists every Omarchy quattro shell plugin, bar widget/indicator, panel, theme pack, theme/bg CLI family, and Style-menu action with status port|adapt|rebuild|done|defer|triage and gnomarchi_path."
+    },
+    {
+      "id": "AC-2",
+      "text": "Overlay installs and enables user-themes plus appindicator and first-party gnomarchi extensions; gnome-tweaks remains available; enablement survives GDM restart on the test VM."
+    },
+    {
+      "id": "AC-3",
+      "text": "A visual theme picker (menu Style > Theme and Super+Ctrl+T equivalent) lists all packs with preview, applies via gnomarchi theme set, and refreshes GTK/Ghostty/nvim/btop/Chromium/Shell CSS/wallpaper like Omarchy theme-set."
+    },
+    {
+      "id": "AC-4",
+      "text": "Background picker (Style > Background / Super+Ctrl+W equivalent) cycles stills for the active theme using generated or licensed assets only (no Omarchy binary walls)."
+    },
+    {
+      "id": "AC-5",
+      "text": "Panel chips for agents, weather, system-update, and tailscale remain visible; Agents window and unified menu Style tree expose theme/background actions."
+    },
+    {
+      "id": "AC-6",
+      "text": "VM validation checklist covers every visually checkable shipped feature; each item has a screenshot under docs/screenshots/parity-v2/ with pass/fail recorded."
+    }
+  ],
+  "user_stories": [
+    "As a gnomarchi user on stock GNOME, I open Style > Theme and pick a pack the way Omarchy does, and the whole desktop restyles.",
+    "As an installer, overlay gives me user-themes and tray extensions without hand-enabling.",
+    "As a maintainer, the registry tells me exactly what Omarchy surface is still missing and how we adapt it under D1′.",
+    "As QA, I run the VM checklist and attach screenshots for every visual feature."
+  ],
+  "non_goals": [
+    "No Quickshell or Hyprland session",
+    "No vendoring Omarchy binary backgrounds, unlocks, or app marks without CREDITS",
+    "No full OWE video-wallpaper engine in this wave",
+    "No Omarchy ISO/gaming/Windows-VM (P8/P9) in this wave",
+    "No claim of official Omarchy affiliation"
+  ],
+  "risks": [
+    "Shell CSS via user-themes breaks after GNOME minor bumps",
+    "Extension enable races on GDM restart",
+    "D7 branding if previews look too Omarchy-official"
+  ],
+  "affected_surfaces": [
+    "install/overlay.sh",
+    "apps/theme-picker/**",
+    "theme/** emitters",
+    "menu/default.jsonc Style tree",
+    "plugins/first-party/**",
+    "features/registry.yaml",
+    "docs/plans/**",
+    "docs/screenshots/parity-v2/**",
+    "tests/**"
+  ],
+  "test_implications": [
+    "Unit: theme list/set, extension metadata shell-version includes host",
+    "Integration: overlay dry-run lists user-themes + appindicator",
+    "VM visual: checklist AC-6 with screenshots for theme carousel, wallpaper, panel chips, menu Style, Agents, Ghostty palette"
+  ]
+}

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=gnoma-signed
+GenericName=PDF Annotate
+Comment=Fill and annotate PDFs (Omarchy Signed parity)
+Exec=gnomarchi app signed
+Icon=x-office-document
+Terminal=false
+Categories=Office;Viewer;
+MimeType=application/pdf;
+StartupNotify=true

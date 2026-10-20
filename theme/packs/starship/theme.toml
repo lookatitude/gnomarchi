@@ -1,0 +1,9 @@
+[theme]
+id = "starship"
+name = "Starship"
+version = "1.0.0"
+
+[provenance]
+inspired_by = "Omarchy MIT colors.toml / graphics (quattro)"
+official_omarchy = false
+note = "Not affiliated with Omarchy or Basecamp. Graphics copied with CREDITS; logos replaced with gnomarchi brand."

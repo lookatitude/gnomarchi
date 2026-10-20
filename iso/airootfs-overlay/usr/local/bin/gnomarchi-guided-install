@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Live ISO guided install — finishes with install/overlay.sh on the target root.
+# Does not wipe disks; uses archinstall or an existing pacstrapped root.
+set -euo pipefail
+
+GNOMARCHI_SHARE="${GNOMARCHI_SHARE:-/usr/share/gnomarchi}"
+TARGET="${1:-/mnt}"
+AUTO="${GNOMARCHI_ISO_AUTO:-0}"
+
+log() { printf '[gnomarchi-iso] %s\n' "$*"; }
+die() { printf '[gnomarchi-iso] ERROR: %s\n' "$*" >&2; exit 1; }
+
+[[ "$(id -u)" -eq 0 ]] || die "run as root on the live ISO"
+
+cat <<'BANNER'
+────────────────────────────────────────────────────────────
+  gnomarchi guided install
+
+  1. Install a base Arch system into a mountpoint (default /mnt)
+     via archinstall, or: pacstrap /mnt base linux linux-firmware
+  2. This script copies gnomarchi and runs install/overlay.sh in chroot.
+  3. Updates later: gnomarchi update → sudo pacman -Syu (official Arch).
+────────────────────────────────────────────────────────────
+BANNER
+
+if [[ ! -d "${TARGET}/etc" ]]; then
+  if command -v archinstall >/dev/null 2>&1 && [[ "${AUTO}" != "1" ]]; then
+    log "no system at ${TARGET}; launching archinstall (exit when root is at ${TARGET})"
+    archinstall || true
+  fi
+fi
+
+[[ -d "${TARGET}/etc" ]] || die "no installed root at ${TARGET}; pacstrap or archinstall first"
+[[ -d "${GNOMARCHI_SHARE}/install" ]] || die "missing ${GNOMARCHI_SHARE}/install (rebuild ISO with iso/bootstrap-from-releng.sh)"
+
+DEST_TREE="${TARGET}/usr/share/gnomarchi"
+log "sync gnomarchi → ${DEST_TREE}"
+mkdir -p "${DEST_TREE}"
+rsync -a --delete "${GNOMARCHI_SHARE}/" "${DEST_TREE}/"
+
+# Ensure chroot can resolve DNS
+if [[ -e /etc/resolv.conf ]]; then
+  cp -L /etc/resolv.conf "${TARGET}/etc/resolv.conf" 2>/dev/null || true
+fi
+
+OVERLAY="${DEST_TREE}/install/overlay.sh"
+[[ -x "${OVERLAY}" || -f "${OVERLAY}" ]] || die "overlay missing at ${OVERLAY}"
+chmod +x "${OVERLAY}" "${DEST_TREE}/install/"*.sh 2>/dev/null || true
+
+log "running overlay.sh in chroot (${TARGET})"
+if [[ "${AUTO}" == "1" ]]; then
+  arch-chroot "${TARGET}" env \
+    GNOMARCHI_ROOT=/usr/share/gnomarchi \
+    GNOMARCHI_SKIP_CONFIRM=1 \
+    bash /usr/share/gnomarchi/install/overlay.sh all
+else
+  arch-chroot "${TARGET}" env \
+    GNOMARCHI_ROOT=/usr/share/gnomarchi \
+    bash /usr/share/gnomarchi/install/overlay.sh all
+fi
+
+# Symlink CLI onto PATH in target
+if [[ -f "${DEST_TREE}/bin/gnomarchi" ]]; then
+  mkdir -p "${TARGET}/usr/local/bin"
+  ln -sf /usr/share/gnomarchi/bin/gnomarchi "${TARGET}/usr/local/bin/gnomarchi"
+fi
+
+log "done. umount -R ${TARGET} and reboot; then gnomarchi update for Arch upgrades."

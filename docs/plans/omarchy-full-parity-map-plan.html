@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gnomarchi — Omarchy full parity map &amp; implementation plan</title>
+<style>
+  :root {
+    --bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb;
+    --accent-soft:#eff4ff;--code-bg:#f4f5f7;--code-fg:#1a1d21;--note:#2563eb;--tip:#059669;
+    --warn:#d97706;--danger:#dc2626;--success:#059669;--shadow:0 1px 3px rgba(16,24,40,.08);
+    --maxw:64rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;
+      --accent-soft:#16233a;--code-bg:#161b22;--code-fg:#e6e8eb;--note:#6ea8ff;--tip:#34d399;
+      --warn:#fbbf24;--danger:#f87171;--success:#34d399;--shadow:0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .layout{display:grid;grid-template-columns:15rem minmax(0,1fr);max-width:86rem;margin:0 auto}
+  aside{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:2rem 1.1rem;border-right:1px solid var(--border);font-size:.88rem}
+  .toc-title{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
+  aside nav a{display:block;color:var(--muted);text-decoration:none;padding:.24rem 0;border-left:2px solid transparent;padding-left:.55rem}
+  aside nav a:hover{color:var(--fg)}
+  aside nav a.lvl-3{padding-left:1.25rem;font-size:.82rem}
+  aside nav a.active{color:var(--accent);border-left-color:var(--accent)}
+  main{padding:2.4rem clamp(1.2rem,4vw,3.2rem);max-width:var(--maxw)}
+  .doc-title{font-size:2rem;line-height:1.15;margin:0 0 .35rem;letter-spacing:-.02em}
+  .doc-subtitle{color:var(--muted);margin:0 0 1rem}
+  .doc-meta{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1.5rem}
+  .chip{font-size:.78rem;padding:.2rem .55rem;border-radius:999px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+  .chip.status-review{color:var(--note);border-color:color-mix(in srgb,var(--note) 40%,transparent)}
+  h2{font-size:1.4rem;margin:2.3rem 0 .85rem;scroll-margin-top:1rem}
+  h3{font-size:1.08rem;margin:1.5rem 0 .55rem;scroll-margin-top:1rem}
+  a{color:var(--accent)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+  pre{background:var(--code-bg);padding:1rem;border-radius:8px;overflow-x:auto;border:1px solid var(--border);font-size:.84rem}
+  .table-wrap{overflow-x:auto;margin:1rem 0}
+  table{border-collapse:collapse;width:100%;font-size:.88rem}
+  th,td{text-align:left;padding:.5rem .65rem;border-bottom:1px solid var(--border);vertical-align:top}
+  thead th{background:var(--card);font-weight:600;border-bottom:2px solid var(--border)}
+  tbody tr:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+  .s-done{color:var(--success);font-weight:600}
+  .s-adapt{color:var(--note);font-weight:600}
+  .s-port{color:var(--warn);font-weight:600}
+  .s-rebuild{color:var(--danger);font-weight:600}
+  .s-triage{color:var(--muted);font-weight:600}
+  .s-defer{color:var(--muted)}
+  .callout{display:grid;grid-template-columns:1.3rem 1fr;gap:.5rem;margin:1.1rem 0;padding:.75rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--card)}
+  .callout.note{border-left:3px solid var(--note)}
+  .callout.warn{border-left:3px solid var(--warn)}
+  .callout.tip{border-left:3px solid var(--tip)}
+  .callout p:first-child{margin-top:0}.callout p:last-child{margin-bottom:0}
+  .grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));margin:1rem 0}
+  .card{border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;background:var(--card)}
+  .card h3{margin-top:0}
+  ul.checklist{list-style:none;padding-left:0}
+  ul.checklist li{padding-left:1.8rem;position:relative;margin:.35rem 0}
+  ul.checklist li::before{content:"☐";position:absolute;left:0;color:var(--muted)}
+  details{border:1px solid var(--border);border-radius:8px;padding:.35rem 1rem;margin:1rem 0;background:var(--card)}
+  summary{cursor:pointer;font-weight:600;padding:.45rem 0}
+  .badge{display:inline-block;font-size:.72rem;padding:.1rem .4rem;border-radius:4px;background:var(--accent-soft);color:var(--accent);margin-right:.25rem}
+  @media(max-width:52rem){.layout{grid-template-columns:1fr}aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="toc-title">On this page</div>
+  <nav id="toc">
+    <a href="#verdict">Verdict</a>
+    <a href="#d1">D1′ host model</a>
+    <a href="#inventory">Omarchy inventory</a>
+    <a href="#matrix" class="lvl-3">Port matrix</a>
+    <a href="#themes" class="lvl-3">Themes &amp; Style UX</a>
+    <a href="#extensions" class="lvl-3">Default extensions</a>
+    <a href="#lanes">Implementation lanes</a>
+    <a href="#team">Team</a>
+    <a href="#vm">VM visual checklist</a>
+    <a href="#gate">Gate</a>
+  </nav>
+</aside>
+<main>
+<header class="doc">
+  <h1 class="doc-title">Omarchy → gnomarchi full parity map</h1>
+  <p class="doc-subtitle">Deep surface inventory (Omarchy <code>quattro</code>), port/adapt/rebuild decisions under stock GNOME, lane plan, team, and screenshot-backed VM checklist.</p>
+  <div class="doc-meta">
+    <span class="chip status-review">● Review — awaiting team approve</span>
+    <span class="chip">2026-10-20</span>
+    <span class="chip">run-20261020-172227-guild</span>
+    <span class="chip">spec: omarchy-gnome-parity-v2</span>
+  </div>
+</header>
+
+<section id="verdict">
+  <h2>Verdict</h2>
+  <p>Prior wave shipped agents stack, StatusNotifier chips, menu Style stubs, and CLI theme apply. Gaps that still block Omarchy-like daily use: <strong>user-themes + default extension set</strong>, a <strong>visual theme/background carousel</strong> (not TTY list), registry rows for the full <code>quattro</code> plugin/panel/CLI surface, and a <strong>screenshot matrix on the test VM</strong>.</p>
+  <div class="callout note"><span>!</span><div><p>Disposition codes: <span class="s-done">done</span> · <span class="s-adapt">adapt</span> (GNOME equivalent) · <span class="s-port">port</span> (logic reuse) · <span class="s-rebuild">rebuild</span> (new under D1′) · <span class="s-defer">defer</span> · <span class="s-triage">triage</span> (D7).</div></div>
+</section>
+
+<section id="d1">
+  <h2>D1′ host model</h2>
+  <div class="grid">
+    <div class="card"><h3>Omarchy</h3><p>Single Quickshell process: bar + menu + notifications + OSD + lock + plugins.</p></div>
+    <div class="card"><h3>gnomarchi</h3><p>GNOME Shell panel host + AppIndicator/StatusNotifier + optional Shell chips + GTK overlays + <code>gnomarchi-bus</code> + theme emitters.</p></div>
+  </div>
+  <p>Forbidden: Hyprland, Quickshell bar, SDDM. Allowed: GNOME extensions with explicit enable; GTK4/libadwaita apps; generated wallpapers.</p>
+</section>
+
+<section id="inventory">
+  <h2>Omarchy <code>quattro</code> inventory</h2>
+  <p>Source: GitHub <code>basecamp/omarchy</code> tree <code>quattro</code> (recursive) + manuals 05/06/39.</p>
+  <ul>
+    <li><strong>17</strong> shell plugin dirs: agents, background, bar, clipboard, dev-gallery, dock, emojis, image-picker, lock, menu, notifications, osd, panels, polkit, reminders, services (+ README).</li>
+    <li><strong>23</strong> theme packs with <code>colors.toml</code>.</li>
+    <li><strong>8</strong> bar widgets + <strong>7</strong> indicators + <strong>13</strong> panel families.</li>
+    <li><strong>535</strong> <code>bin/omarchy-*</code> helpers; theme/bg family is the Style UX core.</li>
+    <li><strong>20</strong> <code>default/themed/*.tpl</code> emitters (subset already in gnomarchi).</li>
+  </ul>
+
+  <h3 id="matrix">Port matrix (every surface)</h3>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Omarchy surface</th><th>Disposition</th><th>gnomarchi action</th><th>Lane</th></tr></thead>
+    <tbody>
+      <tr><td colspan="4"><em>Shell plugins</em></td></tr>
+      <tr><td>bar (Quickshell strip)</td><td class="s-adapt">adapt</td><td>GNOME top bar + indicator order in <code>shell.toml</code>; no edge-drag in this wave</td><td>architect</td></tr>
+      <tr><td>bar/widgets ActiveWindow</td><td class="s-adapt">adapt</td><td>GNOME overview / window menu — document; no custom chip</td><td>architect</td></tr>
+      <tr><td>bar/widgets Workspaces</td><td class="s-adapt">adapt</td><td>GNOME dynamic workspaces; optional PaperWM later</td><td>defer P5</td></tr>
+      <tr><td>bar/widgets Tray</td><td class="s-done">done</td><td>AppIndicator extension</td><td>—</td></tr>
+      <tr><td>bar/widgets SystemUpdate</td><td class="s-done">done</td><td><code>gnomarchi.system-update</code> indicator</td><td>—</td></tr>
+      <tr><td>bar/widgets Microphone / Spacer / KeyboardLayout</td><td class="s-adapt">adapt</td><td>GNOME Quick Settings; KeyboardLayout when multi-layout</td><td>backend</td></tr>
+      <tr><td>bar/indicators Dnd NightLight StayAwake ScreenRecording Reminder RemoteSession PasswordlessSudo</td><td class="s-adapt">adapt</td><td>Map to GNOME QS / caffeine / screen-cast; Reminder → menu Trigger</td><td>backend</td></tr>
+      <tr><td>agents + Agents panel</td><td class="s-done">done</td><td>Agents window + panel chip + StatusNotifier</td><td>—</td></tr>
+      <tr><td>background + OWE video</td><td class="s-rebuild">rebuild</td><td>Stills via emitters + bg picker; video <span class="s-defer">defer</span></td><td>frontend+backend</td></tr>
+      <tr><td>menu</td><td class="s-done">done</td><td>GTK menu from <code>menu/default.jsonc</code>; extend Style tree</td><td>frontend</td></tr>
+      <tr><td>notifications / osd / lock / polkit</td><td class="s-adapt">adapt</td><td>GNOME native; themed CSS via user-themes</td><td>backend</td></tr>
+      <tr><td>panels audio/network/bluetooth/power/display/clock/elsewhen/weather/tailscale/dropbox/…</td><td class="s-adapt">adapt</td><td>GNOME QS + first-party chips where shipped; Dropbox/speedtest <span class="s-defer">defer</span></td><td>backend</td></tr>
+      <tr><td>clipboard / reminders / dictation / dock / emojis / image-picker / dev-gallery</td><td class="s-port">port</td><td>Menu modules + optional indicators; clipboard→GNOME clipboard history if present</td><td>backend</td></tr>
+      <tr><td>services (installable widgets)</td><td class="s-adapt">adapt</td><td>plugin lifecycle already; Tailscale done</td><td>—</td></tr>
+      <tr><td colspan="4"><em>Style / themes</em></td></tr>
+      <tr><td>22 themes + carousel Super+Ctrl+T</td><td class="s-rebuild">rebuild</td><td>GTK Adwaita carousel; wire <code>gnomarchi theme set</code>; ship ≥10 packs + grow to 22 inspired palettes</td><td>frontend</td></tr>
+      <tr><td>Per-theme backgrounds Super+Ctrl+W</td><td class="s-rebuild">rebuild</td><td>Bg switcher CLI + menu; generated/licensed stills only</td><td>backend+frontend</td></tr>
+      <tr><td>theme-set-* emitters (ghostty nvim btop chromium gnome fcitx5 …)</td><td class="s-adapt">adapt</td><td>Extend emitters; Hyprland/keyboard-RGB templates skip</td><td>backend</td></tr>
+      <tr><td>Unlock / boot decrypt art</td><td class="s-triage">triage</td><td>Out — Plymouth later</td><td>—</td></tr>
+      <tr><td>Omarchy binary walls / marks</td><td class="s-triage">triage</td><td>D7 — never vendor</td><td>security note</td></tr>
+      <tr><td colspan="4"><em>Default GNOME extensions</em></td></tr>
+      <tr><td>user-themes</td><td class="s-rebuild">rebuild</td><td>Package <code>gnome-shell-extensions</code>; enable UUID <code>user-theme@gnome-shell-extensions.gcampax.github.com</code>; point at emitted Shell CSS</td><td>devops+backend</td></tr>
+      <tr><td>AppIndicator</td><td class="s-done">done</td><td>Already in overlay</td><td>—</td></tr>
+      <tr><td>gnomarchi.agents-panel</td><td class="s-done">done</td><td>Keep shell-version 45–51</td><td>—</td></tr>
+      <tr><td>Optional: caffeine / dash-to-panel / vitals</td><td class="s-defer">defer</td><td>Install menu only; not default</td><td>—</td></tr>
+      <tr><td colspan="4"><em>Agents / CLI / install</em></td></tr>
+      <tr><td>omarchy-agent* / mise / usage / accounts / crash</td><td class="s-done">done</td><td>agent/* + overlay agents stage</td><td>—</td></tr>
+      <tr><td>Unified menu Install/Setup/Style/Trigger</td><td class="s-adapt">adapt</td><td>Fill Style Theme/Background/Font entries with real actions</td><td>frontend</td></tr>
+      <tr><td>Overlay install</td><td class="s-adapt">adapt</td><td>Add <code>gnome-shell-extensions</code>; enable user-themes after GDM</td><td>devops</td></tr>
+      <tr><td>ISO / gaming / Windows VM</td><td class="s-defer">defer</td><td>P8/P9</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 id="themes">Theme &amp; Style UX (Omarchy parity target)</h3>
+  <p>Omarchy: <em>Appearance → Theme</em> / <code>Super+Ctrl+T</code> carousel of 22 themes; each restyles desktop, terminal, nvim, btop, Chromium, shell chrome; <code>Super+Ctrl+W</code> cycles theme backgrounds; extras via omarchy.org/themes.</p>
+  <p>gnomarchi today: CLI/list theme picker + emitters for a subset of packs. <strong>This wave</strong> ships a GTK4/libadwaita picker with preview swatches, keyboard next/prev, menu + keybinding hooks, and a background cycle command wired into Style.</p>
+
+  <h3 id="extensions">Default extensions package set</h3>
+  <pre><code>gnome-shell-extensions          # includes user-theme@…
+gnome-shell-extension-appindicator
+gnome-tweaks
+# first-party: gnomarchi.agents-panel (+ StatusNotifier plugins)</code></pre>
+  <p>Enable sequence (overlay post-GNOME): install → copy first-party → <code>gnome-extensions enable</code> / gsettings enabled-extensions → GDM restart → verify state ENABLED.</p>
+</section>
+
+<section id="lanes">
+  <h2>Implementation lanes</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>ID</th><th>Lane</th><th>Deliverable</th><th>Depends</th></tr></thead>
+    <tbody>
+      <tr><td>L0</td><td>researcher</td><td>Freeze inventory → registry rows for every matrix line; D7 note on walls</td><td>—</td></tr>
+      <tr><td>L1</td><td>architect</td><td>Update ADR/shell.toml contracts; Style keybinding map; extension enable contract</td><td>L0</td></tr>
+      <tr><td>L2</td><td>devops</td><td>overlay: <code>gnome-shell-extensions</code>; enable user-themes + appindicator; VM sync path</td><td>L1</td></tr>
+      <tr><td>L3</td><td>backend</td><td>theme bg CLI; Shell CSS emit for user-themes; emitter gaps; Style bus actions</td><td>L1</td></tr>
+      <tr><td>L4</td><td>frontend</td><td>GTK theme carousel + bg picker; menu Style bindings; Super+Ctrl+T/W via GNOME custom keys</td><td>L3</td></tr>
+      <tr><td>L5</td><td>qa</td><td>VM checklist below; capture <code>docs/screenshots/parity-v2/*</code>; unit/integration pass</td><td>L2–L4</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="checklist">
+    <li>Registry 100% coverage of matrix rows</li>
+    <li>user-themes ENABLED on VM after overlay</li>
+    <li>Visual theme picker applies tokyo-night-class pack and Ghostty colors change</li>
+    <li>Background cycle changes desktop wallpaper</li>
+    <li>Every V-* checklist row has a screenshot</li>
+  </ul>
+</section>
+
+<section id="team">
+  <h2>Proposed team (≤6)</h2>
+  <div class="grid">
+    <div class="card"><h3>researcher-1</h3><p>Inventory fidelity + D7.</p></div>
+    <div class="card"><h3>architect-1</h3><p>Contracts + registry ownership.</p></div>
+    <div class="card"><h3>backend-1</h3><p>Emitters, bg CLI, enable helpers.</p></div>
+    <div class="card"><h3>frontend-1</h3><p>Carousel + Style menu.</p></div>
+    <div class="card"><h3>devops-1</h3><p>Overlay packages + VM.</p></div>
+    <div class="card"><h3>qa-1</h3><p>Screenshot checklist.</p></div>
+  </div>
+  <p>Excluded this phase: mobile, marketing, sales, seo, copywriter, social-media, advisor/developer (machinery), security (no new plugin-trust surface; D7 covered by researcher+architect).</p>
+  <p>Schedule: researcher → architect → (backend ∥ frontend ∥ devops) → qa.</p>
+</section>
+
+<section id="vm">
+  <h2>VM visual validation checklist</h2>
+  <p>Host: QEMU test VM · SSH <code>:2222</code> · VNC <code>:5901</code> · repo via 9p <code>/mnt/gnomarchi</code>. Capture to <code>docs/screenshots/parity-v2/&lt;id&gt;.png</code>.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>ID</th><th>Visual check</th><th>How</th><th>Shot</th></tr></thead>
+    <tbody>
+      <tr><td>V-01</td><td>GNOME Shell session (not Hyprland)</td><td>login + <code>echo $XDG_CURRENT_DESKTOP</code></td><td>desktop-overview</td></tr>
+      <tr><td>V-02</td><td>AppIndicator tray present</td><td>panel right cluster</td><td>panel-tray</td></tr>
+      <tr><td>V-03</td><td>user-themes ENABLED</td><td>Extensions app / <code>gnome-extensions info</code></td><td>ext-user-themes</td></tr>
+      <tr><td>V-04</td><td>agents-panel chip visible</td><td>panel</td><td>panel-agents-chip</td></tr>
+      <tr><td>V-05</td><td>weather indicator</td><td>panel</td><td>panel-weather</td></tr>
+      <tr><td>V-06</td><td>system-update indicator</td><td>panel (or idle icon)</td><td>panel-update</td></tr>
+      <tr><td>V-07</td><td>tailscale indicator</td><td>panel when configured</td><td>panel-tailscale</td></tr>
+      <tr><td>V-08</td><td>Unified menu opens</td><td>launcher / key</td><td>menu-root</td></tr>
+      <tr><td>V-09</td><td>Style → Theme opens carousel</td><td>menu</td><td>style-theme-carousel</td></tr>
+      <tr><td>V-10</td><td>Apply theme A → GTK chrome changes</td><td>pick pack</td><td>theme-a-gtk</td></tr>
+      <tr><td>V-11</td><td>Ghostty palette matches theme A</td><td>open Ghostty</td><td>theme-a-ghostty</td></tr>
+      <tr><td>V-12</td><td>Apply theme B → distinct from A</td><td>second pack</td><td>theme-b-gtk</td></tr>
+      <tr><td>V-13</td><td>Wallpaper / generated bg for theme</td><td>desktop</td><td>theme-a-wallpaper</td></tr>
+      <tr><td>V-14</td><td>Background cycle changes image</td><td>Style → Background / hotkey</td><td>bg-cycle</td></tr>
+      <tr><td>V-15</td><td>Shell CSS / panel tint via user-themes</td><td>compare A vs B panel</td><td>shell-css-panel</td></tr>
+      <tr><td>V-16</td><td>Agents window</td><td>open Agents</td><td>agents-window</td></tr>
+      <tr><td>V-17</td><td>Install / Setup / Trigger menu branches</td><td>menu navigation</td><td>menu-branches</td></tr>
+      <tr><td>V-18</td><td>nvim colors after theme set</td><td>nvim in Ghostty</td><td>theme-nvim</td></tr>
+      <tr><td>V-19</td><td>btop theme file applied</td><td>btop</td><td>theme-btop</td></tr>
+      <tr><td>V-20</td><td>Chromium theme policy/file</td><td>chromium settings or file proof + UI</td><td>theme-chromium</td></tr>
+      <tr><td>V-21</td><td>Hotkey theme picker (Super+Ctrl+T equiv)</td><td>custom key</td><td>hotkey-theme</td></tr>
+      <tr><td>V-22</td><td>Hotkey background (Super+Ctrl+W equiv)</td><td>custom key</td><td>hotkey-bg</td></tr>
+      <tr><td>V-23</td><td>gnome-tweaks available</td><td>app grid</td><td>tweaks</td></tr>
+      <tr><td>V-24</td><td>No Hyprland packages</td><td><code>pacman -Q hyprland</code> fails + desktop shot</td><td>no-hyprland</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout tip"><span>✓</span><div><p>QA marks each V-* pass/fail in run receipt; failed rows block product.qa advance.</p></div></div>
+</section>
+
+<section id="gate">
+  <h2>Gate</h2>
+  <p>Team proposal: <code>.guild/runs/run-20261020-172227-guild/team-plan/plan.proposal.v1.yaml</code>. Human must <strong>approve</strong> via team-decide (never auto-approve). After approve → plan lanes → build → VM checklist.</p>
+  <details open>
+    <summary>Operator next step</summary>
+    <pre><code>node "$GUILD_PLUGIN_ROOT/runtime/scripts/team-decide.js" record \
+  --proposal .guild/runs/run-20261020-172227-guild/team-plan/plan.proposal.v1.yaml \
+  --cwd "$(pwd)" --decision approve --decided-by "$USER" --channel chat</code></pre>
+  </details>
+</section>
+</main>
+</div>
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#toc a'));
+  var map={};
+  links.forEach(function(a){var id=a.getAttribute('href').slice(1);var el=document.getElementById(id);if(el)map[id]=a;});
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){links.forEach(function(l){l.classList.remove('active');});if(map[e.target.id])map[e.target.id].classList.add('active');}});
+  },{rootMargin:'-10% 0px -80% 0px'});
+  document.querySelectorAll('main section[id], main h3[id]').forEach(function(s){obs.observe(s);});
+})();
+</script>
+</body>
+</html>

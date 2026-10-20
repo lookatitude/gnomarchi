@@ -62,17 +62,15 @@ def validate_theme(pack_dir: str | Path) -> list[str]:
 
     if colors_toml.is_file():
         try:
-            colors = _load_toml(colors_toml)
-        except tomllib.TOMLDecodeError as exc:
+            from theme.palette import load_palette
+
+            palette = load_palette(root)
+        except Exception as exc:
             errors.append(f"colors.toml: {exc}")
             return errors
-        palette = colors.get("colors")
-        if not isinstance(palette, dict):
-            errors.append("colors.toml: missing [colors] table")
-        else:
-            for key in REQUIRED_COLOR_KEYS:
-                if not palette.get(key):
-                    errors.append(f"colors.toml: colors.{key} required")
+        for key in REQUIRED_COLOR_KEYS:
+            if not palette.get(key):
+                errors.append(f"colors.toml: colors.{key} required (or Omarchy-flat equivalent)")
 
     return errors
 
@@ -104,7 +102,9 @@ def list_themes() -> list[dict[str, str]]:
 
 
 def set_theme(theme_id: str) -> Path:
-    """Validate pack and write active theme state. Returns state file path."""
+    """Validate pack, write state, and apply GTK/Ghostty/wallpaper emitters."""
+    from theme.emitters import apply_theme
+
     pack = find_pack(theme_id)
     if pack is None:
         raise FileNotFoundError(f"theme pack not found: {theme_id}")
@@ -116,6 +116,12 @@ def set_theme(theme_id: str) -> Path:
     dest.mkdir(parents=True, exist_ok=True)
     active = dest / "active-theme"
     active.write_text(f"{theme_id}\n", encoding="utf-8")
-    # Stub emitter: record pack path for later GSettings/CSS apply.
     (dest / "active-theme-path").write_text(f"{pack}\n", encoding="utf-8")
+    apply_theme(pack)
+    try:
+        from theme.backgrounds import ensure_variants
+
+        ensure_variants(theme_id)
+    except Exception:
+        pass
     return active

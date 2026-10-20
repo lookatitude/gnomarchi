@@ -33,6 +33,68 @@ MENU_DIR = Path(__file__).resolve().parent
 DEFAULT_TREE = MENU_DIR / "default.jsonc"
 
 
+def _extensions_dir() -> Path:
+    from common.paths import state_dir
+
+    return state_dir() / "extensions"
+
+
+def load_menu_tree(tree_path: Path = DEFAULT_TREE) -> dict[str, Any]:
+    """Load default JSONC and merge ~/.config/gnomarchi/extensions/*.jsonc children."""
+    tree = load_jsonc(tree_path)
+    ext_dir = _extensions_dir()
+    if not ext_dir.is_dir():
+        return tree
+    entries = list(tree.get("entries") or [])
+    # Map top-level id → entry for append into children
+    by_id = {str(e.get("id")): e for e in entries if isinstance(e, dict)}
+    for frag_path in sorted(ext_dir.glob("*.jsonc")):
+        try:
+            frag = load_jsonc(frag_path)
+        except Exception:
+            continue
+        # Fragment may be a single entry or {entries:[...]} or {path, command}
+        if "entries" in frag:
+            for e in frag["entries"]:
+                entries.append(e)
+        elif "path" in frag and "command" in frag:
+            # Omarchy-style menu module: path: ["Install","AI","X"]
+            path = list(frag.get("path") or [])
+            if not path:
+                continue
+            top = by_id.get(path[0].lower()) or by_id.get(path[0])
+            # Prefer matching label under install/setup/style/trigger
+            target = None
+            for e in entries:
+                if str(e.get("label", "")).lower() == str(path[0]).lower() or str(e.get("id")) == path[0]:
+                    target = e
+                    break
+            if target is None:
+                continue
+            node = target
+            for part in path[1:-1]:
+                children = node.setdefault("children", [])
+                found = None
+                for c in children:
+                    if str(c.get("label")) == part or str(c.get("id")) == part:
+                        found = c
+                        break
+                if found is None:
+                    found = {"id": part.lower().replace(" ", "-"), "label": part, "children": []}
+                    children.append(found)
+                node = found
+            leaf = {
+                "id": str(frag.get("id") or path[-1]),
+                "label": path[-1],
+                "action": {"type": "cli", "argv": str(frag["command"]).split()},
+            }
+            node.setdefault("children", []).append(leaf)
+        elif "id" in frag:
+            entries.append(frag)
+    tree["entries"] = entries
+    return tree
+
+
 def flatten_entries(
     entries: list[dict[str, Any]], prefix: str = ""
 ) -> list[tuple[str, dict[str, Any]]]:
@@ -74,8 +136,8 @@ def run_action(entry: dict[str, Any]) -> int:
 
 
 def open_menu_stub(tree_path: Path = DEFAULT_TREE) -> int:
-    """Documented stub: print the JSONC tree and accept a numeric pick."""
-    tree = load_jsonc(tree_path)
+    """Print the JSONC tree and accept a numeric pick (no GTK)."""
+    tree = load_menu_tree(tree_path)
     entries = flatten_entries(list(tree.get("entries") or []))
     print(f"gnomarchi menu stub (PyGObject GTK4/Adw not available)")
     print(f"tree: {tree_path}")
@@ -108,7 +170,7 @@ def open_menu_gtk(tree_path: Path = DEFAULT_TREE) -> int:
     """GTK4 + libadwaita command palette (requires PyGObject)."""
     assert HAS_GTK and Adw is not None and Gtk is not None
 
-    tree = load_jsonc(tree_path)
+    tree = load_menu_tree(tree_path)
     rows = flatten_entries(list(tree.get("entries") or []))
 
     class PaletteWindow(Adw.ApplicationWindow):
@@ -223,7 +285,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.dump:
-        tree = load_jsonc(args.tree)
+        tree = load_menu_tree(args.tree)
         for path, entry in flatten_entries(list(tree.get("entries") or [])):
             print(f"{entry.get('id')}\t{path}")
         return 0

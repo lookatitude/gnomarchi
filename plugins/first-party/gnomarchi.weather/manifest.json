@@ -1,0 +1,9 @@
+{
+  "id": "gnomarchi.weather",
+  "name": "Weather",
+  "version": "1.0.0",
+  "runtime": "status-indicator",
+  "permissions": ["network"],
+  "hooks": {},
+  "description": "Weather indicator using wttr.in"
+}

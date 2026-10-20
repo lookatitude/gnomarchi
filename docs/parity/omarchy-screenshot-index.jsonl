@@ -1,0 +1,31 @@
+{"id":"M-01-desktop","path":"docs/screenshots/omarchy-manual/M-01-desktop.png","note":"clean desktop top bar","ok":true}
+{"id":"M-02-menu-root","path":"docs/screenshots/omarchy-manual/M-02-menu-root.png","note":"Go menu root","ok":true}
+{"id":"M-03-menu-apps","path":"docs/screenshots/omarchy-manual/M-03-menu-apps.png","note":"menu branch apps","ok":true}
+{"id":"M-03-menu-learn","path":"docs/screenshots/omarchy-manual/M-03-menu-learn.png","note":"menu branch learn","ok":true}
+{"id":"M-03-menu-trigger","path":"docs/screenshots/omarchy-manual/M-03-menu-trigger.png","note":"menu branch trigger","ok":true}
+{"id":"M-03-menu-style","path":"docs/screenshots/omarchy-manual/M-03-menu-style.png","note":"menu branch style","ok":true}
+{"id":"M-03-menu-setup","path":"docs/screenshots/omarchy-manual/M-03-menu-setup.png","note":"menu branch setup","ok":true}
+{"id":"M-03-menu-install","path":"docs/screenshots/omarchy-manual/M-03-menu-install.png","note":"menu branch install","ok":true}
+{"id":"M-03-menu-about","path":"docs/screenshots/omarchy-manual/M-03-menu-about.png","note":"menu branch about","ok":true}
+{"id":"M-03-menu-system","path":"docs/screenshots/omarchy-manual/M-03-menu-system.png","note":"menu branch system","ok":true}
+{"id":"M-04-theme-switcher","ok":false,"note":"capture failed"}
+{"id":"M-04b-theme-browsed","ok":false,"note":"capture failed"}
+{"id":"M-05-bg-switcher","path":"docs/screenshots/omarchy-manual/M-05-bg-switcher.png","note":"background switcher","ok":true}
+{"id":"M-06-panel-audio","ok":false,"note":"capture failed"}
+{"id":"M-06-panel-bluetooth","path":"docs/screenshots/omarchy-manual/M-06-panel-bluetooth.png","note":"panel bluetooth","ok":true}
+{"id":"M-06-panel-network","path":"docs/screenshots/omarchy-manual/M-06-panel-network.png","note":"panel network","ok":true}
+{"id":"M-06-panel-power","path":"docs/screenshots/omarchy-manual/M-06-panel-power.png","note":"panel power","ok":true}
+{"id":"M-07-keybindings","path":"docs/screenshots/omarchy-manual/M-07-keybindings.png","note":"keybindings / cheatsheet","ok":true}
+{"id":"M-08-agents","ok":false,"note":"capture failed"}
+{"id":"M-09-omacalc","path":"docs/screenshots/omarchy-manual/M-09-omacalc.png","note":"omacalc","ok":true}
+{"id":"M-09-omawrite","path":"docs/screenshots/omarchy-manual/M-09-omawrite.png","note":"omawrite","ok":true}
+{"id":"M-09-omacut","path":"docs/screenshots/omarchy-manual/M-09-omacut.png","note":"omacut","ok":true}
+{"id":"M-10-terminal","path":"docs/screenshots/omarchy-manual/M-10-terminal.png","note":"foot terminal","ok":true}
+{"id":"M-11-neovim","ok":false,"note":"capture failed"}
+{"id":"M-12-btop","path":"docs/screenshots/omarchy-manual/M-12-btop.png","note":"btop","ok":true}
+{"id":"M-13-files","path":"docs/screenshots/omarchy-manual/M-13-files.png","note":"Files/Nautilus","ok":true}
+{"id":"M-14-chromium","path":"docs/screenshots/omarchy-manual/M-14-chromium.png","note":"Chromium","ok":true}
+{"id":"M-15-clipboard","path":"docs/screenshots/omarchy-manual/M-15-clipboard.png","note":"clipboard","ok":true}
+{"id":"M-16-trigger","path":"docs/screenshots/omarchy-manual/M-16-trigger.png","note":"Trigger menu (reminders etc)","ok":true}
+{"id":"M-17-install","path":"docs/screenshots/omarchy-manual/M-17-install.png","note":"Install menu","ok":true}
+{"id":"M-18-style","path":"docs/screenshots/omarchy-manual/M-18-style.png","note":"Style menu","ok":true}

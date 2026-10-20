@@ -1,0 +1,8 @@
+{
+  "uuid": "gnomarchi-agents@gnomarchi",
+  "name": "gnomarchi Agents",
+  "description": "Panel button that opens the gnomarchi Agents window",
+  "shell-version": ["45", "46", "47", "48", "49", "50", "51"],
+  "url": "https://github.com/lookatitude/gnomarchi",
+  "version": 2
+}

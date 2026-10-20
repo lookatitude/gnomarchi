@@ -1,0 +1,9 @@
+{
+  "id": "gnomarchi.crash-capture",
+  "name": "Crash capture",
+  "version": "1.0.0",
+  "runtime": "user-service",
+  "permissions": ["session"],
+  "hooks": {},
+  "description": "Watch coredumps and notify for agent diagnose"
+}

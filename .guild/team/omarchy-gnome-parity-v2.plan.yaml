@@ -1,0 +1,41 @@
+spec: .guild/spec/omarchy-gnome-parity-v2.md
+phase: plan
+backend: subagent
+allow_larger: false
+specialists:
+  - name: researcher
+    scope: Omarchy quattro inventory → registry rows; D7 walls note.
+    depends-on: []
+    definition: .guild/agents/researcher.md
+    definition_source: project
+    default_tier: mid
+  - name: architect
+    scope: Style/extension contracts under D1′; registry ownership.
+    depends-on: [researcher]
+    definition: .guild/agents/architect.md
+    definition_source: project
+    default_tier: powerful
+  - name: backend
+    scope: Emitters, bg CLI, user-themes CSS path, Style bus.
+    depends-on: [architect]
+    definition: .guild/agents/backend.md
+    definition_source: project
+    default_tier: mid
+  - name: frontend
+    scope: GTK theme carousel + Style menu.
+    depends-on: [architect]
+    definition: .guild/agents/frontend.md
+    definition_source: project
+    default_tier: mid
+  - name: devops
+    scope: Overlay packages + VM extension enable.
+    depends-on: [architect]
+    definition: .guild/agents/devops.md
+    definition_source: project
+    default_tier: mid
+  - name: qa
+    scope: V-01..V-24 screenshot checklist on test VM.
+    depends-on: [backend, frontend, devops]
+    definition: .guild/agents/qa.md
+    definition_source: project
+    default_tier: mid

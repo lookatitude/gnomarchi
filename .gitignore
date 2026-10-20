@@ -4,3 +4,13 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+dist/
+iso/work/
+iso/out/
+.guild/runs/
+docs/screenshots/omarchy-v1/
+docs/screenshots/parity-v1/
+docs/screenshots/parity/
+*.pkg.tar.zst
+*.pkg.tar.xz
+packaging/repo/pkgs/

@@ -1,6 +1,4 @@
 // gnomarchi default menu tree (JSONC).
-// Loaded by menu/palette.py (GTK4/libadwaita when available; stub otherwise).
-// Modules register additional fragments via the menu-module adapter.
 {
   "version": 1,
   "id": "default",
@@ -11,19 +9,285 @@
       "label": "Install",
       "children": [
         {
-          "id": "install.packages",
-          "label": "Packages…",
-          "action": { "type": "cli", "argv": ["gnomarchi", "install", "--help"] }
-        },
-        {
           "id": "install.ai",
-          "label": "AI apps (placeholder)",
-          "action": { "type": "stub", "message": "Install > AI — P5" }
+          "label": "AI",
+          "children": [
+            {
+              "id": "install.ai.setup",
+              "label": "Setup agent CLIs (mise)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "agent", "setup"] }
+            },
+            {
+              "id": "install.ai.claude",
+              "label": "Claude Code (lazy)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "default", "agent", "claude"] }
+            },
+            {
+              "id": "install.ai.codex",
+              "label": "Codex (lazy)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "default", "agent", "codex"] }
+            },
+            {
+              "id": "install.ai.opencode",
+              "label": "OpenCode (lazy)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "default", "agent", "opencode"] }
+            },
+            {
+              "id": "install.ai.grok",
+              "label": "Grok (lazy)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "default", "agent", "grok"] }
+            },
+            {
+              "id": "install.ai.hermes",
+              "label": "Hermes Desktop (note)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "default", "agent", "hermes"] }
+            },
+            {
+              "id": "install.ai.list",
+              "label": "List agents",
+              "action": { "type": "cli", "argv": ["gnomarchi", "agent", "list"] }
+            }
+          ]
         },
         {
           "id": "install.dev",
-          "label": "Dev languages via mise (placeholder)",
-          "action": { "type": "stub", "message": "Install > Dev — P5" }
+          "label": "Dev",
+          "children": [
+            {
+              "id": "install.dev.mise",
+              "label": "Install mise tools (lazy agents)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "agent", "setup"] }
+            },
+            {
+              "id": "install.dev.paperwm",
+              "label": "PaperWM tiling",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "tiling", "--yes"] }
+            },
+            {
+              "id": "install.dev.shell-tools",
+              "label": "Shell/TUI tools (btop/fzf/…)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "shell-tools", "--yes"] }
+            },
+            {
+              "id": "install.dev.docker",
+              "label": "Docker + compose",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "docker", "--yes"] }
+            }
+          ]
+        },
+        {
+          "id": "install.desktop",
+          "label": "Desktop",
+          "children": [
+            {
+              "id": "install.desktop.panel",
+              "label": "dash-to-panel + caffeine",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "panel", "--yes"] }
+            },
+            {
+              "id": "install.desktop.plymouth",
+              "label": "Plymouth unlock theme",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "plymouth", "--yes"] }
+            },
+            {
+              "id": "install.desktop.capture",
+              "label": "Capture tools (shot/OCR/QR)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "capture", "--yes"] }
+            },
+            {
+              "id": "install.desktop.fcitx5",
+              "label": "fcitx5 input method",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "fcitx5", "--yes"] }
+            }
+          ]
+        },
+        {
+          "id": "install.gui",
+          "label": "GUI",
+          "children": [
+            {
+              "id": "install.gui.obsidian",
+              "label": "Obsidian",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "obsidian", "--yes"] }
+            },
+            {
+              "id": "install.gui.pinta",
+              "label": "Pinta",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "pinta", "--yes"] }
+            },
+            {
+              "id": "install.gui.libreoffice",
+              "label": "LibreOffice",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "libreoffice", "--yes"] }
+            },
+            {
+              "id": "install.gui.evince",
+              "label": "Evince (PDF)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "evince", "--yes"] }
+            },
+            {
+              "id": "install.gui.xournalpp",
+              "label": "Xournal++ (PDF annotate)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "xournalpp", "--yes"] }
+            },
+            {
+              "id": "install.gui.signal",
+              "label": "Signal",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "signal", "--yes"] }
+            }
+          ]
+        },
+        {
+          "id": "install.service",
+          "label": "Service",
+          "children": [
+            {
+              "id": "install.service.tailscale",
+              "label": "Tailscale",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "tailscale", "--yes"] }
+            },
+            {
+              "id": "install.service.spotify",
+              "label": "Spotify",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "spotify", "--yes"] }
+            },
+            {
+              "id": "install.service.bitwarden",
+              "label": "Bitwarden",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "bitwarden", "--yes"] }
+            },
+            {
+              "id": "install.service.localsend",
+              "label": "LocalSend (flatpak)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "service", "localsend", "--yes"] }
+            }
+          ]
+        },
+        {
+          "id": "install.webapps",
+          "label": "Web Apps",
+          "children": [
+            {
+              "id": "install.webapps.seed",
+              "label": "Seed defaults (ChatGPT/YouTube/GitHub)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "webapp", "seed"] }
+            },
+            {
+              "id": "install.webapps.list",
+              "label": "List web apps",
+              "action": { "type": "cli", "argv": ["gnomarchi", "webapp", "list"] }
+            }
+          ]
+        },
+        {
+          "id": "install.gaming",
+          "label": "Gaming",
+          "children": [
+            {
+              "id": "install.gaming.steam",
+              "label": "Steam + Lutris",
+              "action": { "type": "cli", "argv": ["gnomarchi", "install", "gaming", "--yes"] }
+            }
+          ]
+        },
+        {
+          "id": "install.style",
+          "label": "Style",
+          "children": [
+            {
+              "id": "install.style.font",
+              "label": "Font",
+              "children": [
+                {
+                  "id": "install.style.font.jetbrains",
+                  "label": "JetBrains Mono",
+                  "action": { "type": "cli", "argv": ["gnomarchi", "font", "install", "jetbrains"] }
+                },
+                {
+                  "id": "install.style.font.cascadia",
+                  "label": "Cascadia Mono",
+                  "action": { "type": "cli", "argv": ["gnomarchi", "font", "install", "cascadia"] }
+                },
+                {
+                  "id": "install.style.font.meslo",
+                  "label": "Meslo LG Mono",
+                  "action": { "type": "cli", "argv": ["gnomarchi", "font", "install", "meslo"] }
+                },
+                {
+                  "id": "install.style.font.fira",
+                  "label": "Fira Code",
+                  "action": { "type": "cli", "argv": ["gnomarchi", "font", "install", "fira"] }
+                },
+                {
+                  "id": "install.style.font.victor",
+                  "label": "Victor Code",
+                  "action": { "type": "cli", "argv": ["gnomarchi", "font", "install", "victor"] }
+                },
+                {
+                  "id": "install.style.font.bitstream",
+                  "label": "Bitstream Vera Mono",
+                  "action": { "type": "cli", "argv": ["gnomarchi", "font", "install", "bitstream"] }
+                },
+                {
+                  "id": "install.style.font.iosevka",
+                  "label": "Iosevka",
+                  "action": { "type": "cli", "argv": ["gnomarchi", "font", "install", "iosevka"] }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "install.windows-vm",
+          "label": "Windows VM (virt-manager)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "install", "windows-vm", "--yes"] }
+        },
+        {
+          "id": "install.marketplace",
+          "label": "Plugins (git topic)",
+          "children": [
+            {
+              "id": "install.marketplace.help",
+              "label": "Clone via: gnomarchi plugin add <git-url>",
+              "action": { "type": "cli", "argv": ["gnomarchi", "plugin", "list"] }
+            }
+          ]
+        },
+        {
+          "id": "install.widgets",
+          "label": "Panel widgets",
+          "children": [
+            {
+              "id": "install.widgets.agents",
+              "label": "Enable Agents indicator",
+              "action": { "type": "cli", "argv": ["gnomarchi", "plugin", "enable", "--id", "gnomarchi.agents"] }
+            },
+            {
+              "id": "install.widgets.weather",
+              "label": "Enable Weather indicator",
+              "action": { "type": "cli", "argv": ["gnomarchi", "plugin", "enable", "--id", "gnomarchi.weather"] }
+            },
+            {
+              "id": "install.widgets.updates",
+              "label": "Enable Updates indicator",
+              "action": { "type": "cli", "argv": ["gnomarchi", "plugin", "enable", "--id", "gnomarchi.system-update"] }
+            },
+            {
+              "id": "install.widgets.tailscale",
+              "label": "Enable Tailscale indicator",
+              "action": { "type": "cli", "argv": ["gnomarchi", "plugin", "enable", "--id", "gnomarchi.tailscale"] }
+            },
+            {
+              "id": "install.widgets.panel",
+              "label": "Enable Agents Shell panel chip",
+              "action": { "type": "cli", "argv": ["gnomarchi", "plugin", "enable", "--id", "gnomarchi.agents-panel"] }
+            },
+            {
+              "id": "install.widgets.modes",
+              "label": "Enable Mode indicators (DND/Night Light/Stay Awake)",
+              "action": { "type": "cli", "argv": ["gnomarchi", "plugin", "enable", "--id", "gnomarchi.modes"] }
+            }
+          ]
         }
       ]
     },
@@ -32,14 +296,81 @@
       "label": "Setup",
       "children": [
         {
-          "id": "setup.defaults",
-          "label": "Default apps",
-          "action": { "type": "stub", "message": "Setup > Default apps — wire Ghostty/nvim/Chromium" }
+          "id": "setup.defaults.agent",
+          "label": "Defaults › Agent",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "list"] }
+        },
+        {
+          "id": "setup.shell",
+          "label": "Show shell.toml",
+          "action": { "type": "cli", "argv": ["gnomarchi", "shell", "show"] }
+        },
+        {
+          "id": "setup.bar",
+          "label": "Bar position",
+          "children": [
+            {
+              "id": "setup.bar.top",
+              "label": "Top",
+              "action": { "type": "cli", "argv": ["gnomarchi", "shell", "bar-position", "top"] }
+            },
+            {
+              "id": "setup.bar.bottom",
+              "label": "Bottom",
+              "action": { "type": "cli", "argv": ["gnomarchi", "shell", "bar-position", "bottom"] }
+            },
+            {
+              "id": "setup.bar.left",
+              "label": "Left",
+              "action": { "type": "cli", "argv": ["gnomarchi", "shell", "bar-position", "left"] }
+            },
+            {
+              "id": "setup.bar.right",
+              "label": "Right",
+              "action": { "type": "cli", "argv": ["gnomarchi", "shell", "bar-position", "right"] }
+            }
+          ]
         },
         {
           "id": "setup.keybindings",
           "label": "Keybindings help",
           "action": { "type": "open", "path": "docs/menu-super-space.md" }
+        },
+        {
+          "id": "setup.skills",
+          "label": "Install agent skills",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "skills-install"] }
+        },
+        {
+          "id": "setup.config",
+          "label": "Dotfiles sync",
+          "children": [
+            {
+              "id": "setup.config.status",
+              "label": "Status",
+              "action": { "type": "cli", "argv": ["gnomarchi", "config", "status"] }
+            },
+            {
+              "id": "setup.config.init",
+              "label": "Init git repo",
+              "action": { "type": "cli", "argv": ["gnomarchi", "config", "init"] }
+            },
+            {
+              "id": "setup.config.pull",
+              "label": "Pull",
+              "action": { "type": "cli", "argv": ["gnomarchi", "config", "pull"] }
+            },
+            {
+              "id": "setup.config.push",
+              "label": "Push",
+              "action": { "type": "cli", "argv": ["gnomarchi", "config", "push"] }
+            }
+          ]
+        },
+        {
+          "id": "setup.nvim",
+          "label": "Install neovim seed",
+          "action": { "type": "cli", "argv": ["gnomarchi", "nvim", "seed"] }
         }
       ]
     },
@@ -48,14 +379,95 @@
       "label": "Style",
       "children": [
         {
-          "id": "style.theme-picker",
-          "label": "Theme picker",
-          "action": { "type": "cli", "argv": ["gnomarchi-theme-picker"] }
+          "id": "style.theme",
+          "label": "Theme…",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "pick"] }
+        },
+        {
+          "id": "style.theme-new",
+          "label": "New theme… (scaffold)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "new", "my-theme"] }
+        },
+        {
+          "id": "style.background",
+          "label": "Next background",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "bg", "next"] }
+        },
+        {
+          "id": "style.video-on",
+          "label": "Video wallpaper on",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "bg", "video", "on"] }
+        },
+        {
+          "id": "style.video-off",
+          "label": "Video wallpaper off",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "bg", "video", "off"] }
+        },
+        {
+          "id": "style.font",
+          "label": "Font",
+          "children": [
+            {
+              "id": "style.font.list",
+              "label": "List fonts",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "list"] }
+            },
+            {
+              "id": "style.font.jetbrains",
+              "label": "JetBrains Mono",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "set", "jetbrains"] }
+            },
+            {
+              "id": "style.font.cascadia",
+              "label": "Cascadia Mono",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "set", "cascadia"] }
+            },
+            {
+              "id": "style.font.meslo",
+              "label": "Meslo LG Mono",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "set", "meslo"] }
+            },
+            {
+              "id": "style.font.fira",
+              "label": "Fira Code",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "set", "fira"] }
+            },
+            {
+              "id": "style.font.victor",
+              "label": "Victor Code",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "set", "victor"] }
+            },
+            {
+              "id": "style.font.bitstream",
+              "label": "Bitstream Vera Mono",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "set", "bitstream"] }
+            },
+            {
+              "id": "style.font.iosevka",
+              "label": "Iosevka",
+              "action": { "type": "cli", "argv": ["gnomarchi", "font", "set", "iosevka"] }
+            }
+          ]
+        },
+        {
+          "id": "style.update",
+          "label": "System update (pacman -Syu)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "update"] }
         },
         {
           "id": "style.theme-list",
           "label": "List themes",
           "action": { "type": "cli", "argv": ["gnomarchi", "theme", "list"] }
+        },
+        {
+          "id": "style.theme-tokyo",
+          "label": "Apply tokyo-night",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "set", "tokyo-night"] }
+        },
+        {
+          "id": "style.theme-midnight",
+          "label": "Apply midnight-harbor",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "set", "midnight-harbor"] }
         }
       ]
     },
@@ -66,17 +478,172 @@
         {
           "id": "trigger.agents",
           "label": "Agents window",
-          "action": { "type": "cli", "argv": ["gnomarchi-agents-window"] }
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "window"] }
         },
         {
-          "id": "trigger.menu-reload",
-          "label": "Reload menu",
-          "action": { "type": "cli", "argv": ["gnomarchi", "menu", "reload"] }
+          "id": "trigger.write",
+          "label": "gnoma Write",
+          "action": { "type": "cli", "argv": ["gnomarchi", "app", "write"] }
         },
         {
-          "id": "trigger.make-something",
-          "label": "Make something…",
-          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "make-something"] }
+          "id": "trigger.cut",
+          "label": "gnoma Cut",
+          "action": { "type": "cli", "argv": ["gnomarchi", "app", "cut"] }
+        },
+        {
+          "id": "trigger.calc",
+          "label": "gnoma Calc",
+          "action": { "type": "cli", "argv": ["gnomarchi", "app", "calc"] }
+        },
+        {
+          "id": "trigger.hype",
+          "label": "gnoma Hype",
+          "action": { "type": "cli", "argv": ["gnomarchi", "app", "hype"] }
+        },
+        {
+          "id": "trigger.signed",
+          "label": "gnoma Signed",
+          "action": { "type": "cli", "argv": ["gnomarchi", "app", "signed"] }
+        },
+        {
+          "id": "trigger.monologue",
+          "label": "gnoma Monologue",
+          "action": { "type": "cli", "argv": ["gnomarchi", "app", "monologue"] }
+        },
+        {
+          "id": "trigger.herdr",
+          "label": "Herdr (agent tmux)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "herdr", "attach"] }
+        },
+        {
+          "id": "trigger.cliamp",
+          "label": "Cliamp (cmus)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "cliamp"] }
+        },
+        {
+          "id": "trigger.nvim-seed",
+          "label": "Install neovim seed",
+          "action": { "type": "cli", "argv": ["gnomarchi", "nvim", "seed"] }
+        },
+        {
+          "id": "trigger.display",
+          "label": "Displays",
+          "action": { "type": "cli", "argv": ["gnomarchi", "display", "settings"] }
+        },
+        {
+          "id": "trigger.lock",
+          "label": "Lock screen",
+          "action": { "type": "cli", "argv": ["gnomarchi", "idle", "lock"] }
+        },
+        {
+          "id": "trigger.capture-shot",
+          "label": "Screenshot",
+          "action": { "type": "cli", "argv": ["gnomarchi", "capture", "shot"] }
+        },
+        {
+          "id": "trigger.capture-ocr",
+          "label": "OCR selection",
+          "action": { "type": "cli", "argv": ["gnomarchi", "capture", "ocr"] }
+        },
+        {
+          "id": "trigger.capture-qr",
+          "label": "QR scan",
+          "action": { "type": "cli", "argv": ["gnomarchi", "capture", "qr"] }
+        },
+        {
+          "id": "trigger.capture-record",
+          "label": "Screen record",
+          "action": { "type": "cli", "argv": ["gnomarchi", "capture", "record"] }
+        },
+        {
+          "id": "trigger.panel-audio",
+          "label": "Audio panel",
+          "action": { "type": "cli", "argv": ["gnomarchi", "panel", "audio"] }
+        },
+        {
+          "id": "trigger.panel-network",
+          "label": "Network panel",
+          "action": { "type": "cli", "argv": ["gnomarchi", "panel", "network"] }
+        },
+        {
+          "id": "trigger.remind-list",
+          "label": "Reminders",
+          "action": { "type": "cli", "argv": ["gnomarchi", "remind", "list"] }
+        },
+        {
+          "id": "trigger.clipboard",
+          "label": "Clipboard history",
+          "action": { "type": "cli", "argv": ["gnomarchi", "clipboard", "ui"] }
+        },
+        {
+          "id": "trigger.remind-add",
+          "label": "Add reminder (5m)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "remind", "add", "Check this", "--in", "5m"] }
+        },
+        {
+          "id": "trigger.notice-time",
+          "label": "Notice · Time",
+          "action": { "type": "cli", "argv": ["gnomarchi", "notice", "time"] }
+        },
+        {
+          "id": "trigger.notice-battery",
+          "label": "Notice · Battery",
+          "action": { "type": "cli", "argv": ["gnomarchi", "notice", "battery"] }
+        },
+        {
+          "id": "trigger.notice-weather",
+          "label": "Notice · Weather",
+          "action": { "type": "cli", "argv": ["gnomarchi", "notice", "weather"] }
+        },
+        {
+          "id": "trigger.share-receive",
+          "label": "Share · Receive (LocalSend)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "share", "receive"] }
+        },
+        {
+          "id": "trigger.share-clipboard",
+          "label": "Share · Clipboard",
+          "action": { "type": "cli", "argv": ["gnomarchi", "share", "clipboard"] }
+        },
+        {
+          "id": "trigger.btop",
+          "label": "Activity (btop)",
+          "action": { "type": "cli", "argv": ["ghostty", "-e", "btop"] }
+        },
+        {
+          "id": "trigger.mode-status",
+          "label": "Mode toggles status",
+          "action": { "type": "cli", "argv": ["gnomarchi", "mode", "status"] }
+        },
+        {
+          "id": "trigger.launch-default",
+          "label": "Launch default agent",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "launch"] }
+        },
+        {
+          "id": "trigger.make-theme",
+          "label": "Make something — Theme",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "make-something", "theme"] }
+        },
+        {
+          "id": "trigger.make-plugin",
+          "label": "Make something — Plugin",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "make-something", "plugin"] }
+        },
+        {
+          "id": "trigger.make-app",
+          "label": "Make something — App",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "make-something", "app"] }
+        },
+        {
+          "id": "trigger.usage",
+          "label": "Refresh agent usage",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "usage-update"] }
+        },
+        {
+          "id": "trigger.crash-watch",
+          "label": "Scan crashes now",
+          "action": { "type": "cli", "argv": ["gnomarchi", "agent", "crash", "watch"] }
         }
       ]
     }

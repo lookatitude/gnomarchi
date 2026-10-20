@@ -166,7 +166,7 @@ def add_plugin(
 
 
 def enable_plugin(plugin_dir: str | Path) -> str:
-    """Validate then invoke adapter enable stub. Shell-extension never default."""
+    """Validate then invoke adapter enable. Shell extensions need explicit flag."""
     root = Path(plugin_dir).expanduser().resolve()
     errors = validate_plugin(root)
     if errors:
@@ -177,19 +177,25 @@ def enable_plugin(plugin_dir: str | Path) -> str:
         raise ValueError("; ".join(load_errors))
 
     runtime = manifest.get("runtime")
-    if runtime in NON_DEFAULT_RUNTIMES:
+    if runtime in NON_DEFAULT_RUNTIMES and not manifest.get("explicit_shell_extension"):
         raise PermissionError(
-            "refusing to enable gnome-shell-extension on default path (P7 only)"
+            "refusing to enable gnome-shell-extension without explicit_shell_extension=true"
         )
 
     adapter = get_adapter(runtime)
     if adapter is None:
         raise ValueError(f"no enable adapter for runtime {runtime!r}")
+    if hasattr(adapter, "enable"):
+        return adapter.enable(root, manifest)
     return adapter.enable_stub(root, manifest)
 
 
 def list_plugins() -> list[dict[str, str]]:
-    roots = [REPO_ROOT / "plugin" / "installed", state_dir() / "plugins"]
+    roots = [
+        REPO_ROOT / "plugins" / "first-party",
+        REPO_ROOT / "plugin" / "installed",
+        state_dir() / "plugins",
+    ]
     out: list[dict[str, str]] = []
     seen: set[str] = set()
     for root in roots:
@@ -222,13 +228,15 @@ def scaffold_plugin(
     plugin_id: str,
     runtime: str = DEFAULT_RUNTIME,
     dest_root: str | Path | None = None,
+    *,
+    explicit_shell_extension: bool = False,
 ) -> Path:
     if runtime not in ALLOWED_RUNTIMES:
         raise ValueError(f"unknown runtime: {runtime}")
-    if runtime in NON_DEFAULT_RUNTIMES:
+    if runtime in NON_DEFAULT_RUNTIMES and not explicit_shell_extension:
         raise ValueError(
-            "refusing to scaffold gnome-shell-extension by default "
-            "(P7 only; pass a non-default path later with explicit opt-in)"
+            "refusing to scaffold gnome-shell-extension without "
+            "explicit_shell_extension=True"
         )
 
     template = REPO_ROOT / "templates" / "plugin" / runtime
@@ -246,9 +254,10 @@ def scaffold_plugin(
     manifest["id"] = plugin_id
     manifest["name"] = plugin_id.replace("-", " ").title()
     manifest["runtime"] = runtime
+    if runtime == "gnome-shell-extension":
+        manifest["explicit_shell_extension"] = True
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
-    # Rename placeholder unit if present.
     unit = target / "gnomarchi-plugin.service"
     if unit.is_file():
         text = unit.read_text(encoding="utf-8").replace("PLUGIN_ID", plugin_id)
@@ -259,4 +268,27 @@ def scaffold_plugin(
         text = desktop.read_text(encoding="utf-8").replace("PLUGIN_ID", plugin_id)
         desktop.write_text(text, encoding="utf-8")
 
+    meta = target / "metadata.json"
+    if meta.is_file():
+        data = json.loads(meta.read_text(encoding="utf-8"))
+        data["uuid"] = f"{plugin_id}@gnomarchi"
+        data["name"] = plugin_id
+        meta.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
     return target
+
+
+def clone_plugin(plugin_id: str, dest_root: str | Path | None = None) -> Path:
+    """Copy a first-party plugin into the user plugins tree for customization."""
+    src = REPO_ROOT / "plugins" / "first-party" / plugin_id
+    if not src.is_dir():
+        raise FileNotFoundError(f"first-party plugin not found: {plugin_id}")
+    base = Path(dest_root) if dest_root else state_dir() / "plugins"
+    # User-owned id: keep original id in manifest but place under user.$name if collision
+    target = base / plugin_id
+    if target.exists():
+        raise FileExistsError(f"plugin already installed: {target}")
+    base.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(src, target)
+    return target
+

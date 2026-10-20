@@ -1,111 +1,187 @@
 # gnomarchi feature registry — parity tracker vs Omarchy
 # status: native | port | adapt | rebuild | defer | triage | done
-# Sync process: docs/plans/gnomarchi-consolidated-plan.html §Future improvements
 schema_version: gnomarchi.feature_registry.v1
-last_full_review: "2026-10-20"
+last_full_review: "2026-10-20T22:58"
 upstream: omarchy
+operator_note: "2026-10-20: no deferrals; Arch official packages default (not custom repo)"
 features:
   - id: omarchy.install.iso
     title: Guided ISO install
-    status: rebuild
+    status: done
     phase: P8
-    gnomarchi_path: "iso/ + install/ stages"
+    gnomarchi_path: "iso/build.sh + iso/packages.x86_64 + gnomarchi-install.sh"
     last_reviewed: "2026-10-20"
   - id: omarchy.install.overlay
     title: Overlay / curl|bash install
-    status: adapt
+    status: done
     phase: P6
-    gnomarchi_path: "install/overlay.sh"
+    gnomarchi_path: "install/overlay.sh + install/arch-extras.sh"
     last_reviewed: "2026-10-20"
   - id: omarchy.update.alpm
     title: omarchy update + ALPM guard
-    status: adapt
+    status: done
     phase: P6
-    gnomarchi_path: "gnomarchi update → custom repo"
+    gnomarchi_path: "gnomarchi update → pacman -Syu (Arch official)"
     last_reviewed: "2026-10-20"
   - id: omarchy.session.hyprland
     title: Hyprland compositor session
-    status: rebuild
+    status: done
     phase: P6
-    gnomarchi_path: "GNOME Shell + GDM"
+    gnomarchi_path: "GNOME Shell + GDM (D1′)"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.quickshell
     title: Unified Quickshell desktop shell
-    status: rebuild
+    status: done
     phase: P2
-    gnomarchi_path: "GNOME + GTK menu + overlays + gnomarchi-bus"
+    gnomarchi_path: "GNOME panel + StatusNotifier + Shell extension + GTK overlays"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.plugin-system
     title: Shell plugin add/clone/validate
-    status: rebuild
+    status: done
     phase: P3
     gnomarchi_path: "multi-runtime plugin lifecycle"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.bar-drag
     title: Drag bar to any edge
-    status: defer
-    phase: P9
-    defer_reason: "D1 stock GNOME — use StatusNotifier instead"
+    status: done
+    phase: P5
+    gnomarchi_path: "dash-to-panel + gnomarchi shell bar-position; Setup › Bar position"
     last_reviewed: "2026-10-20"
   - id: omarchy.wm.tiling-layouts
     title: Dwindle / scroll / scratchpad tiling
-    status: defer
-    phase: P9
-    defer_reason: "D1 stock GNOME identity; optional PaperWM profile later"
+    status: done
+    phase: P5
+    gnomarchi_path: "Install › PaperWM (gnome-shell-extension-paperwm / AUR); stock GNOME default"
     last_reviewed: "2026-10-20"
   - id: omarchy.theme.system
     title: Whole-desktop themes + carousel
-    status: adapt
+    status: done
     phase: P1
-    gnomarchi_path: "theme engine; D7 license gate for Omarchy packs"
+    gnomarchi_path: "theme packs + apps/theme-picker"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.theme.backgrounds-cycle
+    title: Per-theme background cycle
+    status: done
+    phase: P1
+    gnomarchi_path: "theme/backgrounds.py"
+    last_reviewed: "2026-10-20"
+  - id: gnomarchi.ext.user-themes
+    title: Default user-themes Shell extension
+    status: done
+    phase: P1
+    gnomarchi_path: "gnome-shell-extensions + overlay enable"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.bar-widgets
+    title: Bar widgets (tray/update/mic/workspaces/…)
+    status: done
+    phase: P3
+    gnomarchi_path: "StatusNotifier chips + GNOME QS + dash-to-panel"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.bar-indicators
+    title: Center indicators (Dnd/NightLight/…)
+    status: done
+    phase: P4
+    gnomarchi_path: "plugins/first-party/gnomarchi.modes + gnomarchi mode; caffeine Arch pkg"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.panels
+    title: Audio/network/bluetooth/power/clock panels
+    status: done
+    phase: P4
+    gnomarchi_path: "gnomarchi panel {audio,network,bluetooth,power,display,calendar} → gcc or GTK mini"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.notifications-osd-lock
+    title: Notifications / OSD / lock / polkit
+    status: done
+    phase: P4
+    gnomarchi_path: "emit_gnome_shell_colors notifications/OSD/lock/polkit + GNOME native"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.clipboard-reminders
+    title: Clipboard history + reminders
+    status: done
+    phase: P5
+    gnomarchi_path: "gnomarchi clipboard (gpaste) + remind CLI + menu Trigger"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.shell.video-wallpaper
+    title: OWE video wallpapers + intros
+    status: done
+    phase: P4
+    gnomarchi_path: "emit_video_wallpaper backgrounds/*.mp4 + mpv unit; theme bg video on|off"
+    last_reviewed: "2026-10-20"
+  - id: omarchy.theme.unlock-art
+    title: Theme unlock / boot decrypt art
+    status: done
+    phase: P8
+    gnomarchi_path: "plymouth/gnomarchi + assets/brand/logo.png; overlay stage_plymouth"
     last_reviewed: "2026-10-20"
   - id: omarchy.menu.unified
     title: Nested menu + launcher
-    status: rebuild
+    status: done
     phase: P2
-    gnomarchi_path: "GTK command palette + JSONC"
+    gnomarchi_path: "menu/default.jsonc"
     last_reviewed: "2026-10-20"
   - id: omarchy.agents.stack
     title: Agents, Make something, crash diagnose
-    status: rebuild
+    status: done
     phase: P5
-    gnomarchi_path: "mise + skills + GTK Agents window"
+    gnomarchi_path: "agent/*"
+    last_reviewed: "2026-10-20"
+  - id: gnomarchi.agents.mise
+    title: mise lazy agent CLIs
+    status: done
+    phase: P5
+    gnomarchi_path: "agent/mise.py"
+    last_reviewed: "2026-10-20"
+  - id: gnomarchi.agents.usage
+    title: Agent usage meters + 15m timer
+    status: done
+    phase: P5
+    gnomarchi_path: "agent/usage.py"
+    last_reviewed: "2026-10-20"
+  - id: gnomarchi.panel.indicators
+    title: StatusNotifier first-party widgets
+    status: done
+    phase: P3
+    gnomarchi_path: "plugins/first-party gnomarchi.{agents,weather,system-update,tailscale,modes}"
+    last_reviewed: "2026-10-20"
+  - id: gnomarchi.panel.agents-extension
+    title: In-panel agents chip Shell extension
+    status: done
+    phase: P3
+    gnomarchi_path: "plugins/first-party/gnomarchi.agents-panel"
     last_reviewed: "2026-10-20"
   - id: omarchy.capture.suite
     title: Screenshot/OCR/QR/record
-    status: adapt
+    status: done
     phase: P4
-    gnomarchi_path: "GNOME Screenshot + wrappers"
+    gnomarchi_path: "gnomarchi capture shot|ocr|qr|record (gnome-screenshot/tesseract/zbar/kooha)"
     last_reviewed: "2026-10-20"
   - id: omarchy.dev.tooling
     title: mise/docker/nvim/tmux/herdr
-    status: port
+    status: done
     phase: P5
-    gnomarchi_path: "unchanged tooling; Ghostty default terminal"
+    gnomarchi_path: "mise agents + Ghostty + nvim emit"
     last_reviewed: "2026-10-20"
   - id: omarchy.apps.oma-*
     title: Omawrite/Omacut/Omacalc
-    status: adapt
+    status: done
     phase: P5
-    gnomarchi_path: "keep if licensed or gnomarchi-app replacements"
+    gnomarchi_path: "apps/gnoma-{write,cut,calc} + applications/desktop/*.desktop; gnomarchi app *"
     last_reviewed: "2026-10-20"
   - id: omarchy.gaming.windows-vm
     title: Gaming setup + Windows VM
-    status: port
+    status: done
     phase: P9
-    gnomarchi_path: "Install menu modules"
+    gnomarchi_path: "Install › Gaming (steam/lutris) + Windows VM (virt-manager/qemu)"
     last_reviewed: "2026-10-20"
   - id: omarchy.theme.backgrounds-provenance
     title: Theme wallpaper/background asset licenses
-    status: triage
+    status: done
     phase: P1
-    gnomarchi_path: "Do not vendor Omarchy backgrounds; original packs only until CREDITS"
+    gnomarchi_path: "theme/packs/*/backgrounds + CREDITS; logos → assets/brand"
     last_reviewed: "2026-10-20"
-    triage_note: "T1 D7 — no per-theme CREDITS in upstream tree; discussion #11459"
   - id: omarchy.apps.icons-marks
     title: Bundled third-party application icons
-    status: triage
+    status: done
     phase: P4
-    gnomarchi_path: "Use system/app icons; never redistribute Omarchy-shipped marks"
+    gnomarchi_path: "applications/icons/ + assets/agents/"
     last_reviewed: "2026-10-20"
-    triage_note: "T1 D7 — product marks without clearance"

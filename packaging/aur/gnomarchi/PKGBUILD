@@ -1,31 +1,42 @@
 # Maintainer: gnomarchi contributors
-# AUR fallback stub — keep in sync with packaging/repo version scheme.
-# shellcheck disable=SC2034
+# Experimental — not affiliated with Omarchy / Basecamp / DHH.
 pkgname=gnomarchi
-pkgver=0.1.0
+pkgver=0.0.1beta1
 pkgrel=1
-pkgdesc="Stock GNOME omakase overlay — CLI, theme, menu, plugins"
+pkgdesc="Omakase Arch desktop on stock GNOME (experimental)"
 arch=('any')
-url="https://github.com/example/gnomarchi"
+url="https://github.com/lookatitude/gnomarchi"
 license=('MIT')
-depends=('bash' 'python' 'gnome-shell' 'gdm')
-optdepends=(
-  'ghostty: default terminal'
-  'neovim: default editor'
-  'chromium: default browser'
+depends=(
+  'python'
+  'gnome-shell'
+  'gnome-tweaks'
 )
-makedepends=('git')
-source=("${pkgname}-${pkgver}.tar.gz::https://github.com/example/gnomarchi/archive/refs/tags/v${pkgver}.tar.gz")
+optdepends=(
+  'ghostty: themed terminal'
+  'neovim: seeded config'
+  'starship: prompt theme'
+  'paperwm: tiling shell extension'
+  'localsend: share targets'
+)
+provides=('gnomarchi')
+conflicts=('gnomarchi')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/lookatitude/gnomarchi/archive/refs/tags/v0.0.1-beta.1.tar.gz")
 sha256sums=('SKIP')
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}"
-  install -Dm755 bin/gnomarchi "${pkgdir}/usr/bin/gnomarchi"
-  if [[ -d theme/packs ]]; then
-    install -d "${pkgdir}/usr/share/gnomarchi/themes"
-    cp -a theme/packs/. "${pkgdir}/usr/share/gnomarchi/themes/"
-  fi
-  if [[ -f install/overlay.sh ]]; then
-    install -Dm755 install/overlay.sh "${pkgdir}/usr/share/gnomarchi/install/overlay.sh"
-  fi
+  cd "${srcdir}/gnomarchi-0.0.1-beta.1"
+
+  install -d "${pkgdir}/usr/share/gnomarchi"
+  cp -a bin desktop theme menu install config features VERSION LICENSE README.md \
+    "${pkgdir}/usr/share/gnomarchi/"
+
+  install -d "${pkgdir}/usr/bin"
+  cat > "${pkgdir}/usr/bin/gnomarchi" <<'EOF'
+#!/usr/bin/env bash
+exec /usr/share/gnomarchi/bin/gnomarchi "$@"
+EOF
+  chmod 755 "${pkgdir}/usr/bin/gnomarchi"
+
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }

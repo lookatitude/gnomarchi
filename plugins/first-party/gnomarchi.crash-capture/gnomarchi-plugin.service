@@ -1,0 +1,12 @@
+[Unit]
+Description=gnomarchi crash capture (coredump watch)
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env python3 /usr/local/lib/gnomarchi/agent/services/watch_crashes.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

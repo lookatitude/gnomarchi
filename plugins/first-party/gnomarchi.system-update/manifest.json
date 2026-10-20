@@ -1,0 +1,9 @@
+{
+  "id": "gnomarchi.system-update",
+  "name": "System updates",
+  "version": "1.0.0",
+  "runtime": "status-indicator",
+  "permissions": ["session"],
+  "hooks": {},
+  "description": "Pacman update availability indicator"
+}

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=gnoma-monologue
+GenericName=Dictation
+Comment=Voice notepad / dictation (Omarchy Monologue parity)
+Exec=gnomarchi app monologue
+Icon=audio-input-microphone
+Terminal=false
+Categories=Utility;Audio;
+StartupNotify=true

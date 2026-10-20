@@ -1,0 +1,18 @@
+# Append to archiso releng packages.x86_64 — official Arch only (mkarchiso).
+# AUR extensions (dash-to-panel, PaperWM) install via overlay / Install menu.
+gnome
+gdm
+gnome-tweaks
+gnome-shell-extensions
+gnome-shell-extension-appindicator
+gnome-shell-extension-caffeine
+ghostty
+neovim
+chromium
+mise
+mpv
+plymouth
+qemu-guest-agent
+rsync
+git
+archinstall

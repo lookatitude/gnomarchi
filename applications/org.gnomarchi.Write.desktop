@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=gnoma-write
+GenericName=Notes
+Comment=Simple Markdown notes
+Exec=gnomarchi app write
+Icon=accessories-text-editor
+Terminal=false
+Categories=Utility;TextEditor;
+Keywords=notes;markdown;write;
+StartupNotify=true

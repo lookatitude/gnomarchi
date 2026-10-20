@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=gnoma-cut
+GenericName=Image Crop
+Comment=Basic image crop
+Exec=gnomarchi app cut
+Icon=applications-graphics
+Terminal=false
+Categories=Graphics;2DGraphics;
+Keywords=crop;image;cut;
+StartupNotify=true

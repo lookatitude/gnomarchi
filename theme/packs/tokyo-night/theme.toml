@@ -1,0 +1,12 @@
+[theme]
+id = "tokyo-night"
+name = "Tokyo Night"
+version = "1.0.0"
+description = "Color scheme adapted from Omarchy MIT theme data for stock GNOME (gnomarchi emitters)."
+
+[provenance]
+kind = "derived-config"
+upstream = "https://github.com/basecamp/omarchy (themes/tokyo-night/colors.toml)"
+license = "MIT (Omarchy theme config); gnomarchi emitters original"
+note = "Not affiliated with Omarchy or Basecamp. Palette keys reused; wallpapers are generated locally, not vendored Omarchy backgrounds."
+official_omarchy = false

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=gnomarchi
+Description=gnomarchi boot/unlock theme (GNOME Arch omakase)
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/gnomarchi
+ScriptFile=/usr/share/plymouth/themes/gnomarchi/gnomarchi.script

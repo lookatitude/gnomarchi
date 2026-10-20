@@ -1,0 +1,10 @@
+{
+  "id": "gnomarchi.agents-panel",
+  "name": "Agents panel Shell extension",
+  "version": "1.0.0",
+  "runtime": "gnome-shell-extension",
+  "explicit_shell_extension": true,
+  "permissions": ["shell"],
+  "hooks": {},
+  "description": "In-panel agents chip that opens gnomarchi Agents window"
+}

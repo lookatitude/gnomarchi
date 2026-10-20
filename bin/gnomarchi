@@ -1,15 +1,33 @@
 #!/usr/bin/env python3
-"""gnomarchi CLI — theme / plugin entry (P0–P3 stubs)."""
+"""gnomarchi CLI — theme, plugin, menu, agent, bus, shell, install helpers."""
 
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+
+def _resolve_root() -> Path:
+    here = Path(__file__).resolve()
+    candidates: list[Path] = []
+    env = os.environ.get("GNOMARCHI_ROOT")
+    if env:
+        candidates.append(Path(env).expanduser())
+    candidates.append(here.parent.parent)
+    candidates.append(here.parent.parent / "lib" / "gnomarchi")
+    candidates.append(here.parent / "lib")
+    for root in candidates:
+        if (root / "theme").is_dir() and (root / "plugin").is_dir():
+            return root
+    return candidates[0] if env else here.parent.parent
+
+
+REPO_ROOT = _resolve_root()
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+os.environ.setdefault("GNOMARCHI_ROOT", str(REPO_ROOT))
 
 
 def cmd_theme_validate(args: argparse.Namespace) -> int:
@@ -56,6 +74,365 @@ def cmd_theme_list(_args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_theme_pick(_args: argparse.Namespace) -> int:
+    """Open GTK theme carousel (falls back to CLI list)."""
+    import subprocess
+
+    picker = REPO_ROOT / "apps" / "theme-picker" / "gnomarchi_theme_picker.py"
+    if picker.is_file():
+        return subprocess.call([sys.executable, str(picker), "--gui"])
+    return cmd_theme_list(_args)
+
+
+def cmd_theme_bg_current(_args: argparse.Namespace) -> int:
+    from theme.backgrounds import current_index
+
+    print(current_index())
+    return 0
+
+
+def cmd_theme_bg_next(_args: argparse.Namespace) -> int:
+    from theme.backgrounds import next_background
+
+    try:
+        path = next_background()
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"background → {path}")
+    return 0
+
+
+def cmd_theme_bg_set(args: argparse.Namespace) -> int:
+    from theme.backgrounds import set_background
+
+    try:
+        path = set_background(int(args.index))
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"background → {path}")
+    return 0
+
+
+def cmd_theme_bg_video(args: argparse.Namespace) -> int:
+    from theme.emitters import set_video_wallpaper_enabled, video_wallpaper_enabled
+    from theme.engine import set_theme
+    from theme.paths import state_dir
+
+    if args.video_action == "status":
+        print("on" if video_wallpaper_enabled() else "off")
+        return 0
+    on = args.video_action == "on"
+    set_video_wallpaper_enabled(on)
+    if on:
+        active = (state_dir() / "active-theme").read_text(encoding="utf-8").strip()
+        if active:
+            set_theme(active)
+    print("video wallpaper →", "on" if on else "off")
+    return 0
+
+
+def cmd_update(args: argparse.Namespace) -> int:
+    from common.arch_update import run_update
+
+    return run_update(noconfirm=bool(args.noconfirm), sync_only=bool(args.sync))
+
+
+def cmd_capture(args: argparse.Namespace) -> int:
+    from apps import capture
+
+    if args.capture_action == "shot":
+        return capture.shot(area=bool(args.area))
+    if args.capture_action == "ocr":
+        return capture.ocr()
+    if args.capture_action == "qr":
+        return capture.qr()
+    if args.capture_action == "record":
+        return capture.record()
+    return 2
+
+
+def cmd_remind(args: argparse.Namespace) -> int:
+    from apps import remind
+
+    if args.remind_action == "add":
+        try:
+            item = remind.add(
+                args.text,
+                due_epoch=args.due,
+                in_spec=getattr(args, "in_spec", None),
+            )
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(item["id"], item["text"], item.get("due") or "")
+        return 0
+    if args.remind_action == "list":
+        for item in remind.list_items(include_done=bool(args.all)):
+            print(item["id"], item["text"], item.get("due") or "")
+        return 0
+    if args.remind_action == "due":
+        for item in remind.due_now():
+            print(item["id"], item["text"])
+        return 0
+    if args.remind_action == "done":
+        ok = remind.complete(args.id)
+        return 0 if ok else 1
+    if args.remind_action == "clear":
+        n = remind.clear_all()
+        print(f"cleared {n}")
+        return 0
+    if args.remind_action == "mark-fired":
+        return 0 if remind.complete(args.id) else 1
+    return 2
+
+
+def cmd_clipboard(args: argparse.Namespace) -> int:
+    from apps import clipboard
+
+    if args.clipboard_action == "history":
+        return clipboard.history(limit=int(args.limit))
+    if args.clipboard_action == "select":
+        return clipboard.select(int(args.index))
+    if args.clipboard_action == "ui":
+        return clipboard.ui()
+    return 2
+
+
+def cmd_mode(args: argparse.Namespace) -> int:
+    from desktop import modes
+
+    if args.mode_action == "status":
+        for line in modes.status_lines():
+            print(line)
+        return 0
+    if args.mode_action == "dnd":
+        on = args.state == "on" if args.state else not modes.dnd_enabled()
+        modes.set_dnd(on)
+        print("dnd", "on" if on else "off")
+        return 0
+    if args.mode_action == "night-light":
+        on = args.state == "on" if args.state else not modes.night_light_enabled()
+        modes.set_night_light(on)
+        print("night-light", "on" if on else "off")
+        return 0
+    if args.mode_action == "stay-awake":
+        on = args.state == "on" if args.state else not modes.stay_awake_enabled()
+        modes.set_stay_awake(on)
+        print("stay-awake", "on" if on else "off")
+        return 0
+    return 2
+
+
+def cmd_panel(args: argparse.Namespace) -> int:
+    from apps.panels import open_panel
+
+    return open_panel(args.name, prefer_gtk=bool(getattr(args, "gtk", False)))
+
+
+def cmd_font(args: argparse.Namespace) -> int:
+    from common.fonts import current_monospace, install_font, list_fonts, set_monospace
+
+    action = args.font_action
+    if action == "list":
+        cur = current_monospace() or ""
+        for row in list_fonts():
+            mark = "*" if row["family"] in cur else " "
+            print(f"{mark} {row['id']}\t{row['label']}\t{row['family']}\t{row['package']}")
+        if cur:
+            print(f"# current: {cur}")
+        return 0
+    if action == "set":
+        return set_monospace(args.family)
+    if action == "install":
+        return install_font(args.key)
+    if action == "current":
+        cur = current_monospace()
+        print(cur or "(unset)")
+        return 0
+    return 2
+
+
+def cmd_install_extra(args: argparse.Namespace) -> int:
+    import subprocess
+
+    if getattr(args, "extra", None) == "service":
+        from desktop.services import install as svc_install, list_services
+
+        name = getattr(args, "service_name", None)
+        if not name:
+            for s in list_services():
+                print(s)
+            return 0
+        return svc_install(name, noconfirm=bool(args.yes))
+
+    script = REPO_ROOT / "install" / "arch-extras.sh"
+    if not script.is_file():
+        print("error: install/arch-extras.sh missing", file=sys.stderr)
+        return 1
+    env = os.environ.copy()
+    if args.yes:
+        env["GNOMARCHI_SKIP_CONFIRM"] = "1"
+    return subprocess.call(["bash", str(script), args.extra], env=env)
+
+
+def cmd_notice(args: argparse.Namespace) -> int:
+    from desktop import notices
+
+    if args.notice_action == "all":
+        return notices.demo_all()
+    return notices.run(args.notice_action)
+
+
+def cmd_webapp(args: argparse.Namespace) -> int:
+    from desktop import webapps
+
+    if args.webapp_action == "list":
+        for row in webapps.list_apps():
+            print(f"{row['id']}\t{row['name']}\t{row['url']}")
+        return 0
+    if args.webapp_action == "add":
+        try:
+            sid = webapps.add(args.name, args.url)
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(sid)
+        return 0
+    if args.webapp_action == "remove":
+        return 0 if webapps.remove(args.id) else 1
+    if args.webapp_action == "launch":
+        return webapps.launch(args.id)
+    if args.webapp_action == "seed":
+        created = webapps.seed_defaults()
+        print("seeded", ", ".join(created) or "(none new)")
+        return 0
+    return 2
+
+
+def cmd_share(args: argparse.Namespace) -> int:
+    from desktop import share
+
+    if args.share_action == "file":
+        return share.share_file(args.path)
+    if args.share_action == "folder":
+        return share.share_folder(args.path)
+    if args.share_action == "clipboard":
+        return share.share_clipboard()
+    if args.share_action == "receive":
+        return share.receive()
+    if args.share_action == "hint":
+        print(share.install_hint())
+        return 0
+    return 2
+
+
+def cmd_theme_new(args: argparse.Namespace) -> int:
+    from theme.scaffold import new_theme
+
+    try:
+        dest = new_theme(
+            args.id,
+            name=getattr(args, "name", None),
+            from_id=getattr(args, "from_id", None) or "tokyo-night",
+        )
+    except (ValueError, FileExistsError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(dest)
+    return 0
+
+
+def cmd_herdr(args: argparse.Namespace) -> int:
+    from desktop import herdr
+
+    return herdr.run(args.herdr_action, name=getattr(args, "name", "agent") or "agent")
+
+
+def cmd_display(args: argparse.Namespace) -> int:
+    from desktop import display_ctl
+
+    if args.display_action == "list":
+        return display_ctl.list_monitors()
+    if args.display_action == "settings":
+        return display_ctl.open_settings()
+    if args.display_action == "scale":
+        return display_ctl.set_scale(args.factor)
+    if args.display_action == "status":
+        return display_ctl.status_json()
+    return 2
+
+
+def cmd_idle(args: argparse.Namespace) -> int:
+    from desktop import idle_ctl
+
+    if args.idle_action == "lock":
+        return idle_ctl.lock_now()
+    if args.idle_action == "status":
+        return idle_ctl.status()
+    if args.idle_action == "stay-awake":
+        state = getattr(args, "state", None)
+        on = None if state is None else state == "on"
+        return idle_ctl.stay_awake(on)
+    if args.idle_action == "inhibit":
+        return idle_ctl.inhibit_sleep(int(args.seconds))
+    return 2
+
+
+def cmd_config(args: argparse.Namespace) -> int:
+    from desktop import config_sync
+
+    if args.config_action == "status":
+        return config_sync.status()
+    if args.config_action == "init":
+        return config_sync.init(getattr(args, "remote", None))
+    if args.config_action == "pull":
+        return config_sync.pull()
+    if args.config_action == "push":
+        return config_sync.push()
+    if args.config_action == "export":
+        return config_sync.export_bundle(args.path)
+    return 2
+
+
+def cmd_cliamp(_args: argparse.Namespace) -> int:
+    from desktop import cliamp
+
+    return cliamp.run()
+
+
+def cmd_nvim_seed(args: argparse.Namespace) -> int:
+    from desktop.nvim_seed import install
+
+    path = install(force=bool(args.force))
+    print(path)
+    return 0
+
+
+def cmd_app(args: argparse.Namespace) -> int:
+    import shutil
+    import subprocess
+
+    mapping = {
+        "write": REPO_ROOT / "apps" / "gnoma-write" / "main.py",
+        "cut": REPO_ROOT / "apps" / "gnoma-cut" / "main.py",
+        "calc": REPO_ROOT / "apps" / "gnoma-calc" / "main.py",
+        "hype": REPO_ROOT / "apps" / "gnoma-hype" / "main.py",
+        "signed": REPO_ROOT / "apps" / "gnoma-signed" / "main.py",
+        "monologue": REPO_ROOT / "apps" / "gnoma-monologue" / "main.py",
+    }
+    path = mapping.get(args.name)
+    if path is None or not path.is_file():
+        print(f"error: unknown app {args.name}", file=sys.stderr)
+        return 1
+    # Prefer system Python for PyGObject / Pillow on Arch.
+    py = "/usr/bin/python3" if Path("/usr/bin/python3").is_file() else sys.executable
+    if not shutil.which(py):
+        py = sys.executable
+    return subprocess.call([py, str(path), *list(getattr(args, "app_args", []) or [])])
+
+
 def cmd_plugin_validate(args: argparse.Namespace) -> int:
     from plugin.lifecycle import validate_plugin
 
@@ -72,7 +449,12 @@ def cmd_plugin_scaffold(args: argparse.Namespace) -> int:
     from plugin.lifecycle import scaffold_plugin
 
     try:
-        target = scaffold_plugin(args.id, runtime=args.runtime, dest_root=args.dest)
+        target = scaffold_plugin(
+            args.id,
+            runtime=args.runtime,
+            dest_root=args.dest,
+            explicit_shell_extension=bool(args.explicit_shell_extension),
+        )
     except (ValueError, FileExistsError, FileNotFoundError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -134,65 +516,594 @@ def cmd_plugin_enable(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_plugin_clone(args: argparse.Namespace) -> int:
+    from plugin.lifecycle import clone_plugin
+
+    try:
+        target = clone_plugin(args.id, dest_root=args.dest)
+    except (FileNotFoundError, FileExistsError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"cloned: {target}")
+    return 0
+
+
+def cmd_menu_open(_args: argparse.Namespace) -> int:
+    from menu.palette import open_menu
+
+    return open_menu()
+
+
+def cmd_agent_window(_args: argparse.Namespace) -> int:
+    candidates = [
+        REPO_ROOT / "apps" / "agents-window" / "agents_window.py",
+        Path(__file__).resolve().parent.parent / "apps" / "agents-window" / "agents_window.py",
+    ]
+    for script in candidates:
+        if script.is_file():
+            import runpy
+
+            sys.argv = [str(script)]
+            runpy.run_path(str(script), run_name="__main__")
+            return 0
+    print("error: agents window not installed", file=sys.stderr)
+    return 1
+
+
+def cmd_agent_list(_args: argparse.Namespace) -> int:
+    from agent.catalog import AGENTS
+    from agent.default_agent import get_default_agent
+    from agent.mise import which_agent
+
+    default = get_default_agent()
+    for aid, spec in AGENTS.items():
+        mark = "*" if aid == default else " "
+        path = which_agent(aid) or "-"
+        print(f"{mark} {aid}\t{spec.label}\t{path}")
+    return 0
+
+
+def cmd_default_agent(args: argparse.Namespace) -> int:
+    from agent.default_agent import get_default_agent, set_default_agent
+
+    if not args.id:
+        cur = get_default_agent()
+        print(cur or "(none)")
+        return 0 if cur else 1
+    try:
+        set_default_agent(args.id, install=not args.no_install)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"default agent → {args.id}")
+    return 0
+
+
+def cmd_agent_launch(args: argparse.Namespace) -> int:
+    from agent.launch import launch_agent
+
+    try:
+        return launch_agent(args.id, unattended=bool(args.unattended))
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
+def cmd_agent_prompt(args: argparse.Namespace) -> int:
+    from agent.launch import run_prompt
+
+    try:
+        return run_prompt(args.prompt, agent_id=args.agent, skill=args.skill)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
+def cmd_agent_make(args: argparse.Namespace) -> int:
+    from agent.make import list_starters, make_something
+
+    if not args.kind:
+        for s in list_starters():
+            print(f"{s['id']}\t{s['skill']}")
+        return 0
+    try:
+        return make_something(args.kind, extra=args.extra or "")
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+
+
+def cmd_agent_usage(_args: argparse.Namespace) -> int:
+    from agent.usage import read_usage, update_usage
+
+    data = update_usage() if _args.refresh else read_usage()
+    import json
+
+    print(json.dumps(data, indent=2))
+    return 0
+
+
+def cmd_agent_account(args: argparse.Namespace) -> int:
+    from agent import accounts
+
+    try:
+        if args.account_action == "list":
+            for row in accounts.list_accounts(args.provider):
+                mark = "*" if row.get("active") else " "
+                print(f"{mark} {row['id']}\t{row.get('name')}\t{row.get('provider')}")
+            return 0
+        if args.account_action == "add":
+            print(accounts.add_account(args.provider, args.name))
+            return 0
+        if args.account_action == "use":
+            print(accounts.use_account(args.name))
+            return 0
+        if args.account_action == "remove":
+            accounts.remove_account(args.name)
+            print(f"removed {args.name}")
+            return 0
+        if args.account_action == "mode":
+            enabled = args.mode == "auto"
+            print(accounts.set_autoswitch(enabled, threshold=args.threshold or 95))
+            return 0
+    except (ValueError, KeyError, FileExistsError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 2
+
+
+def cmd_agent_skills(_args: argparse.Namespace) -> int:
+    from agent.skills import install_skills
+
+    linked = install_skills()
+    for p in linked:
+        print(p)
+    print(f"{len(linked)} skill links")
+    return 0
+
+
+def cmd_agent_crash(args: argparse.Namespace) -> int:
+    from agent import crash
+
+    try:
+        if args.crash_action == "diagnose":
+            return crash.diagnose(args.pid)
+        if args.crash_action == "mute":
+            items = crash.mute(args.name, off=bool(args.off))
+            print("\n".join(items) or "(none muted)")
+            return 0
+        if args.crash_action == "watch":
+            return crash.watch_once()
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 2
+
+
+def cmd_agent_setup(_args: argparse.Namespace) -> int:
+    from agent.mise import write_mise_agent_tools
+    from agent.skills import install_skills
+    from common.shell_config import ensure_user_shell_toml
+
+    path = write_mise_agent_tools()
+    linked = install_skills()
+    shell = ensure_user_shell_toml()
+    print(f"mise config → {path}")
+    print(f"skills linked → {len(linked)}")
+    print(f"shell.toml → {shell}")
+    return 0
+
+
+def cmd_bus_serve(args: argparse.Namespace) -> int:
+    from bus import server
+
+    if args.once:
+        server.serve_once()
+    else:
+        server.serve_forever()
+    return 0
+
+
+def cmd_shell_show(_args: argparse.Namespace) -> int:
+    from common.shell_config import load_shell_config
+    import json
+
+    print(json.dumps(load_shell_config(), indent=2))
+    return 0
+
+
+def cmd_shell_bar_position(args: argparse.Namespace) -> int:
+    from common.bar_position import get_bar_position, set_bar_position
+
+    if not args.position:
+        print(get_bar_position())
+        return 0
+    try:
+        pos = set_bar_position(args.position)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    if pos == "top":
+        print(f"bar position → {pos} (stock GNOME top bar)")
+    else:
+        print(f"bar position → {pos} (dash-to-panel enabled)")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gnomarchi",
-        description="gnomarchi — stock GNOME omakase tooling (not affiliated with Omarchy)",
+        description="gnomarchi — stock GNOME omakase (not affiliated with Omarchy)",
     )
     sub = parser.add_subparsers(dest="group", required=True)
 
     theme = sub.add_parser("theme", help="theme pack validate / set / list")
     theme_sub = theme.add_subparsers(dest="action", required=True)
-
-    tv = theme_sub.add_parser("validate", help="validate a theme pack")
-    tv.add_argument("--path", help="path to pack directory")
-    tv.add_argument("--id", help="installed/seeded theme id")
+    tv = theme_sub.add_parser("validate")
+    tv.add_argument("--path")
+    tv.add_argument("--id")
     tv.set_defaults(func=cmd_theme_validate)
-
-    ts = theme_sub.add_parser("set", help="activate a theme pack")
-    ts.add_argument("id", help="theme id")
+    ts = theme_sub.add_parser("set")
+    ts.add_argument("id")
     ts.set_defaults(func=cmd_theme_set)
-
-    tl = theme_sub.add_parser("list", help="list known theme packs")
+    tl = theme_sub.add_parser("list")
     tl.set_defaults(func=cmd_theme_list)
+    tp = theme_sub.add_parser("pick", help="GTK theme carousel (Omarchy Style > Theme)")
+    tp.set_defaults(func=cmd_theme_pick)
+    tn = theme_sub.add_parser("new", help="scaffold user theme under ~/.config/gnomarchi/themes")
+    tn.add_argument("id", help="theme directory id")
+    tn.add_argument("--name", default=None, help="display name")
+    tn.add_argument("--from", dest="from_id", default="tokyo-night", help="base pack to copy")
+    tn.set_defaults(func=cmd_theme_new)
+    tbg = theme_sub.add_parser("bg", help="cycle/set generated backgrounds")
+    tbg_sub = tbg.add_subparsers(dest="bg_action", required=True)
+    tbgn = tbg_sub.add_parser("next")
+    tbgn.set_defaults(func=cmd_theme_bg_next)
+    tbgc = tbg_sub.add_parser("current")
+    tbgc.set_defaults(func=cmd_theme_bg_current)
+    tbgs = tbg_sub.add_parser("set")
+    tbgs.add_argument("index", type=int)
+    tbgs.set_defaults(func=cmd_theme_bg_set)
+    tbgv = tbg_sub.add_parser("video")
+    tbgv.add_argument("video_action", choices=["on", "off", "status"])
+    tbgv.set_defaults(func=cmd_theme_bg_video)
 
-    plugin = sub.add_parser(
-        "plugin", help="plugin validate / scaffold / add / enable / list"
+    upd = sub.add_parser("update", help="Arch pacman -Syu (official repos)")
+    upd.add_argument("--noconfirm", action="store_true")
+    upd.add_argument("--sync", action="store_true", help="pacman -Sy only")
+    upd.set_defaults(func=cmd_update)
+
+    cap = sub.add_parser("capture")
+    cap_sub = cap.add_subparsers(dest="capture_action", required=True)
+    caps = cap_sub.add_parser("shot")
+    caps.add_argument("--area", action="store_true")
+    caps.set_defaults(func=cmd_capture)
+    capo = cap_sub.add_parser("ocr")
+    capo.set_defaults(func=cmd_capture)
+    capq = cap_sub.add_parser("qr")
+    capq.set_defaults(func=cmd_capture)
+    capr = cap_sub.add_parser("record")
+    capr.set_defaults(func=cmd_capture)
+
+    rem = sub.add_parser("remind")
+    rem_sub = rem.add_subparsers(dest="remind_action", required=True)
+    ra = rem_sub.add_parser("add")
+    ra.add_argument("text")
+    ra.add_argument("--due", type=int, default=None, help="unix epoch")
+    ra.add_argument("--in", dest="in_spec", default=None, help="duration e.g. 10m, 1h")
+    ra.set_defaults(func=cmd_remind)
+    rl = rem_sub.add_parser("list")
+    rl.add_argument("--all", action="store_true")
+    rl.set_defaults(func=cmd_remind)
+    rd = rem_sub.add_parser("due")
+    rd.set_defaults(func=cmd_remind)
+    rdone = rem_sub.add_parser("done")
+    rdone.add_argument("id")
+    rdone.set_defaults(func=cmd_remind)
+    rclear = rem_sub.add_parser("clear")
+    rclear.set_defaults(func=cmd_remind)
+    rfired = rem_sub.add_parser("mark-fired")
+    rfired.add_argument("id")
+    rfired.set_defaults(func=cmd_remind)
+
+    clip = sub.add_parser("clipboard", help="clipboard history (GPaste)")
+    clip_sub = clip.add_subparsers(dest="clipboard_action", required=True)
+    ch = clip_sub.add_parser("history")
+    ch.add_argument("--limit", type=int, default=20)
+    ch.set_defaults(func=cmd_clipboard)
+    cs = clip_sub.add_parser("select")
+    cs.add_argument("index", type=int)
+    cs.set_defaults(func=cmd_clipboard)
+    cu = clip_sub.add_parser("ui")
+    cu.set_defaults(func=cmd_clipboard)
+
+    mode = sub.add_parser("mode", help="DND / Night Light / Stay Awake")
+    mode_sub = mode.add_subparsers(dest="mode_action", required=True)
+    ms = mode_sub.add_parser("status")
+    ms.set_defaults(func=cmd_mode)
+    for name in ("dnd", "night-light", "stay-awake"):
+        mp = mode_sub.add_parser(name)
+        mp.add_argument("state", nargs="?", choices=["on", "off"])
+        mp.set_defaults(func=cmd_mode)
+
+    pan = sub.add_parser("panel")
+    pan.add_argument(
+        "name",
+        choices=["audio", "network", "bluetooth", "power", "display", "calendar", "wifi"],
     )
+    pan.add_argument("--gtk", action="store_true", help="force GTK mini panel")
+    pan.set_defaults(func=cmd_panel)
+
+    font = sub.add_parser("font", help="monospace Style > Font")
+    font_sub = font.add_subparsers(dest="font_action", required=True)
+    fl = font_sub.add_parser("list")
+    fl.set_defaults(func=cmd_font)
+    fc = font_sub.add_parser("current")
+    fc.set_defaults(func=cmd_font)
+    fs = font_sub.add_parser("set")
+    fs.add_argument("family", help="font id, label, or family name")
+    fs.set_defaults(func=cmd_font)
+    fi = font_sub.add_parser("install")
+    fi.add_argument("key", help="font id (cascadia, fira, …)")
+    fi.set_defaults(func=cmd_font)
+
+    inst = sub.add_parser("install", help="Arch extras (panel/tiling/gaming/…)")
+    inst.add_argument(
+        "extra",
+        choices=[
+            "all",
+            "panel",
+            "tiling",
+            "capture",
+            "shell-tools",
+            "gaming",
+            "windows-vm",
+            "plymouth",
+            "service",
+        ],
+    )
+    inst.add_argument(
+        "service_name",
+        nargs="?",
+        default=None,
+        help="for: gnomarchi install service <name>",
+    )
+    inst.add_argument("--yes", action="store_true")
+    inst.set_defaults(func=cmd_install_extra)
+
+    notice = sub.add_parser("notice", help="time/battery/weather notices")
+    notice_sub = notice.add_subparsers(dest="notice_action", required=True)
+    for n in ("time", "battery", "weather", "all"):
+        np = notice_sub.add_parser(n)
+        np.set_defaults(func=cmd_notice)
+
+    web = sub.add_parser("webapp", help="Chromium --app web apps")
+    web_sub = web.add_subparsers(dest="webapp_action", required=True)
+    wl = web_sub.add_parser("list")
+    wl.set_defaults(func=cmd_webapp)
+    wa = web_sub.add_parser("add")
+    wa.add_argument("name")
+    wa.add_argument("url")
+    wa.set_defaults(func=cmd_webapp)
+    wr = web_sub.add_parser("remove")
+    wr.add_argument("id")
+    wr.set_defaults(func=cmd_webapp)
+    wlaunch = web_sub.add_parser("launch")
+    wlaunch.add_argument("id")
+    wlaunch.set_defaults(func=cmd_webapp)
+    ws = web_sub.add_parser("seed")
+    ws.set_defaults(func=cmd_webapp)
+
+    shr = sub.add_parser("share", help="LocalSend share helpers")
+    shr_sub = shr.add_subparsers(dest="share_action", required=True)
+    sf = shr_sub.add_parser("file")
+    sf.add_argument("path")
+    sf.set_defaults(func=cmd_share)
+    sfo = shr_sub.add_parser("folder")
+    sfo.add_argument("path")
+    sfo.set_defaults(func=cmd_share)
+    sc = shr_sub.add_parser("clipboard")
+    sc.set_defaults(func=cmd_share)
+    sr = shr_sub.add_parser("receive")
+    sr.set_defaults(func=cmd_share)
+    sh = shr_sub.add_parser("hint")
+    sh.set_defaults(func=cmd_share)
+
+    app = sub.add_parser("app")
+    app.add_argument(
+        "name",
+        choices=["write", "cut", "calc", "hype", "signed", "monologue"],
+    )
+    app.add_argument("app_args", nargs="*", help="args passed to the app")
+    app.set_defaults(func=cmd_app)
+
+    her = sub.add_parser("herdr", help="tmux agent session manager")
+    her_sub = her.add_subparsers(dest="herdr_action", required=True)
+    for a in ("list", "ensure", "attach"):
+        hp = her_sub.add_parser(a)
+        hp.set_defaults(func=cmd_herdr)
+    hn = her_sub.add_parser("new")
+    hn.add_argument("--name", default="agent")
+    hn.set_defaults(func=cmd_herdr)
+
+    disp = sub.add_parser("display", help="monitors / scale")
+    disp_sub = disp.add_subparsers(dest="display_action", required=True)
+    for a in ("list", "settings", "status"):
+        dp = disp_sub.add_parser(a)
+        dp.set_defaults(func=cmd_display)
+    ds = disp_sub.add_parser("scale")
+    ds.add_argument("factor")
+    ds.set_defaults(func=cmd_display)
+
+    idle = sub.add_parser("idle", help="lock / stay-awake / inhibit")
+    idle_sub = idle.add_subparsers(dest="idle_action", required=True)
+    for a in ("lock", "status"):
+        ip = idle_sub.add_parser(a)
+        ip.set_defaults(func=cmd_idle)
+    isa = idle_sub.add_parser("stay-awake")
+    isa.add_argument("state", nargs="?", choices=["on", "off"])
+    isa.set_defaults(func=cmd_idle)
+    ii = idle_sub.add_parser("inhibit")
+    ii.add_argument("--seconds", type=int, default=3600)
+    ii.set_defaults(func=cmd_idle)
+
+    cfg = sub.add_parser("config", help="dotfiles sync for ~/.config/gnomarchi")
+    cfg_sub = cfg.add_subparsers(dest="config_action", required=True)
+    for a in ("status", "pull", "push"):
+        cp = cfg_sub.add_parser(a)
+        cp.set_defaults(func=cmd_config)
+    ci = cfg_sub.add_parser("init")
+    ci.add_argument("--remote", default=None)
+    ci.set_defaults(func=cmd_config)
+    ce = cfg_sub.add_parser("export")
+    ce.add_argument("path")
+    ce.set_defaults(func=cmd_config)
+
+    ca = sub.add_parser("cliamp", help="music TUI (cmus)")
+    ca.set_defaults(func=cmd_cliamp)
+
+    nv = sub.add_parser("nvim", help="neovim seed")
+    nv_sub = nv.add_subparsers(dest="nvim_action", required=True)
+    nvs = nv_sub.add_parser("seed", help="install gnomarchi init.lua")
+    nvs.add_argument("--force", action="store_true")
+    nvs.set_defaults(func=cmd_nvim_seed)
+
+    plugin = sub.add_parser("plugin")
     plugin_sub = plugin.add_subparsers(dest="action", required=True)
-
-    pv = plugin_sub.add_parser("validate", help="validate a plugin directory")
-    pv.add_argument("path", help="path to plugin directory")
+    pv = plugin_sub.add_parser("validate")
+    pv.add_argument("path")
     pv.set_defaults(func=cmd_plugin_validate)
-
-    ps = plugin_sub.add_parser("scaffold", help="scaffold a plugin from template")
-    ps.add_argument("id", help="plugin id (directory name)")
+    ps = plugin_sub.add_parser("scaffold")
+    ps.add_argument("id")
     ps.add_argument(
         "--runtime",
         default="overlay-app",
-        choices=["overlay-app", "menu-module", "user-service"],
-        help="adapter runtime (Shell extension not offered)",
+        choices=[
+            "overlay-app",
+            "menu-module",
+            "user-service",
+            "status-indicator",
+            "gnome-shell-extension",
+        ],
     )
-    ps.add_argument("--dest", help="destination parent directory")
-    ps.set_defaults(func=cmd_plugin_scaffold)
-
-    pa = plugin_sub.add_parser("add", help="install plugin from path (confirm required)")
-    pa.add_argument("path", help="source plugin directory")
-    pa.add_argument(
-        "--confirm",
+    ps.add_argument("--dest")
+    ps.add_argument(
+        "--explicit-shell-extension",
         action="store_true",
-        help="non-interactive confirm after summary is printed (default: prompt)",
+        help="required to scaffold gnome-shell-extension",
     )
-    pa.add_argument("--dest", help="destination parent directory")
+    ps.set_defaults(func=cmd_plugin_scaffold)
+    pa = plugin_sub.add_parser("add")
+    pa.add_argument("path")
+    pa.add_argument("--confirm", action="store_true")
+    pa.add_argument("--dest")
     pa.set_defaults(func=cmd_plugin_add)
-
-    pe = plugin_sub.add_parser("enable", help="validate then enable an installed plugin")
-    pe.add_argument("path", nargs="?", help="plugin directory")
-    pe.add_argument("--id", help="installed plugin id")
+    pe = plugin_sub.add_parser("enable")
+    pe.add_argument("path", nargs="?")
+    pe.add_argument("--id")
     pe.set_defaults(func=cmd_plugin_enable)
-
-    pl = plugin_sub.add_parser("list", help="list installed plugins")
+    pl = plugin_sub.add_parser("list")
     pl.set_defaults(func=cmd_plugin_list)
+    pc = plugin_sub.add_parser("clone", help="clone first-party plugin into user tree")
+    pc.add_argument("id")
+    pc.add_argument("--dest")
+    pc.set_defaults(func=cmd_plugin_clone)
+
+    menu = sub.add_parser("menu")
+    menu_sub = menu.add_subparsers(dest="action", required=True)
+    mo = menu_sub.add_parser("open")
+    mo.set_defaults(func=cmd_menu_open)
+
+    default = sub.add_parser("default", help="defaults")
+    default_sub = default.add_subparsers(dest="action", required=True)
+    da = default_sub.add_parser("agent")
+    da.add_argument("id", nargs="?", help="agent id to set; omit to print current")
+    da.add_argument("--no-install", action="store_true")
+    da.set_defaults(func=cmd_default_agent)
+
+    agent = sub.add_parser("agent")
+    agent_sub = agent.add_subparsers(dest="action", required=True)
+    aw = agent_sub.add_parser("window")
+    aw.set_defaults(func=cmd_agent_window)
+    al = agent_sub.add_parser("list")
+    al.set_defaults(func=cmd_agent_list)
+    alaunch = agent_sub.add_parser("launch")
+    alaunch.add_argument("id", nargs="?")
+    alaunch.add_argument("--unattended", action="store_true")
+    alaunch.set_defaults(func=cmd_agent_launch)
+    ap = agent_sub.add_parser("prompt")
+    ap.add_argument("prompt")
+    ap.add_argument("--agent")
+    ap.add_argument("--skill")
+    ap.set_defaults(func=cmd_agent_prompt)
+    am = agent_sub.add_parser("make-something")
+    am.add_argument("kind", nargs="?")
+    am.add_argument("--extra", default="")
+    am.set_defaults(func=cmd_agent_make)
+    au = agent_sub.add_parser("usage-update")
+    au.add_argument("--refresh", action="store_true", default=True)
+    au.set_defaults(func=cmd_agent_usage)
+    au2 = agent_sub.add_parser("usage")
+    au2.add_argument("--refresh", action="store_true")
+    au2.set_defaults(func=cmd_agent_usage)
+    ask = agent_sub.add_parser("skills-install")
+    ask.set_defaults(func=cmd_agent_skills)
+    asetup = agent_sub.add_parser("setup")
+    asetup.set_defaults(func=cmd_agent_setup)
+
+    aacc = agent_sub.add_parser("account")
+    aacc_sub = aacc.add_subparsers(dest="account_action", required=True)
+    aal = aacc_sub.add_parser("list")
+    aal.add_argument("provider", nargs="?")
+    aal.set_defaults(func=cmd_agent_account)
+    aaa = aacc_sub.add_parser("add")
+    aaa.add_argument("provider")
+    aaa.add_argument("name")
+    aaa.set_defaults(func=cmd_agent_account)
+    aau = aacc_sub.add_parser("use")
+    aau.add_argument("name")
+    aau.set_defaults(func=cmd_agent_account)
+    aar = aacc_sub.add_parser("remove")
+    aar.add_argument("name")
+    aar.set_defaults(func=cmd_agent_account)
+    aam = aacc_sub.add_parser("mode")
+    aam.add_argument("mode", choices=["auto", "notify"])
+    aam.add_argument("threshold", nargs="?", type=int)
+    aam.set_defaults(func=cmd_agent_account)
+
+    acr = agent_sub.add_parser("crash")
+    acr_sub = acr.add_subparsers(dest="crash_action", required=True)
+    acd = acr_sub.add_parser("diagnose")
+    acd.add_argument("pid", nargs="?")
+    acd.set_defaults(func=cmd_agent_crash)
+    acm = acr_sub.add_parser("mute")
+    acm.add_argument("name")
+    acm.add_argument("off", nargs="?", choices=["off"])
+    acm.set_defaults(func=cmd_agent_crash)
+    acw = acr_sub.add_parser("watch")
+    acw.set_defaults(func=cmd_agent_crash)
+
+    bus = sub.add_parser("bus")
+    bus_sub = bus.add_subparsers(dest="action", required=True)
+    bs = bus_sub.add_parser("serve")
+    bs.add_argument("--once", action="store_true")
+    bs.set_defaults(func=cmd_bus_serve)
+
+    shell = sub.add_parser("shell")
+    shell_sub = shell.add_subparsers(dest="action", required=True)
+    ss = shell_sub.add_parser("show")
+    ss.set_defaults(func=cmd_shell_show)
+    sbp = shell_sub.add_parser(
+        "bar-position",
+        help="top=stock GNOME top bar (default); bottom|left|right enables dash-to-panel",
+    )
+    sbp.add_argument(
+        "position",
+        nargs="?",
+        choices=["top", "bottom", "left", "right"],
+        help="omit to print current",
+    )
+    sbp.set_defaults(func=cmd_shell_bar_position)
 
     return parser
 
@@ -204,4 +1115,4 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

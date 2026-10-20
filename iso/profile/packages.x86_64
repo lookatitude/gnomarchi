@@ -1,0 +1,44 @@
+# Live ISO packages — official Arch only (no custom [gnomarchi] repo).
+base
+base-devel
+linux
+linux-firmware
+mkinitcpio
+mkinitcpio-archiso
+syslinux
+systemd-boot
+efibootmgr
+edk2-shell
+memtest86+
+memtest86+-efi
+
+# Network + install tooling
+networkmanager
+openssh
+sudo
+git
+curl
+wget
+rsync
+arch-install-scripts
+archinstall
+parted
+gptfdisk
+btrfs-progs
+e2fsprogs
+dosfstools
+cryptsetup
+lvm2
+
+# Useful rescue / guided-install UX
+nano
+vim
+less
+tmux
+dialog
+python
+python-gobject
+
+# Optional: GNOME on live session for demos (keeps ISO heavier — comment to slim)
+# gnome
+# gdm

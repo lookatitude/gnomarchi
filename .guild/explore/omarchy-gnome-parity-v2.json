@@ -1,0 +1,30 @@
+{
+  "schema_version": "guild.explore.v1",
+  "assumptions": [
+    "Stock GNOME Shell + GDM remain the host (D1′); Quickshell/Hyprland stay forbidden",
+    "Parity means Omarchy-equivalent user outcomes via GNOME panel, StatusNotifier, optional Shell extensions, GTK overlays, and theme emitters — not pixel-clone of Quickshell",
+    "Omarchy MIT colors.toml / Ghostty templates remain reusable; binary backgrounds and product marks stay out until CREDITS (D7)",
+    "QEMU test VM (SSH :2222, VNC :5901, 9p /mnt/gnomarchi) is the acceptance surface for visual checks",
+    "Default GNOME extensions (user-themes, appindicator, gnomarchi first-party) ship enabled from overlay",
+    "Theme select/change UX must match Omarchy Appearance > Theme / Super+Ctrl+T carousel semantics, not CLI-only"
+  ],
+  "evidence_needs": [
+    "Complete Omarchy quattro surface inventory (17 shell plugins, 23 themes, bar widgets/indicators/panels, theme/bg CLIs, menu Style tree)",
+    "gnomarchi registry vs inventory delta (port | adapt | rebuild | done | triage)",
+    "Arch package names for gnome-shell-extension-user-theme and related defaults on the target Shell version",
+    "VM screenshot matrix covering every visually checkable shipped feature"
+  ],
+  "comparables": [
+    "Omarchy quattro Style menu + theme carousel + per-theme backgrounds",
+    "GNOME Tweaks + user-themes extension for GTK/Shell CSS",
+    "Existing gnomarchi theme emitters + CLI theme picker (gap: no visual carousel)"
+  ],
+  "risks": [
+    "Shell extension OUT_OF_DATE / UUID enable races on GNOME 50/51",
+    "user-themes + custom Shell CSS can break panel layout after updates",
+    "Over-claiming Omarchy affiliation when shipping inspired palettes (D7)",
+    "Video wallpaper / OWE intros have no stock-GNOME equivalent without a rebuild",
+    "Team gate blocks build until explicit human approve"
+  ],
+  "recommended_next_step": "Validate explore → write define + full parity map/plan HTML → compose ≤6 specialist team → team-decide gate (human approve) → implement lanes → VM visual checklist with screenshots"
+}

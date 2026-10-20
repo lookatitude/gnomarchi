@@ -1,0 +1,41 @@
+# gnomarchi shell chrome — adapted from Omarchy config/omarchy/shell.json layout.
+# GNOME maps: Quick Settings ≈ audio/network/bluetooth/power/monitor;
+# StatusNotifier ≈ agents/weather/system-update/tray; clock/workspaces stay native.
+
+[panel]
+# Default matches Omarchy: top opaque bar (https://omarchy.org/manual/the-top-bar/).
+# Opt into a bottom/side bar with: gnomarchi shell bar-position bottom|left|right
+position = "top"
+background = "opaque"
+# Indicator order mirrors Omarchy bar right/centerEnd agent+weather+updates.
+indicators = [
+  "gnomarchi.agents",
+  "gnomarchi.weather",
+  "gnomarchi.system-update",
+  "gnomarchi.tailscale",
+]
+tray_host_extension = "ubuntu-appindicators@ubuntu.com"
+# Omarchy layout ids kept for docs / future extension placement.
+layout_left = ["gnomarchi.menu", "gnome.workspaces"]
+layout_center = ["gnome.clock"]
+layout_center_end = ["gnomarchi.weather", "gnomarchi.system-update"]
+layout_right = ["gnome.tray", "gnomarchi.agents", "gnome.bluetooth", "gnome.network", "gnome.audio", "gnome.power"]
+
+# Optional dash-to-panel dock — off by default; enabled only via bar-position ≠ top.
+[dock]
+enabled = false
+position = "bottom"
+pinned = ["org.gnome.Nautilus", "chromium", "com.mitchellh.ghostty"]
+
+[agents]
+usage_refresh_seconds = 900
+autoswitch = false
+autoswitch_threshold = 95
+hotkey_launch = "<Super><Shift><Control>a"
+
+[menu]
+super_space = true
+
+[idle]
+screensaver = 150
+lock = 300

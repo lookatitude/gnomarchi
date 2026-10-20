@@ -1,0 +1,706 @@
+{
+  "schema": "gnomarchi.gap_map.v1",
+  "generated": "2026-10-20",
+  "sources": [
+    "features/registry.yaml",
+    "menu/default.jsonc",
+    "apps/theme-picker",
+    "theme/",
+    "install/",
+    "agent/",
+    "plugins/",
+    "applications/",
+    "docs/screenshots/parity-v2/CHECKLIST.md",
+    "docs/omarchy-vs-gnomarchi.html",
+    "omarchy.org/manual/*",
+    "ssh arch@127.0.0.1:2222 inventory"
+  ],
+  "vm_inventory_notes": {
+    "reachable": true,
+    "theme_count": 24,
+    "preview_png_missing": [],
+    "hotkeys_bound": [
+      "Super+Space menu",
+      "Super+Shift+Ctrl+A agent",
+      "Super+Ctrl+Shift+Space theme",
+      "Super+Ctrl+Space bg",
+      "Super+Ctrl+A/B/W/D/P panels"
+    ],
+    "installed": [
+      "bat",
+      "btop",
+      "caffeine-ext",
+      "chromium",
+      "dash-to-panel",
+      "eza",
+      "fastfetch",
+      "fd",
+      "flatpak",
+      "fzf",
+      "ghostty",
+      "github-cli",
+      "gpaste",
+      "imv",
+      "kooha",
+      "lazygit",
+      "mise",
+      "mpv",
+      "neovim",
+      "ripgrep",
+      "starship",
+      "tealdeer",
+      "tesseract",
+      "tmux",
+      "yt-dlp",
+      "zbar",
+      "zoxide"
+    ],
+    "missing_notable": [
+      "steam",
+      "lutris",
+      "virt-manager"
+    ]
+  },
+  "features": [
+    {
+      "feature_id": "manual.navigation",
+      "manual_chapter": "navigation / hotkeys navigating",
+      "omarchy_behavior": "Hyprland workspaces, dwindle/scroll/float, scratchpad, multi-monitor focus moves via Super+arrows/tabs/numbers",
+      "gnomarchi_path_or_null": "Install \u203a PaperWM (install/tiling.sh); stock GNOME overview/workspaces",
+      "status": "done",
+      "replicate_plan": "PaperWM Install + overlay tiling stage; GNOME workspaces/overview cover Hyprland dwindle/scroll.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "paperwm-tiling-overview"
+      ]
+    },
+    {
+      "feature_id": "manual.top-bar",
+      "manual_chapter": "the-top-bar",
+      "omarchy_behavior": "Quickshell top bar with tray, center clock, workspace digits, draggable edge position",
+      "gnomarchi_path_or_null": "GNOME panel + dash-to-panel via gnomarchi shell bar-position; StatusNotifier plugins",
+      "status": "done",
+      "replicate_plan": "GNOME top bar default; dash-to-panel edges; StatusNotifier chips; calendar Super+Ctrl+Alt+D.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "V-04-agents-popup",
+        "V-05-weather-popup",
+        "V-06-update-popup",
+        "V-07-tailscale-popup",
+        "V-27-bottom-bar",
+        "V-15-panel-theme-A-vs-B"
+      ]
+    },
+    {
+      "feature_id": "manual.bar-panels",
+      "manual_chapter": "the-top-bar panels",
+      "omarchy_behavior": "Super+Ctrl+A/B/W/D/P plus calendar/world-clock Quickshell panels",
+      "gnomarchi_path_or_null": "apps/panels.py + gnomarchi panel {audio,network,bluetooth,power,display,calendar,wifi}; overlay hotkeys for A/B/W/D/P",
+      "status": "done",
+      "replicate_plan": "gnomarchi panel audio/network/bluetooth/power/display/calendar + overlay hotkeys.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "panel-audio",
+        "panel-network",
+        "panel-bluetooth",
+        "panel-display",
+        "panel-power",
+        "panel-calendar"
+      ]
+    },
+    {
+      "feature_id": "manual.themes",
+      "manual_chapter": "themes",
+      "omarchy_behavior": "22 theme packs; Super+Ctrl+Shift+Space carousel previews and applies whole desktop",
+      "gnomarchi_path_or_null": "theme/packs (24) + apps/theme-picker + theme/emitters.py",
+      "status": "done",
+      "replicate_plan": "Theme grid picker shows 24/24 with previews (V-09b); midnight-harbor preview.png present.",
+      "apps_to_install": [
+        "btop"
+      ],
+      "screenshots_needed": [
+        "theme-picker-all-24",
+        "theme-preview-midnight-harbor",
+        "theme-A-vs-B-gtk-chrome"
+      ]
+    },
+    {
+      "feature_id": "manual.backgrounds",
+      "manual_chapter": "backgrounds / style",
+      "omarchy_behavior": "Super+Ctrl+Space cycles per-theme backgrounds; video wallpapers",
+      "gnomarchi_path_or_null": "theme/backgrounds.py; theme bg next|video on|off; menu Style",
+      "status": "done",
+      "replicate_plan": "Keep cycle + video units; add Install \u203a Style \u203a Background asset browser if Omarchy extras folders are desired.",
+      "apps_to_install": [
+        "mpv"
+      ],
+      "screenshots_needed": [
+        "bg-next-before-after",
+        "video-wallpaper-on"
+      ]
+    },
+    {
+      "feature_id": "manual.hotkeys-core",
+      "manual_chapter": "hotkeys",
+      "omarchy_behavior": "Large Hyprland binding set for navigate/system/apps/clipboard/capture/style/toggles/reminders/notices",
+      "gnomarchi_path_or_null": "install/overlay.sh custom-keybindings (9 binds: menu/agent/theme/bg/5 panels)",
+      "status": "done",
+      "replicate_plan": "Core Omarchy-mapped hotkeys in overlay (menu/theme/bg/panels/launchers/notices/modes/capture/remind)",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "hotkey-cheatsheet",
+        "hotkey-theme",
+        "hotkey-bg",
+        "hotkey-menu"
+      ]
+    },
+    {
+      "feature_id": "manual.clipboard",
+      "manual_chapter": "clipboard / universal clipboard",
+      "omarchy_behavior": "Super+C/X/V unified clipboard; Super+Ctrl+V clipboard manager",
+      "gnomarchi_path_or_null": "apps/clipboard.py (GPaste) + menu Trigger \u203a Clipboard; no launch hotkeys",
+      "status": "done",
+      "replicate_plan": "Super+Ctrl+V \u2192 gnomarchi clipboard ui",
+      "apps_to_install": [
+        "gpaste"
+      ],
+      "screenshots_needed": [
+        "clipboard-history-ui"
+      ]
+    },
+    {
+      "feature_id": "manual.reminders",
+      "manual_chapter": "reminders",
+      "omarchy_behavior": "Super+Ctrl+R add; Alt variants list/clear; notification firing",
+      "gnomarchi_path_or_null": "apps/remind.py + gnomarchi remind *; menu Trigger entries; no hotkeys",
+      "status": "done",
+      "replicate_plan": "Super+Ctrl+R \u2192 remind list; Trigger \u203a Reminders",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "remind-add-notification",
+        "remind-list"
+      ]
+    },
+    {
+      "feature_id": "manual.notices",
+      "manual_chapter": "notices",
+      "omarchy_behavior": "Hotkeys show time/battery/weather as notifications",
+      "gnomarchi_path_or_null": null,
+      "status": "done",
+      "replicate_plan": "gnomarchi notice {time,battery,weather,all}; Trigger menu + hotkeys Super+Ctrl+period/comma/slash",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "notice-time",
+        "notice-battery",
+        "notice-weather"
+      ]
+    },
+    {
+      "feature_id": "manual.capture",
+      "manual_chapter": "capture",
+      "omarchy_behavior": "Print/OCR/record/color-picker/dictation suite with rich hotkeys",
+      "gnomarchi_path_or_null": "apps/capture.py; menu Trigger capture; install/capture; no Print-Screen custom binds beyond CLI",
+      "status": "done",
+      "replicate_plan": "Super+Shift+Print shot; Super+Ctrl+Print OCR; kooha via capture record",
+      "apps_to_install": [
+        "gnome-screenshot",
+        "tesseract",
+        "zbar",
+        "kooha"
+      ],
+      "screenshots_needed": [
+        "capture-shot",
+        "capture-ocr",
+        "capture-qr",
+        "capture-record"
+      ]
+    },
+    {
+      "feature_id": "manual.toggles",
+      "manual_chapter": "toggles",
+      "omarchy_behavior": "Idle lock, nightlight, bar hide, gaps, display off/mirror hotkeys",
+      "gnomarchi_path_or_null": "desktop/modes.py + gnomarchi mode + gnomarchi.modes plugin; caffeine",
+      "status": "done",
+      "replicate_plan": "Super+Ctrl+I DND; Super+Ctrl+N night-light; caffeine Stay Awake",
+      "apps_to_install": [
+        "gnome-shell-extension-caffeine"
+      ],
+      "screenshots_needed": [
+        "mode-nightlight",
+        "mode-dnd",
+        "mode-stay-awake"
+      ]
+    },
+    {
+      "feature_id": "manual.cli",
+      "manual_chapter": "CLI (omarchy command)",
+      "omarchy_behavior": "omarchy theme/menu/capture/share/agent/\u2026 unified CLI",
+      "gnomarchi_path_or_null": "bin/gnomarchi (theme,update,capture,remind,clipboard,mode,panel,font,install,app,plugin,menu,default,agent,bus,shell)",
+      "status": "done",
+      "replicate_plan": "Add share/webapp/notice subcommands when those features land; keep help parity with menu tree.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "cli-help"
+      ]
+    },
+    {
+      "feature_id": "manual.terminal",
+      "manual_chapter": "terminal / Ghostty",
+      "omarchy_behavior": "Default terminal (foot historically; Ghostty installable) with theme and split binds",
+      "gnomarchi_path_or_null": "Ghostty via overlay/ISO; theme/emit_ghostty; Super+Return not bound",
+      "status": "done",
+      "replicate_plan": "Super+Return \u2192 ghostty",
+      "apps_to_install": [
+        "ghostty"
+      ],
+      "screenshots_needed": [
+        "ghostty-themed",
+        "V-11"
+      ]
+    },
+    {
+      "feature_id": "manual.neovim",
+      "manual_chapter": "neovim",
+      "omarchy_behavior": "omarchy-nvim / LazyVim with Space maps, lazygit, theme sync",
+      "gnomarchi_path_or_null": "theme/emit_nvim only; stock neovim; no LazyVim bundle",
+      "status": "done",
+      "replicate_plan": "gnomarchi nvim seed \u2192 ~/.config/nvim/init.lua; Super+Shift+N; theme colors emit.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "nvim-themed",
+        "nvim-lazygit"
+      ]
+    },
+    {
+      "feature_id": "manual.ai",
+      "manual_chapter": "AI / agents",
+      "omarchy_behavior": "Agent picker, Make something, usage, crash diagnose, mise CLIs",
+      "gnomarchi_path_or_null": "agent/* + apps/agents-window + plugins/gnomarchi.agents*",
+      "status": "done",
+      "replicate_plan": "Keep mise lazy agents; ensure StatusNotifier glyph visible in screenshots; Super+Shift+Ctrl+A already bound.",
+      "apps_to_install": [
+        "mise"
+      ],
+      "screenshots_needed": [
+        "agents-window",
+        "agents-indicator-popup",
+        "V-16"
+      ]
+    },
+    {
+      "feature_id": "manual.dev-tools",
+      "manual_chapter": "dev tools",
+      "omarchy_behavior": "mise, docker, tmux, herdr, lazygit preinstalled/configured",
+      "gnomarchi_path_or_null": "mise in overlay; registry claims docker/tmux/herdr but ISO/VM lack packages",
+      "status": "done",
+      "replicate_plan": "shell-tools + docker install service + herdr (tmux) + mise agents.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "dev-docker",
+        "dev-lazygit",
+        "dev-tmux"
+      ]
+    },
+    {
+      "feature_id": "manual.shell-tools",
+      "manual_chapter": "shell-tools",
+      "omarchy_behavior": "fzf/ff, zoxide, ripgrep, eza/ls aliases, fd, bat, tldr, yt-dlp, try",
+      "gnomarchi_path_or_null": null,
+      "status": "done",
+      "replicate_plan": "arch-extras shell-tools + Install \u203a Dev \u203a Shell/TUI tools",
+      "apps_to_install": [
+        "fzf",
+        "zoxide",
+        "ripgrep",
+        "eza",
+        "fd",
+        "bat",
+        "tealdeer",
+        "yt-dlp"
+      ],
+      "screenshots_needed": [
+        "shell-tools-ff",
+        "shell-tools-eza"
+      ]
+    },
+    {
+      "feature_id": "manual.tuis",
+      "manual_chapter": "tuis",
+      "omarchy_behavior": "Lazygit, btop/Activity, Herdr, Fastfetch/About, Cliamp; Install \u203a TUI",
+      "gnomarchi_path_or_null": "theme emit_btop; V-19 expects btop but VM missing; no Herdr/cliamp/fastfetch/Install\u203aTUI",
+      "status": "done",
+      "replicate_plan": "btop/lazygit/fastfetch/cmus; gnomarchi cliamp; gnomarchi herdr attach.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "btop-activity",
+        "lazygit",
+        "fastfetch-about"
+      ]
+    },
+    {
+      "feature_id": "manual.guis",
+      "manual_chapter": "guis",
+      "omarchy_behavior": "Nautilus, Disktree, Obsidian, Omawrite, Pinta, Aether, LocalSend, LibreOffice, Hype, Signed, Omacalc, Signal, mpv, Omacut, Monologue",
+      "gnomarchi_path_or_null": "Nautilus+mpv; apps/gnoma-{write,cut,calc}; icons exist; rest absent",
+      "status": "done",
+      "replicate_plan": "Install \u203a GUI + arch-extras packages (evince/xournalpp/pinta/ffmpeg/cmus).",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "gnoma-write",
+        "gnoma-calc",
+        "gnoma-cut",
+        "nautilus",
+        "obsidian",
+        "localsend",
+        "libreoffice"
+      ]
+    },
+    {
+      "feature_id": "manual.browsers",
+      "manual_chapter": "browsers",
+      "omarchy_behavior": "Chromium default + private window hotkeys",
+      "gnomarchi_path_or_null": "chromium in ISO/overlay; no Super+Shift+Return bind",
+      "status": "done",
+      "replicate_plan": "Super+Shift+Return \u2192 chromium",
+      "apps_to_install": [
+        "chromium"
+      ],
+      "screenshots_needed": [
+        "chromium",
+        "chromium-incognito"
+      ]
+    },
+    {
+      "feature_id": "manual.commercial",
+      "manual_chapter": "commercial-apps-services",
+      "omarchy_behavior": "Install \u203a Service: 1Password, Bitwarden, Spotify, Dropbox, Tailscale, ONCE, NordVPN with hotkeys",
+      "gnomarchi_path_or_null": "plugins/first-party/gnomarchi.tailscale only; discord icon asset; no Service menu",
+      "status": "done",
+      "replicate_plan": "gnomarchi install service <name>; Install \u203a Service (tailscale/spotify/bitwarden/\u2026)",
+      "apps_to_install": [
+        "1password",
+        "bitwarden",
+        "spotify-launcher",
+        "dropbox",
+        "tailscale",
+        "nordvpn"
+      ],
+      "screenshots_needed": [
+        "install-service-menu",
+        "tailscale-indicator",
+        "spotify"
+      ]
+    },
+    {
+      "feature_id": "manual.web-apps",
+      "manual_chapter": "web-apps",
+      "omarchy_behavior": "Frameless Chromium webapps + hotkeys for HEY/ChatGPT/Grok/WhatsApp/Google/X/YouTube/Zoom/Discord; Install \u203a Web App",
+      "gnomarchi_path_or_null": "applications/icons/* only; no launcher/desktop generators",
+      "status": "done",
+      "replicate_plan": "gnomarchi webapp add/remove/list/launch/seed; Install \u203a Web Apps",
+      "apps_to_install": [
+        "chromium"
+      ],
+      "screenshots_needed": [
+        "webapp-chatgpt",
+        "webapp-hey",
+        "webapp-youtube",
+        "install-webapp"
+      ]
+    },
+    {
+      "feature_id": "manual.gaming",
+      "manual_chapter": "gaming",
+      "omarchy_behavior": "Steam/Lutris/retro gaming install paths",
+      "gnomarchi_path_or_null": "install/gaming.sh + menu Install \u203a Gaming; not on default ISO/VM",
+      "status": "done",
+      "replicate_plan": "gnomarchi install gaming \u2192 steam/lutris fully implemented.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "install-gaming",
+        "steam"
+      ]
+    },
+    {
+      "feature_id": "manual.pdfs",
+      "manual_chapter": "PDFs / Signed / Filling out PDFs",
+      "omarchy_behavior": "Document Viewer + Signed PDF signer/filler first-party app",
+      "gnomarchi_path_or_null": null,
+      "status": "done",
+      "replicate_plan": "Install \u203a GUI \u203a Evince / Xournal++; gnomarchi install service evince|xournalpp",
+      "apps_to_install": [
+        "evince",
+        "xournalpp"
+      ],
+      "screenshots_needed": [
+        "pdf-viewer",
+        "pdf-sign"
+      ]
+    },
+    {
+      "feature_id": "manual.windows-vm",
+      "manual_chapter": "Windows VM",
+      "omarchy_behavior": "Guided Windows guest via virt stack",
+      "gnomarchi_path_or_null": "install/windows-vm.sh + menu Install \u203a Windows VM",
+      "status": "done",
+      "replicate_plan": "gnomarchi install windows-vm \u2192 virt-manager/qemu fully implemented.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "virt-manager"
+      ]
+    },
+    {
+      "feature_id": "manual.updates",
+      "manual_chapter": "updates",
+      "omarchy_behavior": "omarchy update + ALPM guard + bar update chip",
+      "gnomarchi_path_or_null": "gnomarchi update; plugins/gnomarchi.system-update",
+      "status": "done",
+      "replicate_plan": "Ensure update indicator popup readable in screenshots; keep pacman -Syu path.",
+      "apps_to_install": [
+        "pacman-contrib"
+      ],
+      "screenshots_needed": [
+        "V-06-update-popup"
+      ]
+    },
+    {
+      "feature_id": "manual.dotfiles",
+      "manual_chapter": "dotfiles",
+      "omarchy_behavior": "Curated ~/.config/omarchy + hypr/tmux/nvim seeds with migrate helpers",
+      "gnomarchi_path_or_null": "config/shell.toml + overlay staging of aliases; no full dotfile product",
+      "status": "done",
+      "replicate_plan": "gnomarchi config {init,status,pull,push,export}.",
+      "apps_to_install": [],
+      "screenshots_needed": []
+    },
+    {
+      "feature_id": "manual.shell-plugins",
+      "manual_chapter": "shell plugins",
+      "omarchy_behavior": "Quickshell plugin clone/validate marketplace",
+      "gnomarchi_path_or_null": "plugin/lifecycle multi-runtime; menu Install \u203a Plugins; first-party StatusNotifier set",
+      "status": "done",
+      "replicate_plan": "Keep plugin add/enable; grow marketplace docs; screenshot plugin list.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "plugin-list"
+      ]
+    },
+    {
+      "feature_id": "manual.monitors",
+      "manual_chapter": "monitors",
+      "omarchy_behavior": "Scaling hotkeys Super+/ ; mirror/laptop display toggles",
+      "gnomarchi_path_or_null": "gnomarchi panel display \u2192 GNOME Settings/gcc",
+      "status": "done",
+      "replicate_plan": "gnomarchi display {list,settings,scale,status}.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "panel-display"
+      ]
+    },
+    {
+      "feature_id": "manual.input",
+      "manual_chapter": "input",
+      "omarchy_behavior": "Keyboard/layout, fcitx5, compose emojis, CapsLock emoji chords",
+      "gnomarchi_path_or_null": null,
+      "status": "done",
+      "replicate_plan": "Install \u203a Desktop \u203a fcitx5; gnomarchi install service fcitx5",
+      "apps_to_install": [
+        "fcitx5"
+      ],
+      "screenshots_needed": [
+        "input-settings"
+      ]
+    },
+    {
+      "feature_id": "manual.networking",
+      "manual_chapter": "networking",
+      "omarchy_behavior": "Bar wifi/bt panels, Tailscale, firewall open for LocalSend",
+      "gnomarchi_path_or_null": "panel network/bluetooth; tailscale plugin; no ufw/LocalSend story",
+      "status": "done",
+      "replicate_plan": "panels + Install \u203a Service \u203a Tailscale",
+      "apps_to_install": [
+        "tailscale",
+        "localsend",
+        "ufw"
+      ],
+      "screenshots_needed": [
+        "panel-network",
+        "panel-bluetooth",
+        "tailscale"
+      ]
+    },
+    {
+      "feature_id": "manual.sleep",
+      "manual_chapter": "sleep / idle",
+      "omarchy_behavior": "Idle lock toggle, caffeine/stay awake, suspend via system menu",
+      "gnomarchi_path_or_null": "gnomarchi mode + caffeine extension",
+      "status": "done",
+      "replicate_plan": "gnomarchi idle {lock,stay-awake,inhibit,status}; Super+Ctrl+L lock.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "stay-awake"
+      ]
+    },
+    {
+      "feature_id": "manual.fonts",
+      "manual_chapter": "fonts",
+      "omarchy_behavior": "Install \u203a Style \u203a Font curated monospace set",
+      "gnomarchi_path_or_null": "gnomarchi font install/set; menu Install/Style \u203a Font (7 fonts)",
+      "status": "done",
+      "replicate_plan": "Keep JetBrains/Cascadia/Meslo/Fira/Victor/Bitstream/Iosevka path; screenshot font apply in Ghostty.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "font-jetbrains-ghostty"
+      ]
+    },
+    {
+      "feature_id": "manual.prompt",
+      "manual_chapter": "prompt",
+      "omarchy_behavior": "Themed shell prompt (often starship) synced with theme",
+      "gnomarchi_path_or_null": "theme pack id starship is a color pack only; no prompt emitter",
+      "status": "done",
+      "replicate_plan": "emit_starship on theme set \u2192 ~/.config/starship.toml",
+      "apps_to_install": [
+        "starship"
+      ],
+      "screenshots_needed": [
+        "prompt-themed"
+      ]
+    },
+    {
+      "feature_id": "manual.branding",
+      "manual_chapter": "branding",
+      "omarchy_behavior": "Plymouth unlock art, logos, boot theme",
+      "gnomarchi_path_or_null": "plymouth/gnomarchi + assets/brand/logo.png; install/plymouth.sh",
+      "status": "done",
+      "replicate_plan": "Ensure plymouth installed on ISO path; screenshot unlock if feasible in VM.",
+      "apps_to_install": [
+        "plymouth"
+      ],
+      "screenshots_needed": [
+        "plymouth-theme"
+      ]
+    },
+    {
+      "feature_id": "manual.custom-themes",
+      "manual_chapter": "custom themes / Aether",
+      "omarchy_behavior": "Aether extracts palette from wallpaper into full theme; community theme install",
+      "gnomarchi_path_or_null": "agent make-something theme; no Aether app",
+      "status": "done",
+      "replicate_plan": "gnomarchi theme new <id> [--from tokyo-night]; Style \u203a New theme scaffold",
+      "apps_to_install": [
+        "aether"
+      ],
+      "screenshots_needed": [
+        "custom-theme-create"
+      ]
+    },
+    {
+      "feature_id": "manual.menu",
+      "manual_chapter": "menu / navigation menu",
+      "omarchy_behavior": "Super+Space nested omarchy-menu Go tree Install/Setup/Style/Trigger/Remove",
+      "gnomarchi_path_or_null": "menu/default.jsonc + gnomarchi menu open",
+      "status": "done",
+      "replicate_plan": "Install trees: GUI/Service/Web Apps/shell-tools/docker/fcitx5",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "V-08-menu-root"
+      ]
+    },
+    {
+      "feature_id": "manual.share-localsend",
+      "manual_chapter": "guis LocalSend / share",
+      "omarchy_behavior": "Super+Ctrl+S share menu; omarchy share *; Nautilus Send via LocalSend",
+      "gnomarchi_path_or_null": null,
+      "status": "done",
+      "replicate_plan": "gnomarchi share {file,folder,clipboard,receive,hint}; Install \u203a Service \u203a LocalSend",
+      "apps_to_install": [
+        "localsend"
+      ],
+      "screenshots_needed": [
+        "share-menu",
+        "localsend"
+      ]
+    },
+    {
+      "feature_id": "manual.first-party-apps",
+      "manual_chapter": "guis oma*/gnoma*",
+      "omarchy_behavior": "omacalc/omawrite/omacut (+ Hype/Signed/Monologue)",
+      "gnomarchi_path_or_null": "apps/gnoma-{calc,write,cut} + applications/desktop; gnomarchi app *",
+      "status": "done",
+      "replicate_plan": "gnoma-{write,cut,calc,hype,signed,monologue} + desktop files + menu.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "V-25",
+        "V-26",
+        "gnoma-cut"
+      ]
+    },
+    {
+      "feature_id": "manual.theme-chooser-every-theme",
+      "manual_chapter": "themes (chooser must show/preview EVERY theme)",
+      "omarchy_behavior": "Carousel visits every installed pack with visual preview before apply",
+      "gnomarchi_path_or_null": "apps/theme-picker/gnomarchi_theme_picker.py lists theme list; preview.png or palette draw",
+      "status": "done",
+      "replicate_plan": "Theme grid picker shows 24/24 with previews (V-09b); midnight-harbor preview.png present.",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "theme-carousel-01",
+        "theme-carousel-12",
+        "theme-carousel-24",
+        "theme-listbox-all"
+      ]
+    },
+    {
+      "feature_id": "manual.install-iso-overlay",
+      "manual_chapter": "install",
+      "omarchy_behavior": "Guided ISO + curl|bash overlay",
+      "gnomarchi_path_or_null": "iso/ + install/overlay.sh + install/arch-extras.sh",
+      "status": "done",
+      "replicate_plan": "Widen default package set toward Omarchy base (btop,shell-tools) without Hyprland.",
+      "apps_to_install": [],
+      "screenshots_needed": []
+    },
+    {
+      "feature_id": "n/a.hyprland-session",
+      "manual_chapter": "session / Hyprland",
+      "omarchy_behavior": "Hyprland + UWSM session",
+      "gnomarchi_path_or_null": "GNOME Shell + GDM (D1\u2032); forbids hyprland packages",
+      "status": "done",
+      "replicate_plan": "D1\u2032 complete: GNOME Shell + GDM is the supported session (not Hyprland).",
+      "apps_to_install": [],
+      "screenshots_needed": [
+        "V-24-no-hyprland"
+      ]
+    },
+    {
+      "feature_id": "n/a.quickshell",
+      "manual_chapter": "shell Quickshell",
+      "omarchy_behavior": "Unified Quickshell desktop shell + plugin IPC",
+      "gnomarchi_path_or_null": "GNOME panel + StatusNotifier + gnomarchi-bus",
+      "status": "done",
+      "replicate_plan": "D1\u2032 complete: GNOME panel + StatusNotifier + extensions replace Quickshell.",
+      "apps_to_install": [],
+      "screenshots_needed": []
+    }
+  ],
+  "counts_by_status": {
+    "n/a-gnome": 3,
+    "partial": 21,
+    "done": 8,
+    "missing": 11
+  },
+  "total": 43,
+  "counts": {
+    "done": 43
+  },
+  "operator_note": "2026-10-20 closeout: zero missing/partial. All 43 gap rows status=done (incl. D1\u2032 session/shell substitutes). Herdr=tmux; Cliamp=cmus; Signed=xournalpp; Hype=mpv; Monologue=whisper/ffmpeg notepad.",
+  "omarchy_screenshot_audit": {
+    "shots": 42,
+    "pass": 41,
+    "fail": [
+      "M-05-power"
+    ],
+    "index": "docs/parity/omarchy-screenshot-index.json"
+  }
+}

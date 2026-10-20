@@ -1,0 +1,6 @@
+# Extra live packages merged by iso/bootstrap-from-releng.sh
+archinstall
+dialog
+git
+rsync
+python

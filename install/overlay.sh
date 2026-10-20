@@ -17,6 +17,7 @@ GNOME_PKGS=(
   gnome
   gdm
   gnome-tweaks
+  gnome-shell-extensions
   xdg-desktop-portal-gnome
   xdg-user-dirs
 )
@@ -24,6 +25,37 @@ DEFAULT_APP_PKGS=(
   ghostty
   neovim
   chromium
+)
+AGENT_APP_PKGS=(
+  mise
+  libappindicator-gtk3
+  gnome-shell-extension-appindicator
+  pacman-contrib
+  gnome-shell-extension-caffeine
+  gnome-screenshot
+  tesseract
+  tesseract-data-eng
+  zbar
+  mpv
+  gpaste
+)
+# Shell UUIDs enabled after GNOME session tools exist (user-themes ships in gnome-shell-extensions).
+DEFAULT_SHELL_EXTENSIONS=(
+  user-theme@gnome-shell-extensions.gcampax.github.com
+  appindicatorsupport@rgcjonas.gmail.com
+  caffeine@patapon.info
+)
+# Optional panel / tiling (Arch official + AUR). Installed by stage_panel; not required for stock GNOME.
+PANEL_PKGS=(
+  gnome-shell-extension-caffeine
+  gnome-shell-extension-dash-to-panel
+)
+TILING_PKGS=(
+  gnome-shell-extension-paperwm
+)
+PANEL_SHELL_EXTENSIONS=(
+  dash-to-panel@jderose9.github.com
+  caffeine@patapon.info
 )
 # Never install these (D1 / plan forbidden).
 FORBIDDEN_PKGS=(hyprland hyprland-git sddm uwsm)
@@ -104,12 +136,42 @@ stage_install_gnomarchi() {
   log "stage: install/copy gnomarchi"
   local dest="${GNOMARCHI_PREFIX:-/usr/local}"
   local bin_src="${GNOMARCHI_ROOT}/bin/gnomarchi"
+  local lib_dest="${dest}/lib/gnomarchi"
   mkdir -p "${GNOMARCHI_CONFIG}"
 
   if [[ -f "${bin_src}" ]]; then
-    confirm "Install gnomarchi CLI to ${dest}/bin (sudo)?"
-    run sudo install -d "${dest}/bin"
+    confirm "Install gnomarchi CLI + libs to ${dest} (sudo)?"
+    run sudo install -d "${dest}/bin" "${lib_dest}"
+    # Python packages the CLI imports.
+    local pkg
+    for pkg in theme plugin common bus menu apps agent config desktop; do
+      if [[ -d "${GNOMARCHI_ROOT}/${pkg}" ]]; then
+        run sudo rm -rf "${lib_dest}/${pkg}"
+        run sudo cp -a "${GNOMARCHI_ROOT}/${pkg}" "${lib_dest}/"
+      fi
+    done
+    if [[ -d "${GNOMARCHI_ROOT}/plugins" ]]; then
+      run sudo rm -rf "${lib_dest}/plugins"
+      run sudo cp -a "${GNOMARCHI_ROOT}/plugins" "${lib_dest}/"
+    fi
+    # Drop bytecode caches from the 9p/host tree copy.
+    run sudo find "${lib_dest}" -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
     run sudo install -m 0755 "${bin_src}" "${dest}/bin/gnomarchi"
+    # App menu entries (gnoma-write / cut / calc)
+    if [[ -d "${GNOMARCHI_ROOT}/applications" ]]; then
+      local apps_share="${dest}/share/applications"
+      run sudo install -d "${apps_share}"
+      local desk
+      for desk in "${GNOMARCHI_ROOT}"/applications/org.gnomarchi.*.desktop; do
+        [[ -f "${desk}" ]] || continue
+        run sudo install -m 0644 "${desk}" "${apps_share}/"
+      done
+      run mkdir -p "${HOME}/.local/share/applications"
+      for desk in "${GNOMARCHI_ROOT}"/applications/org.gnomarchi.*.desktop; do
+        [[ -f "${desk}" ]] || continue
+        run install -m 0644 "${desk}" "${HOME}/.local/share/applications/"
+      done
+    fi
   else
     warn "bin/gnomarchi not present yet; seeding config and PATH hint only"
     local local_bin="${HOME}/.local/bin"
@@ -142,9 +204,13 @@ WRAPPER
 }
 
 stage_defaults() {
-  log "stage: seed default apps (Ghostty + nvim + Chromium)"
-  confirm "Install default apps: ghostty neovim chromium?"
+  log "stage: seed default apps (Ghostty + nvim + Chromium + agent deps)"
+  confirm "Install default apps: ghostty neovim chromium (+ mise, appindicator, pacman-contrib)?"
   run sudo pacman -Sy --needed --noconfirm "${DEFAULT_APP_PKGS[@]}"
+  local pkg
+  for pkg in "${AGENT_APP_PKGS[@]}"; do
+    run sudo pacman -Sy --needed --noconfirm "${pkg}" || warn "optional package ${pkg} not installed"
+  done
 
   # Soft defaults via xdg / GSettings when session tools exist (no force).
   if command -v xdg-settings >/dev/null 2>&1; then
@@ -185,21 +251,287 @@ EOF
   fi
 }
 
+stage_agents() {
+  log "stage: agent stack + panel widgets"
+  # mise + wrappers + skills
+  if command -v gnomarchi >/dev/null 2>&1; then
+    run gnomarchi agent setup || warn "agent setup failed"
+  elif [[ -x "${GNOMARCHI_ROOT}/bin/gnomarchi" ]]; then
+    run env GNOMARCHI_ROOT="${GNOMARCHI_ROOT}" python3 "${GNOMARCHI_ROOT}/bin/gnomarchi" agent setup || warn "agent setup failed"
+  fi
+
+  # Shell aliases (Omarchy muscle memory)
+  local alias_file="${GNOMARCHI_CONFIG}/shell-aliases.sh"
+  cat > "${alias_file}" <<'ALIASES'
+# gnomarchi agent aliases
+alias a='gnomarchi agent launch'
+alias cy='gnomarchi agent launch claude'
+alias cx='gnomarchi agent launch codex'
+alias c='gnomarchi agent launch opencode'
+ALIASES
+  for rc in "${HOME}/.zshrc" "${HOME}/.bashrc"; do
+    if [[ -f "${rc}" ]] || [[ "${SKIP_CONFIRM}" == "1" ]]; then
+      touch "${rc}"
+      if ! grep -q 'gnomarchi/shell-aliases.sh' "${rc}" 2>/dev/null; then
+        echo "source ${alias_file}" >> "${rc}"
+      fi
+    fi
+  done
+
+  # Enable first-party indicators + crash capture + agents panel when CLI works
+  if command -v gnomarchi >/dev/null 2>&1 || [[ -x "${GNOMARCHI_ROOT}/bin/gnomarchi" ]]; then
+    local gnom
+    gnom="$(command -v gnomarchi || true)"
+    [[ -n "${gnom}" ]] || gnom="python3 ${GNOMARCHI_ROOT}/bin/gnomarchi"
+    for pid in gnomarchi.agents gnomarchi.weather gnomarchi.system-update gnomarchi.crash-capture gnomarchi.agents-panel gnomarchi.modes; do
+      run bash -c "GNOMARCHI_ROOT=${GNOMARCHI_ROOT} ${gnom} plugin enable --id ${pid}" || warn "enable ${pid} skipped"
+    done
+  fi
+
+  # Enable default Shell extensions (user-themes + AppIndicator + caffeine).
+  # Stock GNOME top bar is the default; dash-to-panel is optional via stage_panel
+  # / `gnomarchi shell bar-position bottom|left|right`.
+  # Copy system extensions into ~/.local so Shell discovers them after first
+  # install without a second GDM cycle (Arch ships under /usr/share/...).
+  local user_ext="${HOME}/.local/share/gnome-shell/extensions"
+  run mkdir -p "${user_ext}"
+  local copy_uuid
+  for copy_uuid in \
+    "user-theme@gnome-shell-extensions.gcampax.github.com" \
+    "caffeine@patapon.info" \
+    "appindicatorsupport@rgcjonas.gmail.com"
+  do
+    local copy_sys="/usr/share/gnome-shell/extensions/${copy_uuid}"
+    if [[ -d "${copy_sys}" ]]; then
+      run rm -rf "${user_ext}/${copy_uuid}"
+      run cp -a "${copy_sys}" "${user_ext}/${copy_uuid}"
+    fi
+  done
+  if command -v gnome-extensions >/dev/null 2>&1 || command -v gsettings >/dev/null 2>&1; then
+    for uuid in "${DEFAULT_SHELL_EXTENSIONS[@]}"; do
+      run gnome-extensions enable "${uuid}" 2>/dev/null || true
+    done
+    # Ensure dash-to-panel stays off unless the user opts into a bottom/side bar.
+    run gnome-extensions disable "dash-to-panel@jderose9.github.com" 2>/dev/null || true
+    # Merge into gsettings so enable survives GDM restart races
+    if command -v gsettings >/dev/null 2>&1 && command -v python3 >/dev/null 2>&1; then
+      run python3 - <<'PY'
+import ast, subprocess
+raw = subprocess.check_output(
+    ["gsettings", "get", "org.gnome.shell", "enabled-extensions"], text=True
+).strip()
+text = raw[4:] if raw.startswith("@as ") else raw
+try:
+    lst = list(ast.literal_eval(text))
+except Exception:
+    lst = []
+want = (
+    "user-theme@gnome-shell-extensions.gcampax.github.com",
+    "appindicatorsupport@rgcjonas.gmail.com",
+    "ubuntu-appindicators@ubuntu.com",
+    "caffeine@patapon.info",
+    "gnomarchi-agents@gnomarchi",
+)
+drop = {"dash-to-panel@jderose9.github.com"}
+lst = [u for u in lst if u not in drop]
+for uuid in want:
+    if uuid not in lst:
+        lst.append(uuid)
+subprocess.check_call(
+    ["gsettings", "set", "org.gnome.shell", "enabled-extensions", str(lst)]
+)
+print("enabled-extensions:", lst)
+PY
+    fi
+    run gsettings set org.gnome.shell.extensions.user-theme name gnomarchi 2>/dev/null || true
+  fi
+
+  # Usage refresh timer
+  local unit_dir="${XDG_CONFIG_HOME}/systemd/user"
+  mkdir -p "${unit_dir}"
+  cat > "${unit_dir}/gnomarchi-agent-usage.service" <<EOF
+[Unit]
+Description=gnomarchi agent usage refresh
+[Service]
+Type=oneshot
+ExecStart=${GNOMARCHI_PREFIX:-/usr/local}/bin/gnomarchi agent usage-update
+EOF
+  cat > "${unit_dir}/gnomarchi-agent-usage.timer" <<'EOF'
+[Unit]
+Description=Refresh gnomarchi agent usage every 15m
+[Timer]
+OnBootSec=2m
+OnUnitActiveSec=15m
+Persistent=true
+[Install]
+WantedBy=timers.target
+EOF
+  if command -v systemctl >/dev/null 2>&1; then
+    run systemctl --user daemon-reload || true
+    run systemctl --user enable --now gnomarchi-agent-usage.timer || warn "usage timer not enabled"
+  fi
+
+  # Hotkeys mirrored from https://omarchy.org/manual/hotkeys/ + the-top-bar/
+  # (GNOME adapters: Quick Settings panels via `gnomarchi panel`, Style via theme).
+  if command -v gsettings >/dev/null 2>&1; then
+    local kb_paths=(
+      gnomarchi-menu gnomarchi-agent gnomarchi-theme gnomarchi-bg
+      gnomarchi-panel-audio gnomarchi-panel-network gnomarchi-panel-bluetooth
+      gnomarchi-panel-display gnomarchi-panel-power
+      gnomarchi-clipboard gnomarchi-terminal gnomarchi-browser gnomarchi-btop
+      gnomarchi-notice-time gnomarchi-notice-battery gnomarchi-notice-weather
+      gnomarchi-mode-dnd gnomarchi-mode-night gnomarchi-calc gnomarchi-write
+      gnomarchi-remind gnomarchi-capture-shot gnomarchi-capture-ocr
+      gnomarchi-nvim gnomarchi-herdr gnomarchi-lock gnomarchi-files
+      gnomarchi-panel-calendar
+    )
+    local listed="'/"
+    listed+="org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${kb_paths[0]}/'"
+    local p
+    for p in "${kb_paths[@]:1}"; do
+      listed+=",'/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${p}/'"
+    done
+    run gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[${listed}]" || true
+    local base="org.gnome.settings-daemon.plugins.media-keys.custom-keybinding"
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-menu/" name 'gnomarchi menu' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-menu/" command 'gnomarchi menu open' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-menu/" binding '<Super>space' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-agent/" name 'gnomarchi default agent' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-agent/" command 'gnomarchi agent launch' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-agent/" binding '<Super><Shift><Control>a' || true
+    # Omarchy Style: Super+Ctrl+Shift+Space theme · Super+Ctrl+Space background
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-theme/" name 'gnomarchi theme picker' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-theme/" command 'gnomarchi theme pick' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-theme/" binding '<Super><Control><Shift>space' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-bg/" name 'gnomarchi next background' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-bg/" command 'gnomarchi theme bg next' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-bg/" binding '<Super><Control>space' || true
+    # Omarchy top-bar panel hotkeys → gnomarchi panel adapters
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-audio/" name 'gnomarchi audio panel' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-audio/" command 'gnomarchi panel audio' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-audio/" binding '<Super><Control>a' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-network/" name 'gnomarchi network panel' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-network/" command 'gnomarchi panel network' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-network/" binding '<Super><Control>w' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-bluetooth/" name 'gnomarchi bluetooth panel' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-bluetooth/" command 'gnomarchi panel bluetooth' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-bluetooth/" binding '<Super><Control>b' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-display/" name 'gnomarchi display panel' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-display/" command 'gnomarchi panel display' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-display/" binding '<Super><Control>d' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-power/" name 'gnomarchi power panel' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-power/" command 'gnomarchi panel power' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-power/" binding '<Super><Control>p' || true
+    # Clipboard / launchers / notices / modes (Omarchy hotkeys, GNOME-safe subset)
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-clipboard/" name 'gnomarchi clipboard' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-clipboard/" command 'gnomarchi clipboard ui' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-clipboard/" binding '<Super><Control>v' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-terminal/" name 'gnomarchi terminal' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-terminal/" command 'ghostty' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-terminal/" binding '<Super>Return' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-browser/" name 'gnomarchi browser' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-browser/" command 'chromium' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-browser/" binding '<Super><Shift>Return' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-btop/" name 'gnomarchi btop' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-btop/" command 'ghostty -e btop' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-btop/" binding '<Super><Control>t' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-time/" name 'gnomarchi notice time' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-time/" command 'gnomarchi notice time' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-time/" binding '<Super><Control>period' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-battery/" name 'gnomarchi notice battery' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-battery/" command 'gnomarchi notice battery' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-battery/" binding '<Super><Control>comma' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-weather/" name 'gnomarchi notice weather' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-weather/" command 'gnomarchi notice weather' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-weather/" binding '<Super><Control>slash' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-mode-dnd/" name 'gnomarchi DND toggle' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-mode-dnd/" command 'gnomarchi mode dnd' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-mode-dnd/" binding '<Super><Control>i' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-mode-night/" name 'gnomarchi night light' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-mode-night/" command 'gnomarchi mode night-light' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-mode-night/" binding '<Super><Control>n' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-calc/" name 'gnomarchi calc' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-calc/" command 'gnomarchi app calc' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-calc/" binding '<Super><Control>q' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-write/" name 'gnomarchi write' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-write/" command 'gnomarchi app write' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-write/" binding '<Super><Shift>w' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-remind/" name 'gnomarchi remind list' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-remind/" command 'gnomarchi remind list' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-remind/" binding '<Super><Control>r' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-shot/" name 'gnomarchi screenshot' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-shot/" command 'gnomarchi capture shot' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-shot/" binding '<Super><Shift>Print' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-ocr/" name 'gnomarchi OCR' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-ocr/" command 'gnomarchi capture ocr' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-ocr/" binding '<Super><Control>Print' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-nvim/" name 'gnomarchi nvim' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-nvim/" command 'ghostty -e nvim' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-nvim/" binding '<Super><Shift>n' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-herdr/" name 'gnomarchi herdr' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-herdr/" command 'gnomarchi herdr attach' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-herdr/" binding '<Super><Control>Return' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-lock/" name 'gnomarchi lock' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-lock/" command 'gnomarchi idle lock' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-lock/" binding '<Super><Control>l' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-files/" name 'gnomarchi files' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-files/" command 'nautilus' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-files/" binding '<Super><Shift>f' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-calendar/" name 'gnomarchi calendar' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-calendar/" command 'gnomarchi panel calendar' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-calendar/" binding '<Super><Control><Alt>d' || true
+  fi
+}
+
+stage_panel() {
+  log "stage: optional dash-to-panel (bottom/side bar) + PaperWM (Arch/AUR)"
+  local extras="${GNOMARCHI_ROOT}/install/arch-extras.sh"
+  if [[ -f "${extras}" ]]; then
+    confirm "Install dash-to-panel package (optional bottom/side bar; stock top bar stays default)?"
+    run env GNOMARCHI_SKIP_CONFIRM="${SKIP_CONFIRM}" bash "${extras}" panel || warn "panel extras failed; Install › Desktop › panel later"
+    # PaperWM is the GNOME tiling path (Omarchy dwindle/scroll substitute).
+    confirm "Install PaperWM tiling layouts (Omarchy navigation parity on GNOME)?"
+    run env GNOMARCHI_SKIP_CONFIRM="${SKIP_CONFIRM}" bash "${extras}" tiling || warn "tiling extras failed; Install › Dev › PaperWM later"
+    run env GNOMARCHI_SKIP_CONFIRM=1 bash "${extras}" shell-tools || warn "shell-tools extras failed"
+  else
+    [[ -f "${GNOMARCHI_ROOT}/install/panel.sh" ]] && run bash "${GNOMARCHI_ROOT}/install/panel.sh" || true
+    [[ -f "${GNOMARCHI_ROOT}/install/tiling.sh" ]] && run bash "${GNOMARCHI_ROOT}/install/tiling.sh" || true
+  fi
+  # Install only — do not enable dash-to-panel. Opt in with:
+  #   gnomarchi shell bar-position bottom
+  log "stock GNOME top bar remains default; enable bottom bar via gnomarchi shell bar-position bottom"
+}
+
+stage_plymouth() {
+  log "stage: plymouth theme (assets/brand/logo.png)"
+  local extras="${GNOMARCHI_ROOT}/install/arch-extras.sh"
+  confirm "Install plymouth boot theme with gnomarchi logo?"
+  if [[ -f "${extras}" ]]; then
+    run env GNOMARCHI_SKIP_CONFIRM="${SKIP_CONFIRM}" bash "${extras}" plymouth || warn "plymouth extras failed"
+  elif [[ -f "${GNOMARCHI_ROOT}/install/plymouth.sh" ]]; then
+    run bash "${GNOMARCHI_ROOT}/install/plymouth.sh" || warn "plymouth.sh failed"
+  else
+    warn "plymouth install helpers missing; skip"
+  fi
+}
+
 stage_agent_invite() {
   log "stage: agent invite"
   cat <<'INVITE'
 
 ────────────────────────────────────────────────────────────
-  gnomarchi overlay complete (stock GNOME + GDM path).
+  gnomarchi overlay complete (stock GNOME + GDM + agents).
 
   Next:
     1. Reboot and select the GNOME session at GDM.
-    2. Run:  gnomarchi theme list
-    3. Agents / Make-something:  gnomarchi agent
-       (skills under ~/.config/gnomarchi/skills when present)
+    2. gnomarchi theme set midnight-harbor
+    3. gnomarchi default agent claude   # or: codex, opencode, grok, …
+    4. Super+Space menu · Agents indicator · Make something
+    5. gnomarchi update                 # sudo pacman -Syu (official Arch)
+    6. Install › Panel / Tiling / Gaming / Windows VM as needed
 
-  Defaults: Ghostty · Neovim · Chromium
-  Docs:     docs/install/vm-test.md
+  Defaults: Ghostty · Neovim · Chromium · mise agents · panel widgets
+  Docs:     docs/install/vm-test.md · iso/README.md
 ────────────────────────────────────────────────────────────
 
 INVITE
@@ -212,7 +544,7 @@ wipe_disk() {
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") [all|detect|gnome|gdm|gnomarchi|defaults|theme|invite]
+Usage: $(basename "$0") [all|detect|gnome|gdm|gnomarchi|defaults|theme|agents|panel|plymouth|invite]
 
 Env:
   GNOMARCHI_DRY_RUN=1              print actions only
@@ -248,6 +580,9 @@ main() {
       stage_detect
       stage_theme_seed
       ;;
+    agents) stage_detect; stage_agents ;;
+    panel) stage_detect; stage_panel ;;
+    plymouth) stage_detect; stage_plymouth ;;
     invite) stage_agent_invite ;;
     all)
       stage_detect
@@ -257,6 +592,9 @@ main() {
       stage_install_gnomarchi
       stage_defaults
       stage_theme_seed
+      stage_agents
+      stage_panel
+      stage_plymouth
       stage_agent_invite
       ;;
     wipe|destroy)

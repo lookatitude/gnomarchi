@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=gnoma-hype
+GenericName=Media
+Comment=Play video or URL (Omarchy Hype parity)
+Exec=gnomarchi app hype
+Icon=multimedia-video-player
+Terminal=false
+Categories=AudioVideo;Player;
+StartupNotify=true

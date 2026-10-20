@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=gnomarchi Agents indicator
+Exec=python3 indicator.py
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

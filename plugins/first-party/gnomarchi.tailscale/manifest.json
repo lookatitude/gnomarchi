@@ -1,0 +1,9 @@
+{
+  "id": "gnomarchi.tailscale",
+  "name": "Tailscale",
+  "version": "1.0.0",
+  "runtime": "status-indicator",
+  "permissions": ["session"],
+  "hooks": {},
+  "description": "Tailscale status indicator"
+}

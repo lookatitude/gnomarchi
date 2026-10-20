@@ -1,0 +1,13 @@
+# Minimal script theme: centered logo + progress
+wallpaper_image = Image("logo.png");
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
+resized = wallpaper_image.Scale(screen_width / 4, screen_width / 4);
+logo = Sprite(resized);
+logo.SetX(screen_width / 2 - resized.GetWidth() / 2);
+logo.SetY(screen_height / 2 - resized.GetHeight() / 2);
+progress = 0;
+fun progress_callback(count, total) {
+  progress = count / total;
+}
+Plymouth.SetProgressFunction(progress_callback);

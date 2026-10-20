@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=gnomarchi Tailscale
+Exec=python3 indicator.py
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

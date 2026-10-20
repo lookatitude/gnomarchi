@@ -1,0 +1,9 @@
+{
+  "id": "gnomarchi.modes",
+  "name": "Mode indicators",
+  "version": "1.0.0",
+  "runtime": "status-indicator",
+  "permissions": [],
+  "hooks": {},
+  "description": "DND, Night Light, Stay Awake (caffeine) StatusNotifier toggles"
+}

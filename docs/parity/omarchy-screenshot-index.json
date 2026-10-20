@@ -1,0 +1,349 @@
+{
+  "generated": "2026-10-20",
+  "source": "omarchy-vm-qa e9d8480d",
+  "unique_ok": 41,
+  "total": 42,
+  "pass": 41,
+  "fail": 1,
+  "fails": [
+    "M-05-power"
+  ],
+  "shots": [
+    {
+      "id": "M-01-topbar",
+      "path": "docs/screenshots/omarchy-manual/M-01-topbar.png",
+      "md5": "21485d64474841fd98a84a75a4721023",
+      "bytes": 2644989,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-02-audio",
+      "path": "docs/screenshots/omarchy-manual/M-02-audio.png",
+      "md5": "3b91926dd5c9ce348affc79970bfa8c7",
+      "bytes": 2608552,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-03-network",
+      "path": "docs/screenshots/omarchy-manual/M-03-network.png",
+      "md5": "ab9878fc45e85bd728eabf55eae486f3",
+      "bytes": 2616744,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-04-bluetooth",
+      "path": "docs/screenshots/omarchy-manual/M-04-bluetooth.png",
+      "md5": "698778fefcbc2dd259ce8fed2519f611",
+      "bytes": 2620658,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-05-power",
+      "path": "docs/screenshots/omarchy-manual/M-05-power.png",
+      "md5": "f17f7261c0c4253ca01cb4555d45d879",
+      "bytes": 2644949,
+      "ok": false,
+      "note": "power panel never visible; use M-05b"
+    },
+    {
+      "id": "M-05b-menu-system-power",
+      "path": "docs/screenshots/omarchy-manual/M-05b-menu-system-power.png",
+      "md5": "7832207cae3b838d09d7774833020789",
+      "bytes": 1946969,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-06-clock",
+      "path": "docs/screenshots/omarchy-manual/M-06-clock.png",
+      "md5": "36508d81b0e2cc10820a272e0eae83fd",
+      "bytes": 2436905,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-07-keybindings",
+      "path": "docs/screenshots/omarchy-manual/M-07-keybindings.png",
+      "md5": "f2576a06110dc4af86972e3adb72e276",
+      "bytes": 1668787,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-08-menu-root",
+      "path": "docs/screenshots/omarchy-manual/M-08-menu-root.png",
+      "md5": "bae64a83d826793edaee359745722510",
+      "bytes": 1912112,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-09-menu-apps",
+      "path": "docs/screenshots/omarchy-manual/M-09-menu-apps.png",
+      "md5": "ea26e784900ea59e0732c61625ec66b8",
+      "bytes": 1878278,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-10-menu-style",
+      "path": "docs/screenshots/omarchy-manual/M-10-menu-style.png",
+      "md5": "3b5006d9e5bf32baee7bd586bb6d6f8f",
+      "bytes": 1934425,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-11-menu-setup",
+      "path": "docs/screenshots/omarchy-manual/M-11-menu-setup.png",
+      "md5": "6b916c3f75acc2c343f584ffe003a0c3",
+      "bytes": 1917053,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-12-menu-install",
+      "path": "docs/screenshots/omarchy-manual/M-12-menu-install.png",
+      "md5": "3e7d1d1daaa4d383899b50b3744e9e0e",
+      "bytes": 1879441,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-12b-menu-learn",
+      "path": "docs/screenshots/omarchy-manual/M-12b-menu-learn.png",
+      "md5": "906bc9b1edc9e86fcc15067991f78adc",
+      "bytes": 497387,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-12c-menu-trigger",
+      "path": "docs/screenshots/omarchy-manual/M-12c-menu-trigger.png",
+      "md5": "407c564bcb628fe3de4e8adab0bd050b",
+      "bytes": 497976,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-12d-menu-system",
+      "path": "docs/screenshots/omarchy-manual/M-12d-menu-system.png",
+      "md5": "2fbc6a5e975bd8403ab0573ffcd7d773",
+      "bytes": 497597,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-13-about",
+      "path": "docs/screenshots/omarchy-manual/M-13-about.png",
+      "md5": "0f2dda937c884aa69a0373962ccf8988",
+      "bytes": 2109600,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-14-theme-switcher",
+      "path": "docs/screenshots/omarchy-manual/M-14-theme-switcher.png",
+      "md5": "c5077bc4ee26ad2e1bab68f11a68aed6",
+      "bytes": 2021291,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-14b-theme-switcher-mid",
+      "path": "docs/screenshots/omarchy-manual/M-14b-theme-switcher-mid.png",
+      "md5": "99144eb79bb81d48fb4487fd71a88637",
+      "bytes": 2041918,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-14c-theme-switcher-end",
+      "path": "docs/screenshots/omarchy-manual/M-14c-theme-switcher-end.png",
+      "md5": "a4ad19293ab4c96a421f62fc854c9ce7",
+      "bytes": 2021288,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-15-bg-switcher",
+      "path": "docs/screenshots/omarchy-manual/M-15-bg-switcher.png",
+      "md5": "36a0d6ae01f4e57aa1973badc364ee68",
+      "bytes": 2214456,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-16-unlock-art",
+      "path": "docs/screenshots/omarchy-manual/M-16-unlock-art.png",
+      "md5": "8fb901406237a66df09fc5b8a5f6fa16",
+      "bytes": 1529492,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-17-clipboard",
+      "path": "docs/screenshots/omarchy-manual/M-17-clipboard.png",
+      "md5": "c396545048dfc87f0f62dad862f9c655",
+      "bytes": 1536756,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-18-reminders",
+      "path": "docs/screenshots/omarchy-manual/M-18-reminders.png",
+      "md5": "04fecebaace1b8d9a3f50099adc7076a",
+      "bytes": 2066274,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-19-notice-toast",
+      "path": "docs/screenshots/omarchy-manual/M-19-notice-toast.png",
+      "md5": "8f2cb461dd61cecf10c23dfc0708cf3a",
+      "bytes": 2629402,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-19b-notice-history",
+      "path": "docs/screenshots/omarchy-manual/M-19b-notice-history.png",
+      "md5": "f35e5613858851febbc8acd76b6b8b68",
+      "bytes": 2553399,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-20-screensaver",
+      "path": "docs/screenshots/omarchy-manual/M-20-screensaver.png",
+      "md5": "8e1ffb1abb036e6c048606f48a8cae65",
+      "bytes": 7696,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-21-agents",
+      "path": "docs/screenshots/omarchy-manual/M-21-agents.png",
+      "md5": "f590ca0684ff5383e92e2daef49cad85",
+      "bytes": 1876900,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-22-foot",
+      "path": "docs/screenshots/omarchy-manual/M-22-foot.png",
+      "md5": "789e11da2f2f331f7845c95ba55bb7d5",
+      "bytes": 410930,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-23-nvim",
+      "path": "docs/screenshots/omarchy-manual/M-23-nvim.png",
+      "md5": "8b10d60dd8ac1038818c90f665373cc9",
+      "bytes": 420220,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-24-btop",
+      "path": "docs/screenshots/omarchy-manual/M-24-btop.png",
+      "md5": "a47cac73b176d3d132f4c1c2aea8dbb7",
+      "bytes": 628735,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-25-chromium",
+      "path": "docs/screenshots/omarchy-manual/M-25-chromium.png",
+      "md5": "64de76304af7546833d5a38d5b7bb435",
+      "bytes": 111243,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-26-omacalc",
+      "path": "docs/screenshots/omarchy-manual/M-26-omacalc.png",
+      "md5": "02e1b1c34b3704400cacd7088365b2cc",
+      "bytes": 2372329,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-27-omawrite",
+      "path": "docs/screenshots/omarchy-manual/M-27-omawrite.png",
+      "md5": "e980888688288af0d0b898f7b04b00df",
+      "bytes": 412205,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-28-omacut",
+      "path": "docs/screenshots/omarchy-manual/M-28-omacut.png",
+      "md5": "2497879eec730aee117ba1e03b85e375",
+      "bytes": 415192,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-29-files",
+      "path": "docs/screenshots/omarchy-manual/M-29-files.png",
+      "md5": "9b9f6b8cf352358638247e8b68d2c26d",
+      "bytes": 446191,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-30-obsidian",
+      "path": "docs/screenshots/omarchy-manual/M-30-obsidian.png",
+      "md5": "4a32c41caf97bef0c79dd4e82b302e9d",
+      "bytes": 2021481,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-31-localsend",
+      "path": "docs/screenshots/omarchy-manual/M-31-localsend.png",
+      "md5": "fc6ba9b693be31b977a5bc37551c4fc8",
+      "bytes": 443363,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-32-pinta",
+      "path": "docs/screenshots/omarchy-manual/M-32-pinta.png",
+      "md5": "6122e770bc5aa6350e3fae0bdb2ea918",
+      "bytes": 144849,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-33-evince",
+      "path": "docs/screenshots/omarchy-manual/M-33-evince.png",
+      "md5": "a0a0378d4bd2e5b9bf7f0abf69bbbb1e",
+      "bytes": 2010776,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-35-menu-install-tui",
+      "path": "docs/screenshots/omarchy-manual/M-35-menu-install-tui.png",
+      "md5": "fc81b0fbfa7f4e6d9a6770d4468c5110",
+      "bytes": 2013473,
+      "ok": true,
+      "note": "pass"
+    },
+    {
+      "id": "M-37-desktop-clean",
+      "path": "docs/screenshots/omarchy-manual/M-37-desktop-clean.png",
+      "md5": "e55814ad043401679dad70a6a0a915a6",
+      "bytes": 2644981,
+      "ok": true,
+      "note": "pass"
+    }
+  ]
+}

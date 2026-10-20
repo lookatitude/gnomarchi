@@ -1,0 +1,9 @@
+{
+  "id": "gnomarchi.agents",
+  "name": "Agents indicator",
+  "version": "1.0.0",
+  "runtime": "status-indicator",
+  "permissions": ["session", "network-optional"],
+  "hooks": {},
+  "description": "Top-bar StatusNotifier for Agents window + default agent launch"
+}

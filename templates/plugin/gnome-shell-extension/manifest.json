@@ -1,0 +1,9 @@
+{
+  "id": "PLUGIN_ID",
+  "name": "Shell Extension",
+  "version": "0.1.0",
+  "runtime": "gnome-shell-extension",
+  "explicit_shell_extension": true,
+  "permissions": ["shell"],
+  "hooks": {}
+}
