@@ -34,7 +34,7 @@ jobs:
           VERSION="${TAG#v}"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "VERSION=${VERSION}" > VERSION
+          printf '%s\n' "${VERSION}" > VERSION
 
       - name: Build source archive
         run: |
