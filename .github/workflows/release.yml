@@ -56,12 +56,12 @@ jobs:
             echo
             echo "### Assets"
             echo "- gnomarchi-${VERSION}.tar.gz — source / overlay tree"
-            echo "- gnomarchi-${VERSION}-x86_64.iso — guided live ISO (archiso)"
+            echo "- gnomarchi-${VERSION}-x86_64.iso or .iso.partNN — guided live ISO (split if over GitHub 2 GiB limit)"
             echo "- matching .sha256 sidecars"
             echo
             echo "### Install"
             echo "Overlay: extract the source tarball and run ./install/overlay.sh."
-            echo "USB: write the .iso with dd / Ventoy / balenaEtcher, boot, then /root/gnomarchi-install.sh."
+            echo "USB: if split, cat *.iso.part* > gnomarchi-${VERSION}-x86_64.iso && sha256sum -c *.iso.sha256; then dd/Ventoy/Etcher."
             echo "AUR: packaging/aur/gnomarchi (makepkg -si)."
           } > dist/RELEASE_NOTES.md
 
@@ -108,16 +108,28 @@ jobs:
           (
             cd dist
             sha256sum "gnomarchi-${VERSION}-x86_64.iso" > "gnomarchi-${VERSION}-x86_64.iso.sha256"
+            # GitHub release assets max 2 GiB; split with margin.
+            MAX=$((1900 * 1024 * 1024))
+            SIZE="$(stat -c%s "gnomarchi-${VERSION}-x86_64.iso")"
+            if (( SIZE > MAX )); then
+              echo "ISO ${SIZE} bytes exceeds GitHub limit; splitting into 1900MiB parts"
+              split -b 1900M -d -a 2 "gnomarchi-${VERSION}-x86_64.iso" \
+                "gnomarchi-${VERSION}-x86_64.iso.part"
+              {
+                echo "# Reassemble: cat gnomarchi-${VERSION}-x86_64.iso.part* > gnomarchi-${VERSION}-x86_64.iso && sha256sum -c gnomarchi-${VERSION}-x86_64.iso.sha256"
+                sha256sum "gnomarchi-${VERSION}-x86_64.iso.part"*
+                cat "gnomarchi-${VERSION}-x86_64.iso.sha256"
+              } > "gnomarchi-${VERSION}-x86_64.iso.parts.sha256"
+              rm -f "gnomarchi-${VERSION}-x86_64.iso"
+            fi
           )
-          ls -lh "dist/gnomarchi-${VERSION}-x86_64.iso"*
+          ls -lh dist/gnomarchi-"${VERSION}"-x86_64.iso*
 
       - name: Upload ISO artifacts
         uses: actions/upload-artifact@v4
         with:
           name: iso-${{ needs.source.outputs.version }}
-          path: |
-            dist/gnomarchi-${{ needs.source.outputs.version }}-x86_64.iso
-            dist/gnomarchi-${{ needs.source.outputs.version }}-x86_64.iso.sha256
+          path: dist/gnomarchi-${{ needs.source.outputs.version }}-x86_64.iso*
           if-no-files-found: error
           compression-level: 0
 
@@ -150,7 +162,6 @@ jobs:
           files: |
             dist/gnomarchi-${{ needs.source.outputs.version }}.tar.gz
             dist/gnomarchi-${{ needs.source.outputs.version }}.tar.gz.sha256
-            dist/gnomarchi-${{ needs.source.outputs.version }}-x86_64.iso
-            dist/gnomarchi-${{ needs.source.outputs.version }}-x86_64.iso.sha256
+            dist/gnomarchi-${{ needs.source.outputs.version }}-x86_64.iso*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
