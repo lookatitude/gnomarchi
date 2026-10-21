@@ -38,13 +38,14 @@ jobs:
 
       - name: Build source archive
         run: |
-          chmod +x scripts/build-release.sh
+          chmod +x scripts/build-release.sh scripts/build-iso.sh
           ./scripts/build-release.sh
 
       - name: Package ISO builder tree
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
           set -euo pipefail
-          VERSION="${{ steps.ver.outputs.version }}"
           NAME="gnomarchi-iso-builder-${VERSION}"
           STAGE="dist/.stage-iso/${NAME}"
           rm -rf dist/.stage-iso
@@ -57,20 +58,18 @@ jobs:
             iso/ "${STAGE}/iso/"
           install -m 0755 scripts/build-iso.sh "${STAGE}/build-iso.sh"
           printf '%s\n' "${VERSION}" > "${STAGE}/VERSION"
-          cat > "${STAGE}/README.md" <<EOF
-# gnomarchi ISO builder (${VERSION})
-
-Build a guided Arch live ISO locally (needs root + \`archiso\`):
-
-\`\`\`bash
-sudo pacman -S --needed archiso
-sudo ./build-iso.sh
-\`\`\`
-
-Output: \`iso/out/gnomarchi-*.iso\`
-
-Full tree and overlay live under \`iso/\`. See \`iso/README.md\`.
-EOF
+          {
+            echo "# gnomarchi ISO builder (${VERSION})"
+            echo
+            echo "Build a guided Arch live ISO locally (needs root + archiso):"
+            echo
+            echo "    sudo pacman -S --needed archiso"
+            echo "    sudo ./build-iso.sh"
+            echo
+            echo "Output: iso/out/gnomarchi-*.iso"
+            echo
+            echo "Full tree and overlay live under iso/. See iso/README.md."
+          } > "${STAGE}/README.md"
           tar -C dist/.stage-iso -czf "dist/${NAME}.tar.gz" "${NAME}"
           (
             cd dist
@@ -94,22 +93,23 @@ EOF
           echo "Verified SHA256 for source + ISO builder"
 
       - name: Write release notes
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
           set -euo pipefail
-          VERSION="${{ steps.ver.outputs.version }}"
-          cat > dist/RELEASE_NOTES.md <<EOF
-## gnomarchi ${VERSION}
-
-Beta tag (\`${VERSION}\`), published as the **Latest** release so GitHub Releases and \`/releases/latest\` resolve here.
-
-### Assets
-- \`gnomarchi-${VERSION}.tar.gz\` — source / overlay tree
-- \`gnomarchi-iso-builder-${VERSION}.tar.gz\` — archiso builder (\`sudo ./build-iso.sh\` on Arch)
-
-### Install
-Overlay: extract the source tarball and run \`./install/overlay.sh\`.
-ISO (local): extract the ISO builder tarball, \`sudo pacman -S archiso\`, \`sudo ./build-iso.sh\`.
-EOF
+          {
+            echo "## gnomarchi ${VERSION}"
+            echo
+            echo "Beta tag (${VERSION}), published as the Latest release so GitHub Releases and /releases/latest resolve here."
+            echo
+            echo "### Assets"
+            echo "- gnomarchi-${VERSION}.tar.gz — source / overlay tree"
+            echo "- gnomarchi-iso-builder-${VERSION}.tar.gz — archiso builder (sudo ./build-iso.sh on Arch)"
+            echo
+            echo "### Install"
+            echo "Overlay: extract the source tarball and run ./install/overlay.sh."
+            echo "ISO (local): extract the ISO builder tarball, sudo pacman -S archiso, sudo ./build-iso.sh."
+          } > dist/RELEASE_NOTES.md
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
@@ -117,8 +117,8 @@ EOF
           tag_name: ${{ steps.ver.outputs.tag }}
           name: gnomarchi ${{ steps.ver.outputs.version }}
           draft: false
-          # GitHub refuses make_latest on prereleases; beta tags stay
-          # versioned as beta.* but publish as full releases so Latest works.
+          # GitHub refuses Latest on prereleases; keep beta.* in the version
+          # string but publish as a full release so /releases/latest works.
           prerelease: false
           make_latest: true
           generate_release_notes: true
