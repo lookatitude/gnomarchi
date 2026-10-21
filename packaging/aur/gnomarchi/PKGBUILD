@@ -1,7 +1,7 @@
 # Maintainer: gnomarchi contributors
 # Experimental — not affiliated with Omarchy / Basecamp / DHH.
 pkgname=gnomarchi
-pkgver=0.0.1beta1
+pkgver=0.0.1beta2
 pkgrel=1
 pkgdesc="Omakase Arch desktop on stock GNOME (experimental)"
 arch=('any')
@@ -22,9 +22,9 @@ optdepends=(
 provides=('gnomarchi')
 conflicts=('gnomarchi')
 # Release asset name uses the git tag without the leading v (e.g. v0.0.1-beta.1 → 0.0.1-beta.1).
-_tagver=0.0.1-beta.1
+_tagver=0.0.1-beta.2
 source=("${pkgname}-${_tagver}.tar.gz::https://github.com/lookatitude/gnomarchi/releases/download/v${_tagver}/gnomarchi-${_tagver}.tar.gz")
-sha256sums=('692e5cd075e9dc442276e5188ac1f7bd2741f2ba40d3697bd15392bb5c99c50e')
+sha256sums=('SKIP')
 
 package() {
   cd "${srcdir}/gnomarchi-${_tagver}"

@@ -1,6 +1,6 @@
 # gnomarchi ISO (archiso)
 
-**Status: WIP / experimental — not shipped on GitHub Releases for v0.0.1-beta.1.**
+**Status: WIP / experimental — not shipped on GitHub Releases for v0.0.1-beta.2.**
 
 The supported install path for that release is **overlay + release tarball**
 (`install/overlay.sh` / curl|bash), not a published live ISO asset.

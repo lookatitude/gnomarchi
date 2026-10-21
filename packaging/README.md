@@ -22,7 +22,7 @@ packaging/
 
 1. Tag and publish via `.github/workflows/release.yml` (builds `gnomarchi-<VERSION>.tar.gz` + `.sha256`).
 2. Refresh PKGBUILD checksums: `./scripts/update-pkgbuild-checksums.sh` (reads `VERSION`, downloads the release asset, rewrites `sha256sums`).
-3. Keep `pkgver` / `_tagver` / git tag aligned (e.g. `pkgver=0.0.1beta1`, `_tagver=0.0.1-beta.1`, tag `v0.0.1-beta.1`).
+3. Keep `pkgver` / `_tagver` / git tag aligned (e.g. `pkgver=0.0.1beta2`, `_tagver=0.0.1-beta.2`, tag `v0.0.1-beta.2`).
 
 ## Custom repo (optional, must be signed)
 
