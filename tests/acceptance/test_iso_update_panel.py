@@ -56,7 +56,7 @@ class IsoUpdatePanelAcceptance(unittest.TestCase):
         blob = json.dumps(data)
         for needle in (
             "install.desktop.panel",
-            "install.dev.paperwm",
+            "install.paperwm",
             "install.gaming",
             "install.windows-vm",
             "setup.bar",

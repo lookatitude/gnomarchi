@@ -3,14 +3,19 @@ __pycache__/
 .local-state/
 *.egg-info/
 .venv/
+.venv-parity/
 venv/
 dist/
 iso/work/
 iso/out/
 .guild/runs/
+# Optional local large capture dumps (not required in clone)
 docs/screenshots/omarchy-v1/
 docs/screenshots/parity-v1/
 docs/screenshots/parity/
+# Keep committed visual proof JPGs (do not ignore this tree)
+!docs/screenshots/parity-proof/
+!docs/screenshots/parity-proof/**
 *.pkg.tar.zst
 *.pkg.tar.xz
 packaging/repo/pkgs/

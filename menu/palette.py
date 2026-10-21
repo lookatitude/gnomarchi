@@ -167,21 +167,33 @@ def open_menu_stub(tree_path: Path = DEFAULT_TREE) -> int:
 
 
 def open_menu_gtk(tree_path: Path = DEFAULT_TREE) -> int:
-    """GTK4 + libadwaita command palette (requires PyGObject)."""
+    """GTK4 + libadwaita command palette (requires PyGObject).
+
+    Default: hierarchical drill-down (root categories → children, Back).
+    Non-empty filter search flattens the tree (secondary mode).
+    """
     assert HAS_GTK and Adw is not None and Gtk is not None
 
     tree = load_menu_tree(tree_path)
-    rows = flatten_entries(list(tree.get("entries") or []))
+    root_entries = list(tree.get("entries") or [])
+    flat_rows = flatten_entries(root_entries)
 
     class PaletteWindow(Adw.ApplicationWindow):
         def __init__(self, app: Adw.Application) -> None:
             super().__init__(application=app, title="gnomarchi")
             self.set_default_size(520, 420)
-            self._rows = rows
+            self._stack: list[tuple[str, list[dict[str, Any]]]] = [
+                (str(tree.get("label") or "Menu"), root_entries)
+            ]
+            self._flat_rows = flat_rows
 
             toolbar = Adw.ToolbarView()
             header = Adw.HeaderBar()
-            header.set_title_widget(Gtk.Label(label="Command palette"))
+            self._title = Gtk.Label(label="Command palette")
+            header.set_title_widget(self._title)
+            self._back = Gtk.Button(label="Back")
+            self._back.connect("clicked", self._on_back)
+            header.pack_start(self._back)
             toolbar.add_top_bar(header)
 
             box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
@@ -190,7 +202,7 @@ def open_menu_gtk(tree_path: Path = DEFAULT_TREE) -> int:
             box.set_margin_start(12)
             box.set_margin_end(12)
 
-            self._search = Gtk.SearchEntry(placeholder_text="Filter…")
+            self._search = Gtk.SearchEntry(placeholder_text="Filter (flattens)…")
             self._search.connect("search-changed", self._on_filter)
             box.append(self._search)
 
@@ -204,7 +216,15 @@ def open_menu_gtk(tree_path: Path = DEFAULT_TREE) -> int:
 
             toolbar.set_content(box)
             self.set_content(toolbar)
+
+            key = Gtk.EventControllerKey()
+            key.connect("key-pressed", self._on_key)
+            self.add_controller(key)
+
             self._rebuild("")
+
+        def _query(self) -> str:
+            return (self._search.get_text() or "").strip()
 
         def _rebuild(self, query: str) -> None:
             while True:
@@ -213,25 +233,76 @@ def open_menu_gtk(tree_path: Path = DEFAULT_TREE) -> int:
                     break
                 self._list.remove(row)
             q = query.casefold()
-            for path, entry in self._rows:
-                hay = f"{path} {entry.get('id', '')}".casefold()
-                if q and q not in hay:
-                    continue
-                label = Gtk.Label(label=path, xalign=0.0)
-                label.set_margin_top(8)
-                label.set_margin_bottom(8)
-                label.set_margin_start(12)
-                label.set_margin_end(12)
-                row = Gtk.ListBoxRow()
-                row.set_child(label)
-                row._gnomarchi_entry = entry  # type: ignore[attr-defined]
-                self._list.append(row)
+            if q:
+                self._back.set_sensitive(False)
+                self._title.set_label("Search")
+                for path, entry in self._flat_rows:
+                    hay = f"{path} {entry.get('id', '')}".casefold()
+                    if q not in hay:
+                        continue
+                    self._append_row(path, entry, drill=None)
+                return
+            title, entries = self._stack[-1]
+            self._title.set_label(title)
+            self._back.set_sensitive(len(self._stack) > 1)
+            for entry in entries:
+                label = str(entry.get("label") or entry.get("id") or "?")
+                children = entry.get("children") or []
+                if children:
+                    self._append_row(f"{label} ›", entry, drill=list(children))
+                else:
+                    self._append_row(label, entry, drill=None)
+
+        def _append_row(
+            self,
+            label: str,
+            entry: dict[str, Any],
+            drill: list[dict[str, Any]] | None,
+        ) -> None:
+            lab = Gtk.Label(label=label, xalign=0.0)
+            lab.set_margin_top(8)
+            lab.set_margin_bottom(8)
+            lab.set_margin_start(12)
+            lab.set_margin_end(12)
+            row = Gtk.ListBoxRow()
+            row.set_child(lab)
+            row._gnomarchi_entry = entry  # type: ignore[attr-defined]
+            row._gnomarchi_drill = drill  # type: ignore[attr-defined]
+            self._list.append(row)
 
         def _on_filter(self, entry: Gtk.SearchEntry) -> None:
             self._rebuild(entry.get_text())
 
+        def _on_back(self, *_args: Any) -> None:
+            if len(self._stack) > 1:
+                self._stack.pop()
+                self._search.set_text("")
+                self._rebuild("")
+
+        def _on_key(self, _ctrl: Any, keyval: int, *_rest: Any) -> bool:
+            from gi.repository import Gdk  # type: ignore
+
+            if keyval == Gdk.KEY_Escape:
+                if self._query():
+                    self._search.set_text("")
+                    self._rebuild("")
+                    return True
+                if len(self._stack) > 1:
+                    self._on_back()
+                    return True
+                self.close()
+                return True
+            return False
+
         def _on_activate(self, _list: Gtk.ListBox, row: Gtk.ListBoxRow) -> None:
+            drill = getattr(row, "_gnomarchi_drill", None)
             entry = getattr(row, "_gnomarchi_entry", None)
+            if drill is not None and entry is not None:
+                label = str(entry.get("label") or entry.get("id") or "?")
+                self._stack.append((label, drill))
+                self._search.set_text("")
+                self._rebuild("")
+                return
             if entry:
                 GLib.idle_add(self._run_and_close, entry)
 

@@ -3,30 +3,48 @@
 from __future__ import annotations
 
 import os
+import tempfile
+import unittest
 from pathlib import Path
-
-import pytest
-
-
-@pytest.fixture()
-def state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    monkeypatch.setenv("GNOMARCHI_STATE_DIR", str(tmp_path))
-    monkeypatch.setenv("HOME", str(tmp_path / "home"))
-    (tmp_path / "home").mkdir()
-    return tmp_path
+from unittest import mock
 
 
-def test_bg_next_after_theme_set(state: Path) -> None:
-    from theme.engine import set_theme
-    from theme.backgrounds import next_background, current_index, VARIANT_COUNT
+class TestThemeBg(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmpdir.cleanup)
+        root = Path(self._tmpdir.name)
+        home = root / "home"
+        home.mkdir()
+        self.state = root
+        self._env = mock.patch.dict(
+            os.environ,
+            {
+                "GNOMARCHI_STATE_DIR": str(root),
+                "HOME": str(home),
+            },
+        )
+        self._env.start()
+        self.addCleanup(self._env.stop)
 
-    set_theme("tokyo-night")
-    assert (state / "active-theme").read_text().strip() == "tokyo-night"
-    p1 = next_background()
-    assert p1.is_file()
-    idx1 = current_index()
-    assert 0 <= idx1 < VARIANT_COUNT
-    p2 = next_background()
-    assert p2.is_file()
-    assert current_index() == (idx1 + 1) % VARIANT_COUNT
-    assert p1.read_bytes() != p2.read_bytes()
+    def test_bg_next_after_theme_set(self) -> None:
+        from theme.engine import set_theme
+        from theme.backgrounds import next_background, current_index, VARIANT_COUNT
+
+        set_theme("tokyo-night")
+        self.assertEqual((self.state / "active-theme").read_text().strip(), "tokyo-night")
+        p1 = next_background()
+        self.assertTrue(p1.is_file())
+        b1 = p1.read_bytes()
+        idx1 = current_index()
+        self.assertGreaterEqual(idx1, 0)
+        self.assertLess(idx1, VARIANT_COUNT)
+        p2 = next_background()
+        self.assertTrue(p2.is_file())
+        b2 = p2.read_bytes()
+        self.assertEqual(current_index(), (idx1 + 1) % VARIANT_COUNT)
+        self.assertNotEqual(b1, b2)
+
+
+if __name__ == "__main__":
+    unittest.main()

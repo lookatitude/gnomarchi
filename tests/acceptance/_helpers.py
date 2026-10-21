@@ -13,3 +13,4 @@ MENU_DEFAULT = REPO / "menu" / "default.jsonc"
 ALLOWED_STATUS = frozenset(
     {"native", "port", "adapt", "rebuild", "defer", "triage", "done"}
 )
+ALLOWED_MATURITY = frozenset({"adapted", "shipped", "proven"})

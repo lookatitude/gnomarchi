@@ -1,0 +1,9 @@
+{
+  "stamp": "20261020T230318Z",
+  "pass": 16,
+  "fail": 0,
+  "skipped": 96,
+  "report": "/home/miguelp/Projects/gnomarchi/docs/parity/dual-vm-results/workflows-20261020T230318Z.jsonl",
+  "catalog": "/home/miguelp/Projects/gnomarchi/tests/parity/workflows/catalog.json",
+  "workflow_count": 112
+}

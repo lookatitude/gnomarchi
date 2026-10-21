@@ -68,6 +68,13 @@ def add(name: str, url: str) -> str:
     desktop_id = f"gnomarchi-webapp-{sid}"
     desk = _apps_dir() / f"{desktop_id}.desktop"
     browser = _chromium()
+    try:
+        from theme.icon_apply import icon_name_for_app, install_app_icons
+
+        install_app_icons()
+        icon = icon_name_for_app(name)
+    except Exception:
+        icon = "web-browser"
     desk.write_text(
         "\n".join(
             [
@@ -76,6 +83,7 @@ def add(name: str, url: str) -> str:
                 f"Name={name}",
                 f"Comment=gnomarchi web app · {url}",
                 f"Exec={browser} --app={url}",
+                f"Icon={icon}",
                 "Terminal=false",
                 "Categories=Network;WebBrowser;",
                 f"StartupWMClass={sid}",

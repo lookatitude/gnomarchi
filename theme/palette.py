@@ -9,8 +9,12 @@ from pathlib import Path
 def load_palette(pack: Path) -> dict[str, str]:
     """Load colors.toml — supports Omarchy flat keys or gnomarchi [colors] table."""
     data = tomllib.loads((pack / "colors.toml").read_text(encoding="utf-8"))
+    # Top-level mode= light|dark (Omarchy flat packs); keep for gsettings color-scheme.
+    pack_mode = str(data.get("mode") or "").strip().lower()
     if isinstance(data.get("colors"), dict):
         raw = {k: str(v) for k, v in data["colors"].items()}
+        if not pack_mode and isinstance(data["colors"].get("mode"), str):
+            pack_mode = str(data["colors"]["mode"]).strip().lower()
     else:
         raw = {k: str(v) for k, v in data.items() if isinstance(v, str) and k != "mode"}
 
@@ -55,4 +59,18 @@ def load_palette(pack: Path) -> dict[str, str]:
     # Keep any extra Omarchy keys
     for k, v in raw.items():
         out.setdefault(k, v)
+    if pack_mode:
+        out["mode"] = pack_mode
+    elif "mode" not in out:
+        # Heuristic: light backgrounds → prefer-light when mode omitted
+        bg = out.get("background", "#000000").lstrip("#")
+        try:
+            if len(bg) == 3:
+                bg = "".join(c * 2 for c in bg)
+            r, g, b = int(bg[0:2], 16), int(bg[2:4], 16), int(bg[4:6], 16)
+            luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0
+            out["mode"] = "light" if luminance >= 0.55 else "dark"
+        except (ValueError, IndexError):
+            out["mode"] = "dark"
     return out
+

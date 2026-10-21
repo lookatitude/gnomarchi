@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gnomarchi — gaps &amp; improvements</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1a1d21; --muted: #5b6570; --border: #e4e7ec;
+    --card: #f7f8fa; --accent: #2563eb; --accent-soft: #eff4ff;
+    --code-bg: #f4f5f7; --code-fg: #1a1d21;
+    --note: #2563eb; --tip: #059669; --warn: #d97706; --danger: #dc2626; --success: #059669;
+    --shadow: 0 1px 3px rgba(16,24,40,.08), 0 1px 2px rgba(16,24,40,.04);
+    --maxw: 60rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216; --fg: #e6e8eb; --muted: #9aa4b0; --border: #232a33;
+      --card: #161b22; --accent: #6ea8ff; --accent-soft: #16233a;
+      --code-bg: #161b22; --code-fg: #e6e8eb;
+      --note: #6ea8ff; --tip: #34d399; --warn: #fbbf24; --danger: #f87171; --success: #34d399;
+      --shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .layout { display: grid; grid-template-columns: 15rem minmax(0,1fr); max-width: 82rem; margin: 0 auto; }
+  aside {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 2rem 1.25rem; border-right: 1px solid var(--border); font-size: .9rem;
+  }
+  aside .toc-title { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; }
+  aside nav a { display: block; color: var(--muted); text-decoration: none; padding: .28rem 0; border-left: 2px solid transparent; padding-left: .6rem; }
+  aside nav a:hover, aside nav a.active { color: var(--accent); border-left-color: var(--accent); }
+  main { padding: 2.5rem clamp(1.25rem, 4vw, 3.5rem); max-width: var(--maxw); }
+  .doc-title { font-size: 2rem; line-height: 1.15; margin: 0 0 .4rem; letter-spacing: -.02em; }
+  .doc-subtitle { color: var(--muted); margin: 0 0 1rem; }
+  .doc-meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 2rem; }
+  .chip { font-size: .78rem; padding: .22rem .6rem; border-radius: 999px; background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+  .chip.status-review { color: var(--note); }
+  h2 { font-size: 1.4rem; margin: 2.25rem 0 1rem; scroll-margin-top: 1rem; }
+  h3 { font-size: 1.05rem; margin: 1.4rem 0 .5rem; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .88em; background: var(--code-bg); padding: .12em .38em; border-radius: 4px; }
+  .table-wrap { overflow-x: auto; margin: 1.25rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  thead th { background: var(--card); font-weight: 600; }
+  .callout { display: grid; grid-template-columns: 1.5rem 1fr; gap: .6rem; margin: 1.25rem 0;
+    padding: .85rem 1rem; border-radius: 8px; border: 1px solid var(--border); background: var(--card); }
+  .callout.warn { border-left: 3px solid var(--warn); }
+  .callout.note { border-left: 3px solid var(--note); }
+  .sev { font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .sev-h { color: var(--danger); } .sev-m { color: var(--warn); } .sev-l { color: var(--muted); }
+  .id { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85em; color: var(--accent); }
+  ol.actions { padding-left: 1.2rem; }
+  ol.actions li { margin: .4rem 0; }
+  @media (max-width: 52rem) { .layout { grid-template-columns: 1fr; } aside { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="toc-title">On this page</div>
+    <nav id="toc">
+      <a href="#verdict">Verdict</a>
+      <a href="#findings">Findings</a>
+      <a href="#improvements">Suggested improvements</a>
+      <a href="#risks">Risks</a>
+      <a href="#actions">Priority actions</a>
+    </nav>
+  </aside>
+  <main>
+    <header class="doc">
+      <h1 class="doc-title">Gaps &amp; improvements</h1>
+      <p class="doc-subtitle">Post–v0.0.1-beta.1 assessment. Manual feature map is 43/43 “done” on the GNOME adaptation path; product maturity is not.</p>
+      <div class="doc-meta">
+        <span class="chip status-review">● Review</span>
+        <span class="chip status-review">● A1–A3 remediated in-tree (beta)</span>
+        <span class="chip">2026-10-20</span>
+        <span class="chip">v0.0.1-beta.1</span>
+      </div>
+    </header>
+
+    <section id="verdict">
+      <h2>Verdict</h2>
+      <div class="callout warn">
+        <div class="ico">!</div>
+        <div>
+          <p><strong>“Done” means adapted, not Omarchy-identical.</strong> Hyprland/Quickshell are deliberately replaced (D1′). The largest remaining gaps are distribution trust, ISO proof, UX fidelity on tiling/shell, and repo weight — not missing menu chapters.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="findings">
+      <h2>Findings</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Sev</th><th>Gap</th><th>Evidence</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="id">F1</td>
+              <td><span class="sev sev-h">High</span></td>
+              <td>No production install channel with signatures</td>
+              <td>AUR <code>sha256sums=('SKIP')</code>; pacman example still <code>Optional TrustAll</code> / <code>example.invalid</code>; security doc F4 residual open</td>
+            </tr>
+            <tr>
+              <td class="id">F2</td>
+              <td><span class="sev sev-h">High</span></td>
+              <td>ISO marked done but unproven as product path</td>
+              <td><code>iso/build.sh</code> exists; no published ISO artifact on the GitHub release; guided flow still “boot → pacstrap → overlay”</td>
+            </tr>
+            <tr>
+              <td class="id">F3</td>
+              <td><span class="sev sev-m">Med</span></td>
+              <td>Tiling / compositor UX is optional substitute</td>
+              <td>PaperWM via Install path; default is stock GNOME overview — Omarchy users expect tiling-first</td>
+            </tr>
+            <tr>
+              <td class="id">F4</td>
+              <td><span class="sev sev-m">Med</span></td>
+              <td>App substitutes are “good enough” wrappers</td>
+              <td>Hype→mpv, Signed→xournalpp, Herdr→tmux, Cliamp→cmus, Monologue→whisper/ffmpeg — feature-complete on paper, feel different</td>
+            </tr>
+            <tr>
+              <td class="id">F5</td>
+              <td><span class="sev sev-m">Med</span></td>
+              <td>Repo / release bloat</td>
+              <td>~178M theme packs (incl. intro MP4s); ~109M screenshots in git; release tarball ~180M without manual/parity dumps</td>
+            </tr>
+            <tr>
+              <td class="id">F6</td>
+              <td><span class="sev sev-m">Med</span></td>
+              <td>Weak automated regression vs VMs</td>
+              <td>~1.1k lines of unit/acceptance tests; parity validated manually via VNC shots, not CI against a GNOME VM</td>
+            </tr>
+            <tr>
+              <td class="id">F7</td>
+              <td><span class="sev sev-l">Low</span></td>
+              <td>Plugin / Shell-extension story is thin</td>
+              <td>Adapters + validate gates exist; Shell-extension enable refused by design; multi-runtime plugins lack a public gallery / trust UX polish</td>
+            </tr>
+            <tr>
+              <td class="id">F8</td>
+              <td><span class="sev sev-l">Low</span></td>
+              <td>GNOME version coupling</td>
+              <td>Extensions (user-themes, dash-to-panel, PaperWM) break across Shell majors; no matrix or pin strategy documented for consumers</td>
+            </tr>
+            <tr>
+              <td class="id">F9</td>
+              <td><span class="sev sev-l">Low</span></td>
+              <td>Registry overstates readiness</td>
+              <td><code>features/registry.yaml</code> marks ISO/update/session rows <code>done</code>; operators reading only the registry will misread beta maturity</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="improvements">
+      <h2>Suggested improvements</h2>
+      <h3>Distribution</h3>
+      <ul>
+        <li>Publish a signed <code>.pkg.tar.zst</code> (or real AUR package with pinned checksums) and drop <code>TrustAll</code> before any public mirror.</li>
+        <li>Attach a tested ISO (or document “overlay-only until v0.1”) so README channels match artifacts.</li>
+        <li>Split theme media: ship palette + wallpaper webp in core; lazy-fetch intro videos / full backgrounds.</li>
+      </ul>
+      <h3>Product feel</h3>
+      <ul>
+        <li>First-run: offer PaperWM (or clear tiling profile) instead of burying it under Install.</li>
+        <li>Tighten hotkey cheatsheet vs Omarchy Super+* map; flag intentional GNOME divergences in-app.</li>
+        <li>Replace or deepen wrapper apps where the substitute fails the daily loop (esp. Monologue / Signed).</li>
+      </ul>
+      <h3>Hardening &amp; quality</h3>
+      <ul>
+        <li>CI: <code>unittest</code> on PR + one scheduled “overlay dry-run” on Arch container; later a GNOME VM smoke.</li>
+        <li>Move <code>parity-v2</code> / <code>omarchy-manual</code> PNGs to release assets or LFS; keep README JPEGs in-tree.</li>
+        <li>Add a status enum beyond feature-map <code>done</code>: <code>adapted</code> | <code>shipped</code> | <code>proven</code>.</li>
+      </ul>
+    </section>
+
+    <section id="risks">
+      <h2>Risks</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Risk</th></tr></thead>
+          <tbody>
+            <tr><td class="id">R1</td><td>Users treat beta overlay as a supported distro and hit unsigned / TrustAll paths.</td></tr>
+            <tr><td class="id">R2</td><td>Extension breakage on GNOME upgrades looks like “gnomarchi broke” with no recovery story.</td></tr>
+            <tr><td class="id">R3</td><td>Omarchy branding confusion (disclaimer exists; AppStream / AUR description must stay explicit).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="actions">
+      <h2>Priority actions</h2>
+      <div class="callout note">
+        <div class="ico">→</div>
+        <div>
+          <p><strong>A1–A3 landed in-tree for beta</strong> (2026-10-20 team pass). Residual: operator GPG keys for a public pacman mirror; published ISO artifact deferred; no <code>proven</code> maturity rows yet.</p>
+        </div>
+      </div>
+      <ol class="actions">
+        <li><span class="id">A1</span> — Done for beta: PKGBUILD pinned SHA256; example <code>SigLevel = Required TrustedOnly</code>; signing checklist; <code>scripts/update-pkgbuild-checksums.sh</code>. Keys remain operator-owned.</li>
+        <li><span class="id">A2</span> — Done via honesty path: ISO demoted WIP (README + registry maturity); <code>iso-validate.yml</code> (no mkarchiso). Published ISO still open.</li>
+        <li><span class="id">A3</span> — Done: <code>ci.yml</code> unittest; release tarball excludes evidence dumps + theme intro MP4s; <code>docs/parity/media-policy.md</code>.</li>
+      </ol>
+      <p>Also closed: F3 PaperWM opt-in · F4 <code>docs/apps/substitutes.md</code> · F7 plugin-trust copy · F8 <code>docs/gnome-shell-matrix.md</code> · F9 registry <code>maturity</code>.</p>
+      <p style="color:var(--muted);font-size:.9rem;margin-top:2rem">Sources: <code>docs/parity/gnomarchi-gap-map.json</code>, <code>docs/security/findings-T3-T5.md</code>, <code>packaging/</code>, <code>iso/README.md</code>, release <code>v0.0.1-beta.1</code>.</p>
+    </section>
+  </main>
+</div>
+<script>
+(function () {
+  var links = [].slice.call(document.querySelectorAll('#toc a'));
+  var map = {};
+  links.forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) map[id] = a;
+  });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        links.forEach(function (l) { l.classList.remove('active'); });
+        if (map[e.target.id]) map[e.target.id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+  document.querySelectorAll('main section[id]').forEach(function (s) { obs.observe(s); });
+})();
+</script>
+</body>
+</html>

@@ -31,6 +31,55 @@ def _leaf_ids(node: dict, acc: list[str] | None = None) -> list[str]:
 
 
 class AppsPanelsFontsTests(unittest.TestCase):
+    def test_parse_wpctl_volume(self) -> None:
+        from apps.panels import parse_wpctl_volume
+
+        self.assertEqual(parse_wpctl_volume("Volume: 0.50"), (0.5, False))
+        self.assertEqual(parse_wpctl_volume("Volume: 0.25 [MUTED]"), (0.25, True))
+
+    def test_write_ghostty_font(self) -> None:
+        from common.fonts import write_ghostty_font
+
+        with tempfile.TemporaryDirectory() as td:
+            home = Path(td)
+            conf = home / ".config" / "ghostty" / "config"
+            conf.parent.mkdir(parents=True)
+            conf.write_text("background = #000\n", encoding="utf-8")
+            import os
+
+            old = os.environ.get("HOME")
+            os.environ["HOME"] = str(home)
+            try:
+                out = write_ghostty_font("JetBrainsMono Nerd Font")
+                self.assertIsNotNone(out)
+                body = conf.read_text(encoding="utf-8")
+                self.assertIn('font-family = "JetBrainsMono Nerd Font"', body)
+                self.assertIn("background = #000", body)
+                write_ghostty_font("FiraCode Nerd Font")
+                body2 = conf.read_text(encoding="utf-8")
+                self.assertIn('font-family = "FiraCode Nerd Font"', body2)
+                self.assertEqual(body2.count("font-family"), 1)
+            finally:
+                if old is None:
+                    os.environ.pop("HOME", None)
+                else:
+                    os.environ["HOME"] = old
+
+    def test_menu_hierarchy_helpers(self) -> None:
+        from menu.palette import flatten_entries
+
+        tree = [
+            {
+                "id": "a",
+                "label": "A",
+                "children": [{"id": "a1", "label": "A1", "action": {"type": "stub"}}],
+            },
+            {"id": "b", "label": "B", "action": {"type": "stub"}},
+        ]
+        flat = flatten_entries(tree)
+        self.assertEqual(len(flat), 2)
+        self.assertTrue(any(p.startswith("A /") for p, _ in flat))
+
     def test_app_scripts_exist(self) -> None:
         for name in ("gnoma-write", "gnoma-cut", "gnoma-calc"):
             p = REPO / "apps" / name / "main.py"
@@ -138,11 +187,22 @@ class AppsPanelsFontsTests(unittest.TestCase):
         for required in (
             "style.font",
             "style.font.cascadia",
+            "style.background",
+            "style.background.next",
             "install.style",
             "install.style.font.fira",
             "install.gaming",
         ):
             self.assertIn(required, ids, f"missing menu id {required}")
+        bg = None
+        for e in data["entries"]:
+            if e.get("id") == "style":
+                for c in e.get("children") or []:
+                    if c.get("id") == "style.background":
+                        bg = c
+                        break
+        self.assertIsNotNone(bg)
+        self.assertIn("pick", (bg.get("action") or {}).get("argv") or [])
 
     def test_registry_done(self) -> None:
         text = REGISTRY.read_text(encoding="utf-8")

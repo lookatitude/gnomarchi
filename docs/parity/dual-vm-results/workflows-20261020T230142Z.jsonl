@@ -1,0 +1,9 @@
+{"id": "desktop.proof.capture", "side": "gnomarchi", "feature": "manual.menu", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.agents", "side": "gnomarchi", "feature": "manual.ai", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.panel.audio", "side": "gnomarchi", "feature": "manual.bar-panels", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.panel.network", "side": "gnomarchi", "feature": "manual.bar-panels", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.panel.bluetooth", "side": "gnomarchi", "feature": "manual.bar-panels", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.app.write", "side": "gnomarchi", "feature": "manual.first-party-apps", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.app.calc", "side": "gnomarchi", "feature": "manual.first-party-apps", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.menu", "side": "gnomarchi", "feature": "manual.menu", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}
+{"id": "desktop.proof.notice.time", "side": "gnomarchi", "feature": "manual.notices", "status": "pass", "steps": [{"step": 0, "ok": true, "detail": ""}, {"step": 1, "ok": true, "detail": "skipped:PARITY_CAPTURE"}]}

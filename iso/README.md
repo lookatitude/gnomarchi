@@ -1,10 +1,18 @@
 # gnomarchi ISO (archiso)
 
-Guided Arch live ISO. After base install, the live session runs `install/overlay.sh`
-(same stages as curl|bash overlay). System updates use official Arch only:
-`gnomarchi update` → `sudo pacman -Syu` (no custom `[gnomarchi]` repo required).
+**Status: WIP / experimental — not shipped on GitHub Releases for v0.0.1-beta.2.**
 
-## Build
+The supported install path for that release is **overlay + release tarball**
+(`install/overlay.sh` / curl|bash), not a published live ISO asset.
+
+Guided Arch live ISO (when built locally). After base install, the live session
+runs `install/overlay.sh` (same stages as curl|bash overlay). System updates use
+official Arch only: `gnomarchi update` → `sudo pacman -Syu` (no custom
+`[gnomarchi]` repo required).
+
+## Build (experimental)
+
+Requires root, `archiso`, and a full `mkarchiso` run. Not part of CI.
 
 ```bash
 sudo pacman -S --needed archiso

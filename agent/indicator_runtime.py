@@ -18,6 +18,24 @@ class MenuAction:
     get_active: Callable[[], bool] | None = None
 
 
+def _themed_icon(plugin_id: str, fallback: str) -> str:
+    """Prefer accent-tinted hicolor icon emitted by theme set (gnomarchi-<slug>)."""
+    import os
+    from pathlib import Path
+
+    slug = plugin_id.split(".")[-1].replace("_", "-")
+    name = f"gnomarchi-{slug}"
+    # system-update → gnomarchi-system-update
+    if plugin_id == "gnomarchi.system-update":
+        name = "gnomarchi-system-update"
+    home = Path(os.environ.get("HOME", "/tmp")).expanduser()
+    for size in ("22x22", "24x24", "32x32", "48x48"):
+        cand = home / ".local" / "share" / "icons" / "hicolor" / size / "apps" / f"{name}.png"
+        if cand.is_file():
+            return name
+    return fallback
+
+
 def run_indicator(
     *,
     id: str,
@@ -49,9 +67,10 @@ def run_indicator(
         signal.pause()
         return 0
 
+    icon_name = _themed_icon(id, icon)
     ind = AppIndicator.Indicator.new(
         id,
-        icon,
+        icon_name,
         AppIndicator.IndicatorCategory.APPLICATION_STATUS,
     )
     ind.set_status(AppIndicator.IndicatorStatus.ACTIVE)

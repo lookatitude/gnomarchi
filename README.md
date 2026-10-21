@@ -4,7 +4,7 @@
   <img src="docs/brand/logo.png" alt="gnomarchi" width="280">
 </p>
 
-<p align="center"><strong>v0.0.1-beta.1</strong> · stock GNOME omakase for Arch</p>
+<p align="center"><strong>v0.0.1-beta.2</strong> · stock GNOME omakase for Arch</p>
 
 **Experimental.** gnomarchi ports [Omarchy](https://omarchy.org)’s omakase Arch desktop — themes, menu, plugins, agents, and overlay install — onto **stock GNOME** instead of Hyprland/Quickshell.
 
@@ -52,13 +52,15 @@ Super+Space                   # unified menu
 
 ## Install channels
 
+**Beta.** Prefer overlay or a release tarball. Packaging and ISO paths are experimental; do not treat them as a signed production distro yet. Gaps: [`docs/parity/gaps-and-improvements.html`](docs/parity/gaps-and-improvements.html) · app substitutes: [`docs/apps/substitutes.md`](docs/apps/substitutes.md) · Shell matrix: [`docs/gnome-shell-matrix.md`](docs/gnome-shell-matrix.md).
+
 | Channel | How |
 | --- | --- |
 | **Overlay** (dev / existing Arch+GNOME) | `./install/overlay.sh` |
-| **Release tarball** | GitHub Releases → `gnomarchi-0.0.1-beta.1.tar.gz` |
-| **AUR-style PKGBUILD** | `packaging/aur/gnomarchi/` (`makepkg -si`) |
+| **Release tarball** | GitHub Releases → `gnomarchi-0.0.1-beta.2.tar.gz` |
+| **AUR-style PKGBUILD** | `packaging/aur/gnomarchi/` (`makepkg -si`) — uses pinned `sha256sums` when a release asset checksum is available |
 | **Custom pacman repo** | `packaging/repo/` — build pkgs, `./packaging/repo/build-repo.sh`, host mirror |
-| **ISO** (WIP) | `iso/build.sh` (needs `archiso`) |
+| **ISO** (WIP — not a supported install path yet) | `iso/build.sh` (needs `archiso`); no published ISO artifact on the current release |
 
 ```bash
 # From a release tag
@@ -67,12 +69,22 @@ Super+Space                   # unified menu
 cd packaging/aur/gnomarchi && makepkg -si
 ```
 
-## Status (v0.0.1-beta.1)
+## Status (v0.0.1-beta.2)
 
-Feature gap map vs Omarchy manual: **43/43 done** on the GNOME adaptation path (Hyprland/Quickshell replaced by GNOME Shell + GDM by design). Tracker: `features/registry.yaml` · `docs/parity/gnomarchi-gap-map.json`.
+Feature gap map vs Omarchy manual: **43/43 done** on the GNOME adaptation path (Hyprland/Quickshell replaced by GNOME Shell + GDM by design). `status=done` is adaptation tracking; product readiness uses `maturity` (`adapted` \| `shipped` \| `proven`) in `features/registry.yaml`. Tracker: `features/registry.yaml` · `docs/parity/gnomarchi-gap-map.json` · honesty notes: [`docs/parity/gaps-and-improvements.html`](docs/parity/gaps-and-improvements.html).
 
 ```bash
 python3 -m unittest discover -s tests
+# Dual-VM adapted-parity workflows (agents/themes/panels/apps/…):
+#   docs/parity/workflows-catalog.html
+#   python3 scripts/parity-workflows-run.py --side both
+#   python3 scripts/parity-workflows-run.py --only theme.effect,plugin.effect
+#   PARITY_CAPTURE=1 ./scripts/parity-capture-theme-proof.sh   # + plugin/desktop
+#   PARITY_CAPTURE=1 python3 scripts/parity-workflows-run.py --only theme.proof,plugin.live,desktop.proof
+#   ./scripts/parity-dual-vm-run.sh
+# Plugin Hypr→GTK plan: docs/parity/plugin-migration-plan.html
+# Visual proof gallery: docs/parity/visual-proof.html
+# Capture runbook: docs/parity/PROOF.md
 ```
 
 ## License

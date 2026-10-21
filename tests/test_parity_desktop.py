@@ -95,6 +95,8 @@ class ParityDesktopTests(unittest.TestCase):
             ["remind", "--help"],
             ["mode", "--help"],
             ["theme", "bg", "video", "--help"],
+            ["theme", "unlock", "--help"],
+            ["branding", "gdm", "apply", "--help"],
             ["notice", "--help"],
             ["webapp", "--help"],
             ["share", "--help"],
@@ -140,10 +142,33 @@ class ParityDesktopTests(unittest.TestCase):
                 "accent": "#4488ff",
                 "muted": "#888888",
                 "red": "#ff5555",
+                "green": "#55aa55",
             }
         )
         self.assertTrue(path.is_file())
-        self.assertIn("4488ff", path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("4488ff", text)
+        self.assertIn("55aa55", text)
+        self.assertIn("$directory$git_branch$git_status$character", text)
+        self.assertIn("[git_status]", text)
+
+    def test_starship_hook_idempotent(self) -> None:
+        from common.starship_hook import ensure_starship_hook, has_starship_hook
+
+        first = ensure_starship_hook(self.home)
+        self.assertEqual(first["zsh"], "created")
+        self.assertEqual(first["bash"], "created")
+        zshrc = self.home / ".zshrc"
+        bashrc = self.home / ".bashrc"
+        self.assertTrue(has_starship_hook(zshrc))
+        self.assertTrue(has_starship_hook(bashrc))
+        self.assertIn('starship init zsh', zshrc.read_text(encoding="utf-8"))
+        self.assertIn('starship init bash', bashrc.read_text(encoding="utf-8"))
+        second = ensure_starship_hook(self.home)
+        self.assertEqual(second["zsh"], "present")
+        self.assertEqual(second["bash"], "present")
+        # Still a single hook block
+        self.assertEqual(zshrc.read_text(encoding="utf-8").count("starship init"), 1)
 
     def test_registry_target_ids_done(self) -> None:
         text = (ROOT / "features" / "registry.yaml").read_text(encoding="utf-8")

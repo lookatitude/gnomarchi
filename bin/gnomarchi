@@ -115,6 +115,27 @@ def cmd_theme_bg_set(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_theme_bg_pick(args: argparse.Namespace) -> int:
+    from theme.backgrounds import list_backgrounds, pick_background_cli, pick_background_gtk
+
+    if getattr(args, "list_only", False):
+        try:
+            rows = list_backgrounds()
+        except FileNotFoundError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        for idx, path in rows:
+            print(f"{idx}\t{path.name}\t{path}")
+        return 0
+    if getattr(args, "cli", False):
+        path = pick_background_cli()
+        if path is None:
+            return 1
+        print(f"background → {path}")
+        return 0
+    return pick_background_gtk()
+
+
 def cmd_theme_bg_video(args: argparse.Namespace) -> int:
     from theme.emitters import set_video_wallpaper_enabled, video_wallpaper_enabled
     from theme.engine import set_theme
@@ -131,6 +152,70 @@ def cmd_theme_bg_video(args: argparse.Namespace) -> int:
             set_theme(active)
     print("video wallpaper →", "on" if on else "off")
     return 0
+
+
+def cmd_theme_unlock(args: argparse.Namespace) -> int:
+    """Style→Unlock: set/list screensaver lock art from pack unlock.png."""
+    from theme.unlock import list_unlock_packs, set_unlock, status
+
+    action = args.unlock_action
+    if action == "status":
+        st = status()
+        print(f"pack\t{st.get('pack') or '(none)'}")
+        print(f"path\t{st.get('path') or '(none)'}")
+        return 0
+    if action == "set":
+        try:
+            path = set_unlock(args.id)
+        except FileNotFoundError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(f"unlock → {path}")
+        return 0
+    if action == "pick":
+        packs = list_unlock_packs()
+        if getattr(args, "id", None):
+            try:
+                path = set_unlock(args.id)
+            except FileNotFoundError as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 1
+            print(f"unlock → {path}")
+            return 0
+        if not packs:
+            print("(no packs with unlock.png)")
+            return 1
+        print("# unlock packs (preview-unlock / unlock.png)")
+        for i, p in enumerate(packs, start=1):
+            print(f"  {i:2d}. {p['id']}\t{p['preview']}")
+        if not sys.stdin.isatty():
+            print("usage: gnomarchi theme unlock set <pack-id>", file=sys.stderr)
+            return 0
+        print("Enter number or pack id (empty = quit): ", end="", flush=True)
+        try:
+            choice = sys.stdin.readline().strip()
+        except KeyboardInterrupt:
+            print()
+            return 130
+        if not choice:
+            return 0
+        if choice.isdigit():
+            idx = int(choice)
+            if idx < 1 or idx > len(packs):
+                print("error: out of range", file=sys.stderr)
+                return 1
+            tid = packs[idx - 1]["id"]
+        else:
+            tid = choice
+        try:
+            path = set_unlock(tid)
+        except FileNotFoundError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(f"unlock → {path}")
+        return 0
+    print(f"error: unknown unlock action: {action}", file=sys.stderr)
+    return 2
 
 
 def cmd_update(args: argparse.Namespace) -> int:
@@ -150,6 +235,8 @@ def cmd_capture(args: argparse.Namespace) -> int:
         return capture.qr()
     if args.capture_action == "record":
         return capture.record()
+    if args.capture_action == "menu":
+        return capture.menu()
     return 2
 
 
@@ -228,7 +315,11 @@ def cmd_mode(args: argparse.Namespace) -> int:
 def cmd_panel(args: argparse.Namespace) -> int:
     from apps.panels import open_panel
 
-    return open_panel(args.name, prefer_gtk=bool(getattr(args, "gtk", False)))
+    return open_panel(
+        args.name,
+        prefer_gtk=bool(getattr(args, "gtk", False)),
+        settings=bool(getattr(args, "settings", False)),
+    )
 
 
 def cmd_font(args: argparse.Namespace) -> int:
@@ -325,6 +416,10 @@ def cmd_share(args: argparse.Namespace) -> int:
     if args.share_action == "hint":
         print(share.install_hint())
         return 0
+    if args.share_action == "nautilus":
+        path = share.install_nautilus_script()
+        print(path)
+        return 0
     return 2
 
 
@@ -336,8 +431,9 @@ def cmd_theme_new(args: argparse.Namespace) -> int:
             args.id,
             name=getattr(args, "name", None),
             from_id=getattr(args, "from_id", None) or "tokyo-night",
+            from_wallpaper=getattr(args, "from_wallpaper", None),
         )
-    except (ValueError, FileExistsError) as exc:
+    except (ValueError, FileExistsError, FileNotFoundError, RuntimeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     print(dest)
@@ -369,6 +465,8 @@ def cmd_idle(args: argparse.Namespace) -> int:
 
     if args.idle_action == "lock":
         return idle_ctl.lock_now()
+    if args.idle_action == "screensaver":
+        return idle_ctl.screensaver()
     if args.idle_action == "status":
         return idle_ctl.status()
     if args.idle_action == "stay-awake":
@@ -377,6 +475,66 @@ def cmd_idle(args: argparse.Namespace) -> int:
         return idle_ctl.stay_awake(on)
     if args.idle_action == "inhibit":
         return idle_ctl.inhibit_sleep(int(args.seconds))
+    return 2
+
+
+def cmd_branding(args: argparse.Namespace) -> int:
+    import shutil
+    import subprocess
+
+    from desktop import branding
+
+    branding.ensure_store()
+    target = getattr(args, "brand_target", None)
+
+    if target == "gdm":
+        if args.brand_action == "apply":
+            return branding.gdm_apply(
+                use_sudo=not bool(getattr(args, "no_sudo", False))
+            )
+        print("error: gdm supports: apply", file=sys.stderr)
+        return 2
+
+    if target == "logo":
+        if args.brand_action == "status":
+            return branding.print_logo_status()
+        if args.brand_action == "preview":
+            try:
+                path = branding.render_boot_preview()
+            except FileNotFoundError as exc:
+                print(f"error: {exc}", file=sys.stderr)
+                return 1
+            print(path)
+            if shutil.which("eog"):
+                subprocess.Popen(["eog", str(path)], start_new_session=True)
+            elif shutil.which("xdg-open"):
+                subprocess.Popen(["xdg-open", str(path)], start_new_session=True)
+            return 0
+        print("error: logo supports: status|preview", file=sys.stderr)
+        return 2
+
+    if target not in ("screensaver", "about"):
+        print("error: unknown branding target", file=sys.stderr)
+        return 2
+
+    action = args.brand_action
+    if action == "show":
+        return branding.launch_viewer(target)
+    if action == "reset":
+        path = branding.reset_surface(target)
+        print(f"{target} reset → {path}")
+        return 0
+    if action == "text":
+        phrase = getattr(args, "phrase", None)
+        path = branding.set_text(target, phrase)
+        print(f"{target} text → {path}")
+        return 0
+    if action == "image":
+        image = Path(args.image)
+        path, msg = branding.set_from_image(target, image)
+        print(msg)
+        return 0 if path is not None else 1
+    print("error: unknown branding action", file=sys.stderr)
     return 2
 
 
@@ -730,6 +888,50 @@ def cmd_shell_bar_position(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_shell_ensure(_args: argparse.Namespace) -> int:
+    """Idempotently install starship init into ~/.zshrc and ~/.bashrc."""
+    from common.starship_hook import ensure_starship_hook
+
+    result = ensure_starship_hook()
+    for shell, status in result.items():
+        print(f"starship {shell} → {status}")
+    return 0
+
+
+def cmd_prompt(args: argparse.Namespace) -> int:
+    """Thin prompt helpers: minimal (re-emit) or status (hook + config)."""
+    from common.starship_hook import ensure_starship_hook, hook_status
+
+    action = args.action
+    if action == "status":
+        import json
+
+        print(json.dumps(hook_status(), indent=2))
+        return 0
+    if action == "minimal":
+        from theme.emitters import emit_starship
+        from theme.engine import list_themes
+        from theme.palette import load_palette
+        from theme.paths import find_pack
+        from common.paths import state_dir
+
+        ensure_starship_hook()
+        active = state_dir() / "active-theme"
+        theme_id = active.read_text(encoding="utf-8").strip() if active.is_file() else None
+        pack = find_pack(theme_id) if theme_id else None
+        if pack is None:
+            themes = list_themes()
+            pack = find_pack(themes[0]["id"]) if themes else None
+        if pack is None:
+            print("error: no theme pack; run gnomarchi theme set first", file=sys.stderr)
+            return 1
+        path = emit_starship(load_palette(pack))
+        print(f"starship minimal → {path}")
+        return 0
+    print(f"error: unknown prompt action: {action}", file=sys.stderr)
+    return 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="gnomarchi",
@@ -754,6 +956,12 @@ def build_parser() -> argparse.ArgumentParser:
     tn.add_argument("id", help="theme directory id")
     tn.add_argument("--name", default=None, help="display name")
     tn.add_argument("--from", dest="from_id", default="tokyo-night", help="base pack to copy")
+    tn.add_argument(
+        "--from-wallpaper",
+        dest="from_wallpaper",
+        default=None,
+        help="sample background/foreground/accent from an image",
+    )
     tn.set_defaults(func=cmd_theme_new)
     tbg = theme_sub.add_parser("bg", help="cycle/set generated backgrounds")
     tbg_sub = tbg.add_subparsers(dest="bg_action", required=True)
@@ -764,9 +972,25 @@ def build_parser() -> argparse.ArgumentParser:
     tbgs = tbg_sub.add_parser("set")
     tbgs.add_argument("index", type=int)
     tbgs.set_defaults(func=cmd_theme_bg_set)
+    tbgp = tbg_sub.add_parser("pick", help="grid/list pack backgrounds (Style > Background)")
+    tbgp.add_argument("--list", dest="list_only", action="store_true", help="print index\\tname\\tpath")
+    tbgp.add_argument("--cli", action="store_true", help="stdin pick instead of GTK")
+    tbgp.set_defaults(func=cmd_theme_bg_pick)
     tbgv = tbg_sub.add_parser("video")
     tbgv.add_argument("video_action", choices=["on", "off", "status"])
     tbgv.set_defaults(func=cmd_theme_bg_video)
+    tun = theme_sub.add_parser(
+        "unlock", help="lock/screensaver art from pack unlock.png (Style→Unlock)"
+    )
+    tun_sub = tun.add_subparsers(dest="unlock_action", required=True)
+    tuns = tun_sub.add_parser("set", help="apply unlock.png from a pack id")
+    tuns.add_argument("id", help="theme pack id")
+    tuns.set_defaults(func=cmd_theme_unlock)
+    tunp = tun_sub.add_parser("pick", help="list unlock packs / pick interactively")
+    tunp.add_argument("id", nargs="?", help="optional pack id (non-interactive)")
+    tunp.set_defaults(func=cmd_theme_unlock)
+    tunst = tun_sub.add_parser("status", help="show active unlock art")
+    tunst.set_defaults(func=cmd_theme_unlock)
 
     upd = sub.add_parser("update", help="Arch pacman -Syu (official repos)")
     upd.add_argument("--noconfirm", action="store_true")
@@ -784,6 +1008,8 @@ def build_parser() -> argparse.ArgumentParser:
     capq.set_defaults(func=cmd_capture)
     capr = cap_sub.add_parser("record")
     capr.set_defaults(func=cmd_capture)
+    capm = cap_sub.add_parser("menu", help="GTK capture chooser")
+    capm.set_defaults(func=cmd_capture)
 
     rem = sub.add_parser("remind")
     rem_sub = rem.add_subparsers(dest="remind_action", required=True)
@@ -831,7 +1057,16 @@ def build_parser() -> argparse.ArgumentParser:
         "name",
         choices=["audio", "network", "bluetooth", "power", "display", "calendar", "wifi"],
     )
-    pan.add_argument("--gtk", action="store_true", help="force GTK mini panel")
+    pan.add_argument(
+        "--gtk",
+        action="store_true",
+        help="GTK mini tray popup (default; Omarchy-comparable framing)",
+    )
+    pan.add_argument(
+        "--settings",
+        action="store_true",
+        help="open full gnome-control-center instead of tray popup",
+    )
     pan.set_defaults(func=cmd_panel)
 
     font = sub.add_parser("font", help="monospace Style > Font")
@@ -873,7 +1108,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     notice = sub.add_parser("notice", help="time/battery/weather notices")
     notice_sub = notice.add_subparsers(dest="notice_action", required=True)
-    for n in ("time", "battery", "weather", "all"):
+    for n in ("time", "battery", "weather", "all", "history", "dismiss", "clear", "silence"):
         np = notice_sub.add_parser(n)
         np.set_defaults(func=cmd_notice)
 
@@ -908,6 +1143,8 @@ def build_parser() -> argparse.ArgumentParser:
     sr.set_defaults(func=cmd_share)
     sh = shr_sub.add_parser("hint")
     sh.set_defaults(func=cmd_share)
+    sn = shr_sub.add_parser("nautilus", help="install Nautilus Send with LocalSend script")
+    sn.set_defaults(func=cmd_share)
 
     app = sub.add_parser("app")
     app.add_argument(
@@ -935,9 +1172,9 @@ def build_parser() -> argparse.ArgumentParser:
     ds.add_argument("factor")
     ds.set_defaults(func=cmd_display)
 
-    idle = sub.add_parser("idle", help="lock / stay-awake / inhibit")
+    idle = sub.add_parser("idle", help="lock / screensaver / stay-awake / inhibit")
     idle_sub = idle.add_subparsers(dest="idle_action", required=True)
-    for a in ("lock", "status"):
+    for a in ("lock", "status", "screensaver"):
         ip = idle_sub.add_parser(a)
         ip.set_defaults(func=cmd_idle)
     isa = idle_sub.add_parser("stay-awake")
@@ -946,6 +1183,42 @@ def build_parser() -> argparse.ArgumentParser:
     ii = idle_sub.add_parser("inhibit")
     ii.add_argument("--seconds", type=int, default=3600)
     ii.set_defaults(func=cmd_idle)
+
+    brand = sub.add_parser(
+        "branding",
+        help="ASCII screensaver/about/logo + GDM greeter (GNOME, not SDDM)",
+    )
+    brand_sub = brand.add_subparsers(dest="brand_target", required=True)
+    for surface in ("screensaver", "about"):
+        surf = brand_sub.add_parser(surface)
+        surf_sub = surf.add_subparsers(dest="brand_action", required=True)
+        for a in ("show", "reset"):
+            sp = surf_sub.add_parser(a)
+            sp.set_defaults(func=cmd_branding)
+        st = surf_sub.add_parser("text", help="FIGlet text (default: gnomarchi)")
+        st.add_argument("phrase", nargs="?", default="gnomarchi")
+        st.set_defaults(func=cmd_branding)
+        si = surf_sub.add_parser("image", help="image→ASCII (needs Pillow)")
+        si.add_argument("image", help="path to png/jpg")
+        si.set_defaults(func=cmd_branding)
+    logo = brand_sub.add_parser("logo")
+    logo_sub = logo.add_subparsers(dest="brand_action", required=True)
+    ls = logo_sub.add_parser("status")
+    ls.set_defaults(func=cmd_branding)
+    lp = logo_sub.add_parser("preview", help="composite plymouth/GDM preview PNG")
+    lp.set_defaults(func=cmd_branding)
+    bgdm = brand_sub.add_parser("gdm", help="greeter background from unlock art")
+    bgdm_sub = bgdm.add_subparsers(dest="brand_action", required=True)
+    bgdma = bgdm_sub.add_parser(
+        "apply",
+        help="stage unlock art for GDM; sudo -n install when available",
+    )
+    bgdma.add_argument(
+        "--no-sudo",
+        action="store_true",
+        help="only stage under ~/.config/gnomarchi/branding",
+    )
+    bgdma.set_defaults(func=cmd_branding)
 
     cfg = sub.add_parser("config", help="dotfiles sync for ~/.config/gnomarchi")
     cfg_sub = cfg.add_subparsers(dest="config_action", required=True)
@@ -968,12 +1241,18 @@ def build_parser() -> argparse.ArgumentParser:
     nvs.add_argument("--force", action="store_true")
     nvs.set_defaults(func=cmd_nvim_seed)
 
-    plugin = sub.add_parser("plugin")
+    plugin = sub.add_parser(
+        "plugin",
+        help="manage plugins (confirm-on-add; see docs/security/plugin-trust.md)",
+    )
     plugin_sub = plugin.add_subparsers(dest="action", required=True)
-    pv = plugin_sub.add_parser("validate")
-    pv.add_argument("path")
+    pv = plugin_sub.add_parser(
+        "validate",
+        help="check manifest, runtime, permissions, hooks (no sudo/system paths)",
+    )
+    pv.add_argument("path", help="plugin directory with manifest.json")
     pv.set_defaults(func=cmd_plugin_validate)
-    ps = plugin_sub.add_parser("scaffold")
+    ps = plugin_sub.add_parser("scaffold", help="create a plugin from a runtime template")
     ps.add_argument("id")
     ps.add_argument(
         "--runtime",
@@ -993,16 +1272,26 @@ def build_parser() -> argparse.ArgumentParser:
         help="required to scaffold gnome-shell-extension",
     )
     ps.set_defaults(func=cmd_plugin_scaffold)
-    pa = plugin_sub.add_parser("add")
-    pa.add_argument("path")
-    pa.add_argument("--confirm", action="store_true")
+    pa = plugin_sub.add_parser(
+        "add",
+        help="copy plugin into state after interactive yes (or --confirm)",
+    )
+    pa.add_argument("path", help="source plugin directory")
+    pa.add_argument(
+        "--confirm",
+        action="store_true",
+        help="non-interactive approve after the printed summary (still prints id/runtime/hooks)",
+    )
     pa.add_argument("--dest")
     pa.set_defaults(func=cmd_plugin_add)
-    pe = plugin_sub.add_parser("enable")
-    pe.add_argument("path", nargs="?")
-    pe.add_argument("--id")
+    pe = plugin_sub.add_parser(
+        "enable",
+        help="validate then enable; refuses Shell extensions without opt-in",
+    )
+    pe.add_argument("path", nargs="?", help="installed plugin path")
+    pe.add_argument("--id", help="plugin id from gnomarchi plugin list")
     pe.set_defaults(func=cmd_plugin_enable)
-    pl = plugin_sub.add_parser("list")
+    pl = plugin_sub.add_parser("list", help="list first-party and installed plugins")
     pl.set_defaults(func=cmd_plugin_list)
     pc = plugin_sub.add_parser("clone", help="clone first-party plugin into user tree")
     pc.add_argument("id")
@@ -1104,6 +1393,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="omit to print current",
     )
     sbp.set_defaults(func=cmd_shell_bar_position)
+    se = shell_sub.add_parser(
+        "ensure",
+        help="idempotently append starship init to ~/.zshrc and ~/.bashrc",
+    )
+    se.set_defaults(func=cmd_shell_ensure)
+
+    prompt = sub.add_parser("prompt", help="starship prompt helpers")
+    prompt_sub = prompt.add_subparsers(dest="action", required=True)
+    pm = prompt_sub.add_parser("minimal", help="emit Omarchy-minimal starship.toml + ensure hook")
+    pm.set_defaults(func=cmd_prompt)
+    ps = prompt_sub.add_parser("status", help="show starship hook + config status")
+    ps.set_defaults(func=cmd_prompt)
 
     return parser
 

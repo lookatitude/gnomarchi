@@ -3,6 +3,16 @@
 **Lane:** T6-security · **Consumers:** T3-backend, T4-frontend, T7-qa  
 **Inputs:** `docs/architecture/module-boundaries.md`, `.guild/spec/gnomarchi-v1.md` (forbid sudo install hooks), D7 theme rules
 
+## For users (short)
+
+Plugins are **arbitrary code** in your session. Before install:
+
+1. `gnomarchi plugin add <path>` prints id, source, runtime, permissions, and hooks, then asks **Add this plugin? [y/N]** (default no). Use `--confirm` only after you have seen that summary (agents/scripts).
+2. `gnomarchi plugin enable` always re-validates; it refuses unsafe hooks and Shell-extension runtimes unless the manifest opts in.
+3. Themes are data; plugins are not — never expect silent plugin install from the menu or bus.
+
+Full rules below. gnomarchi is not official Omarchy / Basecamp.
+
 ## Threat posture
 
 Plugins run **unsandboxed** in the user session (overlay apps, menu helpers, systemd `--user` units, optional Shell extensions). Treat every third-party plugin as arbitrary code with the user’s privileges. Themes are data-only and may auto-apply after validate; plugins must not.

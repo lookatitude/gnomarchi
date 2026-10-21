@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plugin migration — Omarchy/Hypr → GNOME/GTK</title>
+<style>
+:root{--bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb;--ok:#059669;--warn:#d97706}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;--ok:#34d399;--warn:#fbbf24}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.layout{display:grid;grid-template-columns:14rem 1fr;max-width:78rem;margin:0 auto}
+aside{position:sticky;top:0;height:100vh;padding:1.5rem 1rem;border-right:1px solid var(--border);font-size:.88rem;overflow:auto}
+aside a{display:block;color:var(--muted);text-decoration:none;padding:.25rem 0}
+aside a:hover{color:var(--accent)}
+main{padding:2rem 1.5rem;max-width:46rem}
+h1{font-size:1.7rem;margin:0 0 .35rem} .sub{color:var(--muted)}
+h2{margin:2rem 0 .75rem;font-size:1.25rem} h3{margin:1.25rem 0 .5rem;font-size:1.05rem}
+.callout{border:1px solid var(--border);border-left:3px solid var(--accent);background:var(--card);padding:.85rem 1rem;border-radius:8px;margin:1rem 0}
+.callout.ok{border-left-color:var(--ok)} .callout.warn{border-left-color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
+th,td{border-bottom:1px solid var(--border);padding:.45rem .55rem;text-align:left;vertical-align:top}
+th{background:var(--card)} code{font-size:.84em} .id{font-family:ui-monospace,Menlo,monospace;color:var(--accent)}
+@media(max-width:52rem){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <nav>
+    <a href="#verdict">Verdict</a>
+    <a href="#map">Runtime map</a>
+    <a href="#first-party">First-party plugins</a>
+    <a href="#config">Config paths</a>
+    <a href="#phases">Phases</a>
+    <a href="#tests">Test depth</a>
+    <a href="#visual">Visual proof</a>
+    <a href="#non-goals">Non-goals</a>
+  </nav>
+</aside>
+<main>
+<header>
+  <h1>Plugin migration &amp; adaptation plan</h1>
+  <p class="sub">Keep Omarchy-shaped plugin <em>core</em> (manifest, trust, lifecycle). Replace Hyprland/Quickshell runtimes with GNOME/GTK adapters. 2026-10-20.</p>
+</header>
+
+<section id="verdict">
+  <h2>Verdict</h2>
+  <div class="callout ok">
+    <p><strong>Already on the GNOME path.</strong> Runtimes are <code>overlay-app</code> | <code>menu-module</code> | <code>user-service</code> | <code>status-indicator</code> | <code>gnome-shell-extension</code>. There is no Quickshell runtime in tree. Work left is depth: live indicators, Omarchy marketplace plugin ports, and config that still smells Hypr-shaped in docs/tests only.</p>
+  </div>
+  <div class="callout warn">
+    <p><strong>P0/P2 status:</strong> P0 gap fixes + <code>theme.effect</code> green on VM; P2 plugin shots landed under <code>docs/screenshots/parity-proof/plugins/</code> — still <em>in progress</em> (not proven). Index: <a href="visual-proof.html">visual-proof.html</a> · <a href="PROOF.md">PROOF.md</a>.</p>
+  </div>
+  <div class="callout warn">
+    <p><strong>D1′.</strong> Do not port Hyprland compositor plugins or Quickshell QML. Re-implement behaviors as StatusNotifier / GTK overlays / menu modules / optional pinned Shell extensions.</p>
+  </div>
+</section>
+
+<section id="map">
+  <h2>Runtime map (Omarchy → gnomarchi)</h2>
+  <table>
+    <thead><tr><th>Omarchy / Hypr surface</th><th>gnomarchi runtime</th><th>Config / IPC</th></tr></thead>
+    <tbody>
+      <tr><td>Quickshell bar widget / tray chip</td><td><code>status-indicator</code> (AppIndicator / SNI)</td><td><code>~/.config/autostart/</code> + <code>~/.local/share/gnomarchi/indicators/</code></td></tr>
+      <tr><td>Quickshell panel / floating UI</td><td><code>overlay-app</code> (GTK4/libadwaita)</td><td>desktop entry under <code>~/.local/share/applications/</code></td></tr>
+      <tr><td>Walker / menu module</td><td><code>menu-module</code></td><td>JSONC fragment merged into <code>menu/default.jsonc</code> tree</td></tr>
+      <tr><td>systemd --user helper</td><td><code>user-service</code></td><td><code>~/.config/systemd/user/</code></td></tr>
+      <tr><td>Hyprland plugin / IPC</td><td><strong>forbidden</strong> → GNOME Shell extension only with explicit opt-in</td><td><code>gnome-shell-extension</code> adapter; never default scaffold</td></tr>
+      <tr><td>hyprland.conf binds</td><td>GNOME custom keybindings / Settings</td><td>dconf / <code>gnomarchi shell</code> helpers — not plugin hooks</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="first-party">
+  <h2>First-party plugins (shipped)</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Omarchy analog</th><th>Runtime</th><th>Adaptation status</th></tr></thead>
+    <tbody>
+      <tr><td class="id">gnomarchi.agents</td><td>Agents tray</td><td>status-indicator</td><td>Adapted — deepen live SNI assert</td></tr>
+      <tr><td class="id">gnomarchi.agents-panel</td><td>Agents Shell chip</td><td>status-indicator / panel</td><td>Adapted</td></tr>
+      <tr><td class="id">gnomarchi.system-update</td><td>Update badge</td><td>status-indicator</td><td>Adapted — pacman check</td></tr>
+      <tr><td class="id">gnomarchi.tailscale</td><td>Tailscale chip</td><td>status-indicator</td><td>Adapted</td></tr>
+      <tr><td class="id">gnomarchi.weather</td><td>Weather notice/chip</td><td>status-indicator</td><td>Adapted</td></tr>
+      <tr><td class="id">gnomarchi.modes</td><td>DND / night / awake</td><td>status-indicator + <code>gnomarchi mode</code></td><td>Adapted — GTK/GNOME APIs</td></tr>
+      <tr><td class="id">gnomarchi.crash-capture</td><td>Crash watch</td><td>user-service / agent</td><td>Adapted</td></tr>
+    </tbody>
+  </table>
+  <p>Trust gates stay: confirm-on-add, validate-before-enable, no-sudo hooks (<code>docs/security/plugin-trust.md</code>).</p>
+</section>
+
+<section id="config">
+  <h2>Keep core — adjust configs to GTK/GNOME</h2>
+  <h3>Keep</h3>
+  <ul>
+    <li><code>manifest.json</code> schema (<code>id/name/version/runtime/permissions/hooks</code>)</li>
+    <li><code>plugin/lifecycle.py</code> validate / add / enable</li>
+    <li>Adapter interface (<code>validate_artifacts</code>, <code>enable</code>)</li>
+    <li>Bus signals for Theme.Changed / menu summon</li>
+  </ul>
+  <h3>Adjust / forbid</h3>
+  <ul>
+    <li>Any <code>hypr*</code> / <code>quickshell</code> runtime string → reject in validate (already unknown-runtime)</li>
+    <li>Hooks that write <code>~/.config/hypr/</code> → deny pattern in <code>check_hooks_no_sudo</code> (extend deny list)</li>
+    <li>Theme apply: GTK CSS + gsettings icon-theme + pack-driven accent (F2/F5)</li>
+    <li>Keybinds: document GNOME custom keys only in <code>docs/menu-super-space.md</code></li>
+  </ul>
+</section>
+
+<section id="phases">
+  <h2>Phases</h2>
+  <table>
+    <thead><tr><th>Phase</th><th>Work</th><th>Done when</th></tr></thead>
+    <tbody>
+      <tr><td><span class="id">P0</span></td><td>Gap fixes: icon-theme emit, pack accent gsettings, deep <code>theme.effect.*</code></td><td><strong>In progress:</strong> theme.effect green; theme jpgs captured — review open</td></tr>
+      <tr><td><span class="id">P1</span></td><td>Deny hypr/quickshell paths in hook validator; plugin.effect enable workflows for all first-party</td><td><strong>In progress:</strong> plugin.effect.* green; hypr deny landed</td></tr>
+      <tr><td><span class="id">P2</span></td><td>Live SNI: after enable, assert process or StatusNotifier registration</td><td><strong>In progress:</strong> plugin pngs in <a href="visual-proof.html#plugins">gallery</a> — not marked proven</td></tr>
+      <tr><td><span class="id">P3</span></td><td>Marketplace clone path: sample Omarchy-topic plugin → rewrite runtime to status-indicator/overlay-app</td><td>one external port documented</td></tr>
+      <tr><td><span class="id">P4</span></td><td>Optional Shell extensions only behind <code>--explicit-shell-extension</code>; version pin matrix</td><td>matrix doc + refuse default</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="tests">
+  <h2>Test depth required</h2>
+  <ul>
+    <li><code>theme.effect.*</code> — GTK css, ghostty, wallpaper URI, icon-theme, last-apply, accent-color</li>
+    <li><code>plugin.effect.&lt;id&gt;</code> — validate → enable → autostart desktop exists → optional pgrep indicator</li>
+    <li><code>plugin.live.*</code> / <code>theme.proof.*</code> — gated by <code>PARITY_CAPTURE=1</code> for screenshots</li>
+    <li>Unit: unknown runtime <code>quickshell</code>/<code>hyprland</code> rejected; hypr config path in hooks rejected</li>
+  </ul>
+  <p>Runner: <code>python3 scripts/parity-workflows-run.py --only theme.effect,plugin.effect</code> · capture: <code>PARITY_CAPTURE=1</code> (see <a href="PROOF.md">PROOF.md</a>)</p>
+</section>
+
+<section id="visual">
+  <h2>Visual proof</h2>
+  <p>Gallery index: <a href="visual-proof.html">visual-proof.html</a>. Paths: <code>docs/screenshots/parity-proof/{theme,plugins,desktop}/</code>. Shots landed; status: in progress (acceptance review), not proven.</p>
+</section>
+
+<section id="non-goals">
+  <h2>Non-goals</h2>
+  <ul>
+    <li>Running Hyprland beside GNOME</li>
+    <li>Bit-identical Quickshell QML</li>
+    <li>Silent plugin install from theme packs</li>
+  </ul>
+</section>
+</main>
+</div>
+</body>
+</html>

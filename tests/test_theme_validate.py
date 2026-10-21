@@ -59,3 +59,11 @@ class ThemeValidateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_accent_gsettings_name_nearest(self) -> None:
+        sys.path.insert(0, str(REPO))
+        from theme.emitters import accent_gsettings_name
+
+        self.assertEqual(accent_gsettings_name("#7aa2f7"), "blue")
+        self.assertEqual(accent_gsettings_name("#9ece6a"), "green")
+        self.assertEqual(accent_gsettings_name("#f7768e"), "red")

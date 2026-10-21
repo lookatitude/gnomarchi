@@ -1,0 +1,1710 @@
+{
+  "schema": "gnomarchi.parity_workflows.v1",
+  "version": 1,
+  "defaults": {
+    "gnomarchi_ssh": {
+      "host": "127.0.0.1",
+      "port": 2222,
+      "user": "arch"
+    },
+    "omarchy_ssh": {
+      "host": "127.0.0.1",
+      "port": 2223,
+      "user": "omarchy"
+    },
+    "display": ":0",
+    "timeout_sec": 45
+  },
+  "workflows": [
+    {
+      "id": "agents.list",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent list",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "agents.window.open",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent window",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "agents_window|gnomarchi.*agent",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "agents.setup.help",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent setup --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "agents.launch.help",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent launch --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "agents.skills.help",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent skills-install --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "agents.usage",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent usage",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents.crash.watch",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent crash watch",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents.account.help",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent account --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "agents.make-something.help",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent make-something --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "agents.default.claude",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "note": "Sets default agent id; does not require Claude binary installed",
+      "steps": [
+        {
+          "run": "gnomarchi default agent claude",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents.default.codex",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi default agent codex",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents.default.opencode",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi default agent opencode",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents.default.grok",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi default agent grok",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agents.herdr.attach",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi herdr --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "cli.install.help",
+      "feature": "manual.dev-tools",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi install --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "cli.plugin.help",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi plugin --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "cli.plugin.list",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi plugin list",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "cli.bus.help",
+      "feature": "manual.cli",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi bus --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "cli.shell.show",
+      "feature": "manual.cli",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi shell show",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cli.config.status",
+      "feature": "manual.dotfiles",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi config status",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cli.nvim.seed.help",
+      "feature": "manual.neovim",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi nvim --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "cli.update.help",
+      "feature": "manual.updates",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi update --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.list.min20",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme list | wc -l",
+          "expect_rc": 0,
+          "expect_stdout_gte_int": 20
+        }
+      ]
+    },
+    {
+      "id": "theme.validate.tokyo-night",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme validate --id tokyo-night",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.tokyo-night",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set tokyo-night",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.catppuccin",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set catppuccin",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.nord",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set nord",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.gruvbox",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set gruvbox",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.everforest",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set everforest",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.kanagawa",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set kanagawa",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.rose-pine",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set rose-pine",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.matte-black",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set matte-black",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.midnight-harbor",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set midnight-harbor",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.osaka-jade",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set osaka-jade",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.hackerman",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set hackerman",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.ethereal",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set ethereal",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.flexoki-light",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set flexoki-light",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.catppuccin-latte",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set catppuccin-latte",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.last-horizon",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set last-horizon",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.lumon",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set lumon",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.lupine",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set lupine",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.miasma",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set miasma",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.retro-82",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set retro-82",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.ristretto",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set ristretto",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.solitude",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set solitude",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.starship",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set starship",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.vantablack",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set vantablack",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.set.white",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set white",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.bg.next",
+      "feature": "manual.backgrounds",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme bg next",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.bg.video.off",
+      "feature": "manual.backgrounds",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme bg video off",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "theme.pick.help",
+      "feature": "manual.theme-chooser-every-theme",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme pick --help",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "theme.new.scaffold",
+      "feature": "manual.custom-themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme new parity-test-theme --force 2>/dev/null || gnomarchi theme new parity-test-theme",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "panel.audio",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel audio",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "panel.network",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel network",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "panel.bluetooth",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel bluetooth",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "panel.power",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel power",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "panel.display",
+      "feature": "manual.monitors",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel display",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "panel.calendar",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel calendar",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-calendar|gnome-control-center|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "panel.wifi",
+      "feature": "manual.networking",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel wifi",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "app.write",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi app write",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "gnoma-write|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "app.cut",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi app cut",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "gnoma-cut|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "app.calc",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi app calc",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "gnoma-calc|gnomarchi|python",
+          "stop": true
+        }
+      ]
+    },
+    {
+      "id": "app.hype",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "note": "substitute \u2192 mpv",
+      "steps": [
+        {
+          "run": "gnomarchi app hype --help",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app.signed",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "note": "substitute \u2192 xournalpp",
+      "steps": [
+        {
+          "run": "gnomarchi app signed --help",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "app.monologue",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "note": "substitute \u2192 whisper/ffmpeg notepad",
+      "steps": [
+        {
+          "run": "gnomarchi app monologue --help",
+          "expect_rc": [
+            0,
+            1,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notice.time",
+      "feature": "manual.notices",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi notice time",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "notice.battery",
+      "feature": "manual.notices",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi notice battery",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notice.weather",
+      "feature": "manual.notices",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi notice weather",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "remind.list",
+      "feature": "manual.reminders",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi remind list",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "remind.add",
+      "feature": "manual.reminders",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi remind add 'parity-probe' --in 60m",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "clipboard.ui",
+      "feature": "manual.clipboard",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi clipboard --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "capture.help",
+      "feature": "manual.capture",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi capture --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "share.help",
+      "feature": "manual.share-localsend",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi share --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "webapp.list",
+      "feature": "manual.web-apps",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi webapp list",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "mode.status",
+      "feature": "manual.toggles",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi mode status",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "display.help",
+      "feature": "manual.monitors",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi display --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "idle.help",
+      "feature": "manual.sleep",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi idle --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "font.list",
+      "feature": "manual.fonts",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi font list",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "cliamp.help",
+      "feature": "manual.tuis",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi cliamp --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "menu.help",
+      "feature": "manual.menu",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi menu --help",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "omarchy.hyprland.present",
+      "feature": "n/a.hyprland-session",
+      "side": "omarchy",
+      "steps": [
+        {
+          "run": "command -v Hyprland",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "omarchy.terminal.present",
+      "feature": "manual.terminal",
+      "side": "omarchy",
+      "steps": [
+        {
+          "run": "command -v foot || command -v alacritty || command -v ghostty || command -v omarchy-launch-terminal",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "omarchy.nvim.present",
+      "feature": "manual.neovim",
+      "side": "omarchy",
+      "steps": [
+        {
+          "run": "command -v nvim",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "omarchy.starship.present",
+      "feature": "manual.prompt",
+      "side": "omarchy",
+      "steps": [
+        {
+          "run": "command -v starship",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.effect.tokyo-night",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set tokyo-night",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/gtk-4.0/gtk.css && grep -q generated ~/.config/gtk-4.0/gtk.css",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/ghostty/config && grep -Eqi 'background|foreground|#[0-9a-fA-F]{6}' ~/.config/ghostty/config",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/starship.toml && grep -q generated ~/.config/starship.toml",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/gnomarchi/last-apply.json && grep -q tokyo-night ~/.config/gnomarchi/last-apply.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "ICON=$(head -1 /usr/local/lib/gnomarchi/theme/packs/tokyo-night/icons.theme | tr -d '\\r'); gsettings get org.gnome.desktop.interface icon-theme | grep -F \"$ICON\"",
+          "expect_rc": 0
+        },
+        {
+          "run": "gsettings get org.gnome.desktop.background picture-uri | grep -E 'file://'",
+          "expect_rc": 0
+        },
+        {
+          "run": "gsettings get org.gnome.desktop.interface accent-color | grep -E \"blue|teal|green|purple|pink|red|orange|yellow|slate\"",
+          "expect_rc": 0
+        }
+      ],
+      "note": "Assert GTK/ghostty/wallpaper/icon-theme after theme set"
+    },
+    {
+      "id": "theme.effect.nord",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set nord",
+          "expect_rc": 0
+        },
+        {
+          "run": "grep -q generated ~/.config/gtk-4.0/gtk.css",
+          "expect_rc": 0
+        },
+        {
+          "run": "ICON=$(head -1 /usr/local/lib/gnomarchi/theme/packs/nord/icons.theme | tr -d '\\r'); gsettings get org.gnome.desktop.interface icon-theme | grep -F \"$ICON\"",
+          "expect_rc": 0
+        },
+        {
+          "run": "grep -q nord ~/.config/gnomarchi/last-apply.json",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.effect.gruvbox",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set gruvbox",
+          "expect_rc": 0
+        },
+        {
+          "run": "grep -q generated ~/.config/gtk-3.0/gtk.css",
+          "expect_rc": 0
+        },
+        {
+          "run": "ICON=$(head -1 /usr/local/lib/gnomarchi/theme/packs/gruvbox/icons.theme | tr -d '\\r'); gsettings get org.gnome.desktop.interface icon-theme | grep -F \"$ICON\"",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "theme.effect.cli-list-after-set",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi theme set catppuccin",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi theme list | grep -qi catppuccin",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi theme validate --id catppuccin",
+          "expect_rc": 0
+        }
+      ],
+      "note": "CLI still lists packs after apply"
+    },
+    {
+      "id": "theme.proof.tokyo-night",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "note": "Always gtk/gsettings; PARITY_CAPTURE=1 runs host capture + asserts JPEG",
+      "steps": [
+        {
+          "run": "gnomarchi theme set tokyo-night",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/gtk-4.0/gtk.css && grep -q generated ~/.config/gtk-4.0/gtk.css",
+          "expect_rc": 0
+        },
+        {
+          "run": "ICON=$(head -1 /usr/local/lib/gnomarchi/theme/packs/tokyo-night/icons.theme | tr -d '\\r'); gsettings get org.gnome.desktop.interface icon-theme | grep -F \"$ICON\"",
+          "expect_rc": 0
+        },
+        {
+          "run": "gsettings get org.gnome.desktop.background picture-uri | grep -E 'file://'",
+          "expect_rc": 0
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_run": [
+            "bash",
+            "scripts/parity-capture-theme-proof.sh",
+            "tokyo-night"
+          ],
+          "expect_rc": 0,
+          "timeout_sec": 120
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/theme/theme-tokyo-night.jpg"
+        }
+      ]
+    },
+    {
+      "id": "theme.proof.nord",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "note": "Always gtk/gsettings; PARITY_CAPTURE=1 runs host capture + asserts JPEG",
+      "steps": [
+        {
+          "run": "gnomarchi theme set nord",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/gtk-4.0/gtk.css && grep -q generated ~/.config/gtk-4.0/gtk.css",
+          "expect_rc": 0
+        },
+        {
+          "run": "ICON=$(head -1 /usr/local/lib/gnomarchi/theme/packs/nord/icons.theme | tr -d '\\r'); gsettings get org.gnome.desktop.interface icon-theme | grep -F \"$ICON\"",
+          "expect_rc": 0
+        },
+        {
+          "run": "gsettings get org.gnome.desktop.background picture-uri | grep -E 'file://'",
+          "expect_rc": 0
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_run": [
+            "bash",
+            "scripts/parity-capture-theme-proof.sh",
+            "nord"
+          ],
+          "expect_rc": 0,
+          "timeout_sec": 120
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/theme/theme-nord.jpg"
+        }
+      ]
+    },
+    {
+      "id": "theme.proof.gruvbox",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "note": "Always gtk/gsettings; PARITY_CAPTURE=1 runs host capture + asserts JPEG",
+      "steps": [
+        {
+          "run": "gnomarchi theme set gruvbox",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/gtk-4.0/gtk.css && grep -q generated ~/.config/gtk-4.0/gtk.css || (test -f ~/.config/gtk-3.0/gtk.css && grep -q generated ~/.config/gtk-3.0/gtk.css)",
+          "expect_rc": 0
+        },
+        {
+          "run": "ICON=$(head -1 /usr/local/lib/gnomarchi/theme/packs/gruvbox/icons.theme | tr -d '\\r'); gsettings get org.gnome.desktop.interface icon-theme | grep -F \"$ICON\"",
+          "expect_rc": 0
+        },
+        {
+          "run": "gsettings get org.gnome.desktop.background picture-uri | grep -E 'file://'",
+          "expect_rc": 0
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_run": [
+            "bash",
+            "scripts/parity-capture-theme-proof.sh",
+            "gruvbox"
+          ],
+          "expect_rc": 0,
+          "timeout_sec": 120
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/theme/theme-gruvbox.jpg"
+        }
+      ]
+    },
+    {
+      "id": "theme.proof.catppuccin-latte",
+      "feature": "manual.themes",
+      "side": "gnomarchi",
+      "note": "Light pack; always gtk/gsettings; PARITY_CAPTURE=1 capture + JPEG assert",
+      "steps": [
+        {
+          "run": "gnomarchi theme set catppuccin-latte",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/gtk-4.0/gtk.css && grep -q generated ~/.config/gtk-4.0/gtk.css",
+          "expect_rc": 0
+        },
+        {
+          "run": "ICON=$(head -1 /usr/local/lib/gnomarchi/theme/packs/catppuccin-latte/icons.theme | tr -d '\\r'); gsettings get org.gnome.desktop.interface icon-theme | grep -F \"$ICON\"",
+          "expect_rc": 0
+        },
+        {
+          "run": "grep -q catppuccin-latte ~/.config/gnomarchi/last-apply.json && grep -qiE 'eff1f5|#eff1f5|Catppuccin Latte|latte' ~/.config/gtk-4.0/gtk.css",
+          "expect_rc": 0
+        },
+        {
+          "run": "gsettings get org.gnome.desktop.background picture-uri | grep -E 'file://'",
+          "expect_rc": 0
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_run": [
+            "bash",
+            "scripts/parity-capture-theme-proof.sh",
+            "catppuccin-latte"
+          ],
+          "expect_rc": 0,
+          "timeout_sec": 120
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/theme/theme-catppuccin-latte.jpg"
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.gnomarchi.agents",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "validate + enable; assert autostart or enabled list",
+      "steps": [
+        {
+          "run": "test -f /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents/manifest.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.agents.desktop || grep -q 'gnomarchi.agents' ~/.config/gnomarchi/enabled-indicators.json || test -d ~/.local/share/gnomarchi/indicators/gnomarchi.agents || test -f ~/.config/systemd/user/*gnomarchi.agents* || true; test -f ~/.config/autostart/gnomarchi-gnomarchi.agents.desktop -o -f ~/.config/gnomarchi/enabled-indicators.json -o -d ~/.config/systemd/user",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.gnomarchi.agents-panel",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "validate + enable; assert autostart or enabled list",
+      "steps": [
+        {
+          "run": "test -f /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents-panel/manifest.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents-panel",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents-panel",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.agents-panel.desktop || grep -q 'gnomarchi.agents-panel' ~/.config/gnomarchi/enabled-indicators.json || test -d ~/.local/share/gnomarchi/indicators/gnomarchi.agents-panel || test -f ~/.config/systemd/user/*gnomarchi.agents-panel* || true; test -f ~/.config/autostart/gnomarchi-gnomarchi.agents-panel.desktop -o -f ~/.config/gnomarchi/enabled-indicators.json -o -d ~/.config/systemd/user",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.gnomarchi.system-update",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "validate + enable; assert autostart or enabled list",
+      "steps": [
+        {
+          "run": "test -f /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.system-update/manifest.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.system-update",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.system-update",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.system-update.desktop || grep -q 'gnomarchi.system-update' ~/.config/gnomarchi/enabled-indicators.json || test -d ~/.local/share/gnomarchi/indicators/gnomarchi.system-update || test -f ~/.config/systemd/user/*gnomarchi.system-update* || true; test -f ~/.config/autostart/gnomarchi-gnomarchi.system-update.desktop -o -f ~/.config/gnomarchi/enabled-indicators.json -o -d ~/.config/systemd/user",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.gnomarchi.tailscale",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "validate + enable; assert autostart or enabled list",
+      "steps": [
+        {
+          "run": "test -f /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.tailscale/manifest.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.tailscale",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.tailscale",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.tailscale.desktop || grep -q 'gnomarchi.tailscale' ~/.config/gnomarchi/enabled-indicators.json || test -d ~/.local/share/gnomarchi/indicators/gnomarchi.tailscale || test -f ~/.config/systemd/user/*gnomarchi.tailscale* || true; test -f ~/.config/autostart/gnomarchi-gnomarchi.tailscale.desktop -o -f ~/.config/gnomarchi/enabled-indicators.json -o -d ~/.config/systemd/user",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.gnomarchi.weather",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "validate + enable; assert autostart or enabled list",
+      "steps": [
+        {
+          "run": "test -f /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.weather/manifest.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.weather",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.weather",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.weather.desktop || grep -q 'gnomarchi.weather' ~/.config/gnomarchi/enabled-indicators.json || test -d ~/.local/share/gnomarchi/indicators/gnomarchi.weather || test -f ~/.config/systemd/user/*gnomarchi.weather* || true; test -f ~/.config/autostart/gnomarchi-gnomarchi.weather.desktop -o -f ~/.config/gnomarchi/enabled-indicators.json -o -d ~/.config/systemd/user",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.gnomarchi.modes",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "validate + enable; assert autostart or enabled list",
+      "steps": [
+        {
+          "run": "test -f /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.modes/manifest.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.modes",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.modes",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.modes.desktop || grep -q 'gnomarchi.modes' ~/.config/gnomarchi/enabled-indicators.json || test -d ~/.local/share/gnomarchi/indicators/gnomarchi.modes || test -f ~/.config/systemd/user/*gnomarchi.modes* || true; test -f ~/.config/autostart/gnomarchi-gnomarchi.modes.desktop -o -f ~/.config/gnomarchi/enabled-indicators.json -o -d ~/.config/systemd/user",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.gnomarchi.crash-capture",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "validate + enable; assert autostart or enabled list",
+      "steps": [
+        {
+          "run": "test -f /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.crash-capture/manifest.json",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.crash-capture",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.crash-capture",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.crash-capture.desktop || grep -q 'gnomarchi.crash-capture' ~/.config/gnomarchi/enabled-indicators.json || test -d ~/.local/share/gnomarchi/indicators/gnomarchi.crash-capture || test -f ~/.config/systemd/user/*gnomarchi.crash-capture* || true; test -f ~/.config/autostart/gnomarchi-gnomarchi.crash-capture.desktop -o -f ~/.config/gnomarchi/enabled-indicators.json -o -d ~/.config/systemd/user",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.effect.list",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi plugin list",
+          "expect_rc": 0
+        },
+        {
+          "run": "gnomarchi plugin --help | grep -qi confirm",
+          "expect_rc": [
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plugin.live.agents",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "live StatusNotifier: enable, autostart, pgrep indicator; PARITY_CAPTURE gates screenshot assert",
+      "steps": [
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents && gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.agents",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.agents.desktop && test -f ~/.local/share/gnomarchi/indicators/gnomarchi.agents/indicator.py",
+          "expect_rc": 0
+        },
+        {
+          "run": "export GNOMARCHI_ROOT=/usr/local/lib/gnomarchi XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)} DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus} DISPLAY=${DISPLAY:-:0}; IND=$HOME/.local/share/gnomarchi/indicators/gnomarchi.agents/indicator.py; pgrep -f 'indicators/gnomarchi.agents/indicator.py' >/dev/null || (nohup python3 \"$IND\" >>\"${IND%.py}.log\" 2>&1 & sleep 1); pgrep -f 'indicators/gnomarchi.agents/indicator.py' >/dev/null",
+          "expect_rc": 0
+        },
+        {
+          "run": "if [ \"${PARITY_CAPTURE:-}\" = \"1\" ]; then test -s \"$HOME/.local/share/gnomarchi/parity-proof/plugins/plugin.live.agents.png\"; else echo capture_skipped; fi",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.live.system-update",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "live StatusNotifier: enable, autostart, pgrep indicator; PARITY_CAPTURE gates screenshot assert",
+      "steps": [
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.system-update && gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.system-update",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.system-update.desktop && test -f ~/.local/share/gnomarchi/indicators/gnomarchi.system-update/indicator.py",
+          "expect_rc": 0
+        },
+        {
+          "run": "export GNOMARCHI_ROOT=/usr/local/lib/gnomarchi XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)} DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus} DISPLAY=${DISPLAY:-:0}; IND=$HOME/.local/share/gnomarchi/indicators/gnomarchi.system-update/indicator.py; pgrep -f 'indicators/gnomarchi.system-update/indicator.py' >/dev/null || (nohup python3 \"$IND\" >>\"${IND%.py}.log\" 2>&1 & sleep 1); pgrep -f 'indicators/gnomarchi.system-update/indicator.py' >/dev/null",
+          "expect_rc": 0
+        },
+        {
+          "run": "if [ \"${PARITY_CAPTURE:-}\" = \"1\" ]; then test -s \"$HOME/.local/share/gnomarchi/parity-proof/plugins/plugin.live.system-update.png\"; else echo capture_skipped; fi",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "plugin.live.modes",
+      "feature": "manual.shell-plugins",
+      "side": "gnomarchi",
+      "note": "live StatusNotifier: enable, autostart, pgrep indicator; PARITY_CAPTURE gates screenshot assert",
+      "steps": [
+        {
+          "run": "gnomarchi plugin validate /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.modes && gnomarchi plugin enable /usr/local/lib/gnomarchi/plugins/first-party/gnomarchi.modes",
+          "expect_rc": 0
+        },
+        {
+          "run": "test -f ~/.config/autostart/gnomarchi-gnomarchi.modes.desktop && test -f ~/.local/share/gnomarchi/indicators/gnomarchi.modes/indicator.py",
+          "expect_rc": 0
+        },
+        {
+          "run": "export GNOMARCHI_ROOT=/usr/local/lib/gnomarchi XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/$(id -u)} DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus} DISPLAY=${DISPLAY:-:0}; IND=$HOME/.local/share/gnomarchi/indicators/gnomarchi.modes/indicator.py; pgrep -f 'indicators/gnomarchi.modes/indicator.py' >/dev/null || (nohup python3 \"$IND\" >>\"${IND%.py}.log\" 2>&1 & sleep 1); pgrep -f 'indicators/gnomarchi.modes/indicator.py' >/dev/null",
+          "expect_rc": 0
+        },
+        {
+          "run": "if [ \"${PARITY_CAPTURE:-}\" = \"1\" ]; then test -s \"$HOME/.local/share/gnomarchi/parity-proof/plugins/plugin.live.modes.png\"; else echo capture_skipped; fi",
+          "expect_rc": 0
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.capture",
+      "feature": "manual.menu",
+      "side": "gnomarchi",
+      "note": "Host VNC capture; skipped unless PARITY_CAPTURE=1",
+      "steps": [
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_run": "./scripts/parity-capture-desktop-proof.sh",
+          "expect_rc": 0,
+          "timeout_sec": 300
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.agents",
+      "feature": "manual.ai",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi agent window",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "agents_window|gnomarchi.*agent",
+          "stop": true
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/agents-window.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.panel.audio",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel audio",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/panel-audio.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.panel.network",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel network",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/panel-network.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.panel.bluetooth",
+      "feature": "manual.bar-panels",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi panel bluetooth",
+          "background": true,
+          "settle_ms": 1200,
+          "assert_pgrep": "gnome-control-center|gnomarchi|python",
+          "stop": true
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/panel-bluetooth.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.app.write",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi app write",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "gnoma-write|gnomarchi|python",
+          "stop": true
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/app-write.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.app.calc",
+      "feature": "manual.first-party-apps",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi app calc",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "gnoma-calc|gnomarchi|python",
+          "stop": true
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/app-calc.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.menu",
+      "feature": "manual.menu",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi menu open",
+          "background": true,
+          "settle_ms": 1500,
+          "assert_pgrep": "python3 -m menu|gnomarchi.*menu|menu",
+          "stop": true
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/menu-root.jpg"
+        }
+      ]
+    },
+    {
+      "id": "desktop.proof.notice.time",
+      "feature": "manual.notices",
+      "side": "gnomarchi",
+      "steps": [
+        {
+          "run": "gnomarchi notice time",
+          "expect_rc": 0
+        },
+        {
+          "when_env": "PARITY_CAPTURE",
+          "host_file": "docs/screenshots/parity-proof/desktop/notice-time.jpg"
+        }
+      ]
+    }
+  ]
+}

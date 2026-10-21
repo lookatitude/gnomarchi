@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Omarchy ↔ gnomarchi dual-VM acceptance</title>
+<style>
+:root { --bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb; }
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:72rem;margin:0 auto;padding:2rem 1.25rem}
+h1{font-size:1.75rem;margin:0 0 .4rem} .sub{color:var(--muted);margin:0 0 1.5rem}
+.callout{border:1px solid var(--border);border-left:3px solid var(--accent);background:var(--card);padding:.85rem 1rem;border-radius:8px;margin:1rem 0}
+table{border-collapse:collapse;width:100%;font-size:.86rem} th,td{border-bottom:1px solid var(--border);padding:.45rem .55rem;vertical-align:top;text-align:left}
+th{background:var(--card)} code{font-size:.84em}
+</style></head><body><main>
+<h1>Dual-VM acceptance suite</h1>
+<p class="sub">43 feature cases · adapted parity (D1′ substitutes for Hyprland/Quickshell) · runner: <code>scripts/parity-dual-vm-run.sh</code></p>
+<div class="callout"><strong>Pass rule.</strong> Omarchy proves native omakase behavior. gnomarchi proves the documented GNOME adaptation path — not Hyprland/Quickshell identity. “Full parity” here means every row’s adapted criterion is green, not byte-identical UX.</div>
+<div class="callout">SSH: Omarchy <code>omarchy@127.0.0.1:2223</code> · gnomarchi <code>arch@127.0.0.1:2222</code>. Results: <code>docs/parity/dual-vm-results/</code>.</div>
+<table><thead><tr><th>ID</th><th>Kind</th><th>Chapter</th><th>Omarchy expect</th><th>gnomarchi path</th><th>Verify</th></tr></thead>
+<tbody>
+<tr>
+<td><code>manual.navigation</code></td>
+<td>adapt</td>
+<td>navigation / hotkeys navigating</td>
+<td>Hyprland workspaces, dwindle/scroll/float, scratchpad, multi-monitor focus moves via Super+arrows/tabs/numbers</td>
+<td>Install › PaperWM (install/tiling.sh); stock GNOME overview/workspaces</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.top-bar</code></td>
+<td>adapt</td>
+<td>the-top-bar</td>
+<td>Quickshell top bar with tray, center clock, workspace digits, draggable edge position</td>
+<td>GNOME panel + dash-to-panel via gnomarchi shell bar-position; StatusNotifier plugins</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.bar-panels</code></td>
+<td>adapt</td>
+<td>the-top-bar panels</td>
+<td>Super+Ctrl+A/B/W/D/P plus calendar/world-clock Quickshell panels</td>
+<td>apps/panels.py + gnomarchi panel {audio,network,bluetooth,power,display,calendar,wifi}; overlay hotkeys for A/B/W/D/P</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.themes</code></td>
+<td>adapt</td>
+<td>themes</td>
+<td>22 theme packs; Super+Ctrl+Shift+Space carousel previews and applies whole desktop</td>
+<td>theme/packs (24) + apps/theme-picker + theme/emitters.py</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.backgrounds</code></td>
+<td>adapt</td>
+<td>backgrounds / style</td>
+<td>Super+Ctrl+Space cycles per-theme backgrounds; video wallpapers</td>
+<td>theme/backgrounds.py; theme bg next|video on|off; menu Style</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.hotkeys-core</code></td>
+<td>adapt</td>
+<td>hotkeys</td>
+<td>Large Hyprland binding set for navigate/system/apps/clipboard/capture/style/toggles/reminders/notices</td>
+<td>install/overlay.sh custom-keybindings (9 binds: menu/agent/theme/bg/5 panels)</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.clipboard</code></td>
+<td>adapt</td>
+<td>clipboard / universal clipboard</td>
+<td>Super+C/X/V unified clipboard; Super+Ctrl+V clipboard manager</td>
+<td>apps/clipboard.py (GPaste) + menu Trigger › Clipboard; no launch hotkeys</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.reminders</code></td>
+<td>adapt</td>
+<td>reminders</td>
+<td>Super+Ctrl+R add; Alt variants list/clear; notification firing</td>
+<td>apps/remind.py + gnomarchi remind *; menu Trigger entries; no hotkeys</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.notices</code></td>
+<td>adapt</td>
+<td>notices</td>
+<td>Hotkeys show time/battery/weather as notifications</td>
+<td></td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.capture</code></td>
+<td>adapt</td>
+<td>capture</td>
+<td>Print/OCR/record/color-picker/dictation suite with rich hotkeys</td>
+<td>apps/capture.py; menu Trigger capture; install/capture; no Print-Screen custom binds beyond CLI</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.toggles</code></td>
+<td>adapt</td>
+<td>toggles</td>
+<td>Idle lock, nightlight, bar hide, gaps, display off/mirror hotkeys</td>
+<td>desktop/modes.py + gnomarchi mode + gnomarchi.modes plugin; caffeine</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.cli</code></td>
+<td>adapt</td>
+<td>CLI (omarchy command)</td>
+<td>omarchy theme/menu/capture/share/agent/… unified CLI</td>
+<td>bin/gnomarchi (theme,update,capture,remind,clipboard,mode,panel,font,install,app,plugin,menu,default,agent,bus,shell)</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.terminal</code></td>
+<td>adapt</td>
+<td>terminal / Ghostty</td>
+<td>Default terminal (foot historically; Ghostty installable) with theme and split binds</td>
+<td>Ghostty via overlay/ISO; theme/emit_ghostty; Super+Return not bound</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.neovim</code></td>
+<td>adapt</td>
+<td>neovim</td>
+<td>omarchy-nvim / LazyVim with Space maps, lazygit, theme sync</td>
+<td>theme/emit_nvim only; stock neovim; no LazyVim bundle</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.ai</code></td>
+<td>adapt</td>
+<td>AI / agents</td>
+<td>Agent picker, Make something, usage, crash diagnose, mise CLIs</td>
+<td>agent/* + apps/agents-window + plugins/gnomarchi.agents*</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.dev-tools</code></td>
+<td>adapt</td>
+<td>dev tools</td>
+<td>mise, docker, tmux, herdr, lazygit preinstalled/configured</td>
+<td>mise in overlay; registry claims docker/tmux/herdr but ISO/VM lack packages</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.shell-tools</code></td>
+<td>adapt</td>
+<td>shell-tools</td>
+<td>fzf/ff, zoxide, ripgrep, eza/ls aliases, fd, bat, tldr, yt-dlp, try</td>
+<td></td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.tuis</code></td>
+<td>adapt</td>
+<td>tuis</td>
+<td>Lazygit, btop/Activity, Herdr, Fastfetch/About, Cliamp; Install › TUI</td>
+<td>theme emit_btop; V-19 expects btop but VM missing; no Herdr/cliamp/fastfetch/Install›TUI</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.guis</code></td>
+<td>adapt</td>
+<td>guis</td>
+<td>Nautilus, Disktree, Obsidian, Omawrite, Pinta, Aether, LocalSend, LibreOffice, Hype, Signed, Omacalc, Signal, mpv, Omacut, Monologue</td>
+<td>Nautilus+mpv; apps/gnoma-{write,cut,calc}; icons exist; rest absent</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.browsers</code></td>
+<td>adapt</td>
+<td>browsers</td>
+<td>Chromium default + private window hotkeys</td>
+<td>chromium in ISO/overlay; no Super+Shift+Return bind</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.commercial</code></td>
+<td>adapt</td>
+<td>commercial-apps-services</td>
+<td>Install › Service: 1Password, Bitwarden, Spotify, Dropbox, Tailscale, ONCE, NordVPN with hotkeys</td>
+<td>plugins/first-party/gnomarchi.tailscale only; discord icon asset; no Service menu</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.web-apps</code></td>
+<td>adapt</td>
+<td>web-apps</td>
+<td>Frameless Chromium webapps + hotkeys for HEY/ChatGPT/Grok/WhatsApp/Google/X/YouTube/Zoom/Discord; Install › Web App</td>
+<td>applications/icons/* only; no launcher/desktop generators</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.gaming</code></td>
+<td>adapt</td>
+<td>gaming</td>
+<td>Steam/Lutris/retro gaming install paths</td>
+<td>install/gaming.sh + menu Install › Gaming; not on default ISO/VM</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.pdfs</code></td>
+<td>adapt</td>
+<td>PDFs / Signed / Filling out PDFs</td>
+<td>Document Viewer + Signed PDF signer/filler first-party app</td>
+<td></td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.windows-vm</code></td>
+<td>adapt</td>
+<td>Windows VM</td>
+<td>Guided Windows guest via virt stack</td>
+<td>install/windows-vm.sh + menu Install › Windows VM</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.updates</code></td>
+<td>adapt</td>
+<td>updates</td>
+<td>omarchy update + ALPM guard + bar update chip</td>
+<td>gnomarchi update; plugins/gnomarchi.system-update</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.dotfiles</code></td>
+<td>adapt</td>
+<td>dotfiles</td>
+<td>Curated ~/.config/omarchy + hypr/tmux/nvim seeds with migrate helpers</td>
+<td>config/shell.toml + overlay staging of aliases; no full dotfile product</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.shell-plugins</code></td>
+<td>adapt</td>
+<td>shell plugins</td>
+<td>Quickshell plugin clone/validate marketplace</td>
+<td>plugin/lifecycle multi-runtime; menu Install › Plugins; first-party StatusNotifier set</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.monitors</code></td>
+<td>adapt</td>
+<td>monitors</td>
+<td>Scaling hotkeys Super+/ ; mirror/laptop display toggles</td>
+<td>gnomarchi panel display → GNOME Settings/gcc</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.input</code></td>
+<td>adapt</td>
+<td>input</td>
+<td>Keyboard/layout, fcitx5, compose emojis, CapsLock emoji chords</td>
+<td></td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.networking</code></td>
+<td>adapt</td>
+<td>networking</td>
+<td>Bar wifi/bt panels, Tailscale, firewall open for LocalSend</td>
+<td>panel network/bluetooth; tailscale plugin; no ufw/LocalSend story</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.sleep</code></td>
+<td>adapt</td>
+<td>sleep / idle</td>
+<td>Idle lock toggle, caffeine/stay awake, suspend via system menu</td>
+<td>gnomarchi mode + caffeine extension</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.fonts</code></td>
+<td>adapt</td>
+<td>fonts</td>
+<td>Install › Style › Font curated monospace set</td>
+<td>gnomarchi font install/set; menu Install/Style › Font (7 fonts)</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.prompt</code></td>
+<td>adapt</td>
+<td>prompt</td>
+<td>Themed shell prompt (often starship) synced with theme</td>
+<td>theme pack id starship is a color pack only; no prompt emitter</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.branding</code></td>
+<td>adapt</td>
+<td>branding</td>
+<td>Plymouth unlock art, logos, boot theme</td>
+<td>plymouth/gnomarchi + assets/brand/logo.png; install/plymouth.sh</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.custom-themes</code></td>
+<td>adapt</td>
+<td>custom themes / Aether</td>
+<td>Aether extracts palette from wallpaper into full theme; community theme install</td>
+<td>agent make-something theme; no Aether app</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.menu</code></td>
+<td>adapt</td>
+<td>menu / navigation menu</td>
+<td>Super+Space nested omarchy-menu Go tree Install/Setup/Style/Trigger/Remove</td>
+<td>menu/default.jsonc + gnomarchi menu open</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.share-localsend</code></td>
+<td>adapt</td>
+<td>guis LocalSend / share</td>
+<td>Super+Ctrl+S share menu; omarchy share *; Nautilus Send via LocalSend</td>
+<td></td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.first-party-apps</code></td>
+<td>adapt</td>
+<td>guis oma*/gnoma*</td>
+<td>omacalc/omawrite/omacut (+ Hype/Signed/Monologue)</td>
+<td>apps/gnoma-{calc,write,cut} + applications/desktop; gnomarchi app *</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.theme-chooser-every-theme</code></td>
+<td>adapt</td>
+<td>themes (chooser must show/preview EVERY theme)</td>
+<td>Carousel visits every installed pack with visual preview before apply</td>
+<td>apps/theme-picker/gnomarchi_theme_picker.py lists theme list; preview.png or palette draw</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>manual.install-iso-overlay</code></td>
+<td>adapt</td>
+<td>install</td>
+<td>Guided ISO + curl|bash overlay</td>
+<td>iso/ + install/overlay.sh + install/arch-extras.sh</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>n/a.hyprland-session</code></td>
+<td>D1′</td>
+<td>session / Hyprland</td>
+<td>Hyprland + UWSM session</td>
+<td>GNOME Shell + GDM (D1′); forbids hyprland packages</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr><tr>
+<td><code>n/a.quickshell</code></td>
+<td>D1′</td>
+<td>shell Quickshell</td>
+<td>Unified Quickshell desktop shell + plugin IPC</td>
+<td>GNOME panel + StatusNotifier + gnomarchi-bus</td>
+<td>Omarchy: native behavior present<br>gnomarchi: adapted path callable / visible</td>
+</tr>
+</tbody></table>
+</main></body></html>
