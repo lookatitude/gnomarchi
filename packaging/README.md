@@ -22,7 +22,8 @@ packaging/
 
 1. Tag and publish via `.github/workflows/release.yml` (builds `gnomarchi-<VERSION>.tar.gz` + `.sha256`).
 2. Refresh PKGBUILD checksums: `./scripts/update-pkgbuild-checksums.sh` (reads `VERSION`, downloads the release asset, rewrites `sha256sums`).
-3. Keep `pkgver` / `_tagver` / git tag aligned (e.g. `pkgver=0.0.1beta2`, `_tagver=0.0.1-beta.2`, tag `v0.0.1-beta.2`).
+3. Keep `pkgver` / `_tagver` / git tag aligned (e.g. `pkgver=0.0.1beta3`, `_tagver=0.0.1-beta.3`, tag `v0.0.1-beta.3`).
+4. ISO builder asset `gnomarchi-iso-builder-<VERSION>.tar.gz` is published beside the source tarball (local `mkarchiso`; no `.iso` upload).
 
 ## Custom repo (optional, must be signed)
 

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to build (e.g. v0.0.1-beta.1)'
+        description: 'Tag to build (e.g. v0.0.1-beta.3)'
         required: false
         default: ''
 
@@ -41,18 +41,75 @@ jobs:
           chmod +x scripts/build-release.sh
           ./scripts/build-release.sh
 
+      - name: Package ISO builder tree
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
+          NAME="gnomarchi-iso-builder-${VERSION}"
+          STAGE="dist/.stage-iso/${NAME}"
+          rm -rf dist/.stage-iso
+          mkdir -p "${STAGE}"
+          rsync -a \
+            --exclude 'work-releng' \
+            --exclude 'mkarchiso-tmp' \
+            --exclude 'out' \
+            --exclude 'profile/.gnomarchi-from-releng' \
+            iso/ "${STAGE}/iso/"
+          install -m 0755 scripts/build-iso.sh "${STAGE}/build-iso.sh"
+          printf '%s\n' "${VERSION}" > "${STAGE}/VERSION"
+          cat > "${STAGE}/README.md" <<EOF
+# gnomarchi ISO builder (${VERSION})
+
+Build a guided Arch live ISO locally (needs root + \`archiso\`):
+
+\`\`\`bash
+sudo pacman -S --needed archiso
+sudo ./build-iso.sh
+\`\`\`
+
+Output: \`iso/out/gnomarchi-*.iso\`
+
+Full tree and overlay live under \`iso/\`. See \`iso/README.md\`.
+EOF
+          tar -C dist/.stage-iso -czf "dist/${NAME}.tar.gz" "${NAME}"
+          (
+            cd dist
+            sha256sum "${NAME}.tar.gz" > "${NAME}.tar.gz.sha256"
+          )
+          ls -la dist/"${NAME}".tar.gz*
+
       - name: Verify archive sha256
         run: |
           set -euo pipefail
           cd dist
-          archive="$(echo gnomarchi-*.tar.gz | awk '{print $1}')"
+          archive="gnomarchi-${{ steps.ver.outputs.version }}.tar.gz"
           sumfile="${archive}.sha256"
           test -f "${archive}"
           test -f "${sumfile}"
           echo "Archive: ${archive}"
           cat "${sumfile}"
           sha256sum -c "${sumfile}"
-          echo "Verified SHA256 matches ${sumfile}"
+          iso="gnomarchi-iso-builder-${{ steps.ver.outputs.version }}.tar.gz"
+          sha256sum -c "${iso}.sha256"
+          echo "Verified SHA256 for source + ISO builder"
+
+      - name: Write release notes
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.ver.outputs.version }}"
+          cat > dist/RELEASE_NOTES.md <<EOF
+## gnomarchi ${VERSION}
+
+Beta tag (\`${VERSION}\`), published as the **Latest** release so GitHub Releases and \`/releases/latest\` resolve here.
+
+### Assets
+- \`gnomarchi-${VERSION}.tar.gz\` — source / overlay tree
+- \`gnomarchi-iso-builder-${VERSION}.tar.gz\` — archiso builder (\`sudo ./build-iso.sh\` on Arch)
+
+### Install
+Overlay: extract the source tarball and run \`./install/overlay.sh\`.
+ISO (local): extract the ISO builder tarball, \`sudo pacman -S archiso\`, \`sudo ./build-iso.sh\`.
+EOF
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
@@ -60,10 +117,16 @@ jobs:
           tag_name: ${{ steps.ver.outputs.tag }}
           name: gnomarchi ${{ steps.ver.outputs.version }}
           draft: false
-          prerelease: true
+          # GitHub refuses make_latest on prereleases; beta tags stay
+          # versioned as beta.* but publish as full releases so Latest works.
+          prerelease: false
+          make_latest: true
           generate_release_notes: true
+          body_path: dist/RELEASE_NOTES.md
           files: |
-            dist/gnomarchi-*.tar.gz
-            dist/gnomarchi-*.tar.gz.sha256
+            dist/gnomarchi-${{ steps.ver.outputs.version }}.tar.gz
+            dist/gnomarchi-${{ steps.ver.outputs.version }}.tar.gz.sha256
+            dist/gnomarchi-iso-builder-${{ steps.ver.outputs.version }}.tar.gz
+            dist/gnomarchi-iso-builder-${{ steps.ver.outputs.version }}.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

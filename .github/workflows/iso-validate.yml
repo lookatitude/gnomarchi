@@ -31,6 +31,7 @@ jobs:
             iso/build.sh
             iso/bootstrap-from-releng.sh
             iso/airootfs-overlay/usr/local/bin/gnomarchi-guided-install
+            scripts/build-iso.sh
           )
           for f in "${required[@]}"; do
             [[ -f "$f" ]] || { echo "missing: $f" >&2; exit 1; }
@@ -46,6 +47,7 @@ jobs:
             iso/profiledef.gnomarchi.sh
             iso/profile/profiledef.sh
             iso/airootfs-overlay/usr/local/bin/gnomarchi-guided-install
+            scripts/build-iso.sh
           )
           for s in "${scripts[@]}"; do
             bash -n "$s"
@@ -56,7 +58,8 @@ jobs:
         run: |
           set -euo pipefail
           for s in iso/build.sh iso/bootstrap-from-releng.sh \
-            iso/airootfs-overlay/usr/local/bin/gnomarchi-guided-install; do
+            iso/airootfs-overlay/usr/local/bin/gnomarchi-guided-install \
+            scripts/build-iso.sh; do
             [[ -x "$s" ]] || { echo "not executable: $s" >&2; exit 1; }
             echo "executable: $s"
           done

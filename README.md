@@ -4,7 +4,7 @@
   <img src="docs/brand/logo.png" alt="gnomarchi" width="280">
 </p>
 
-<p align="center"><strong>v0.0.1-beta.2</strong> · stock GNOME omakase for Arch</p>
+<p align="center"><strong>v0.0.1-beta.3</strong> · stock GNOME omakase for Arch</p>
 
 **Experimental.** gnomarchi ports [Omarchy](https://omarchy.org)’s omakase Arch desktop — themes, menu, plugins, agents, and overlay install — onto **stock GNOME** instead of Hyprland/Quickshell.
 
@@ -57,19 +57,20 @@ Super+Space                   # unified menu
 | Channel | How |
 | --- | --- |
 | **Overlay** (dev / existing Arch+GNOME) | `./install/overlay.sh` |
-| **Release tarball** | GitHub Releases → `gnomarchi-0.0.1-beta.2.tar.gz` |
+| **Release tarball** | GitHub Releases → `gnomarchi-0.0.1-beta.3.tar.gz` |
 | **AUR-style PKGBUILD** | `packaging/aur/gnomarchi/` (`makepkg -si`) — uses pinned `sha256sums` when a release asset checksum is available |
 | **Custom pacman repo** | `packaging/repo/` — build pkgs, `./packaging/repo/build-repo.sh`, host mirror |
-| **ISO** (WIP — not a supported install path yet) | `iso/build.sh` (needs `archiso`); no published ISO artifact on the current release |
+| **ISO builder** | Release asset `gnomarchi-iso-builder-0.0.1-beta.3.tar.gz` → `sudo ./build-iso.sh` (needs `archiso`); or `sudo ./scripts/build-iso.sh` from a checkout |
 
 ```bash
 # From a release tag
 ./scripts/build-release.sh          # source archive + checksums under dist/
+sudo ./scripts/build-iso.sh         # guided live ISO under iso/out/ (archiso + root)
 # Optional Arch package
 cd packaging/aur/gnomarchi && makepkg -si
 ```
 
-## Status (v0.0.1-beta.2)
+## Status (v0.0.1-beta.3)
 
 Feature gap map vs Omarchy manual: **43/43 done** on the GNOME adaptation path (Hyprland/Quickshell replaced by GNOME Shell + GDM by design). `status=done` is adaptation tracking; product readiness uses `maturity` (`adapted` \| `shipped` \| `proven`) in `features/registry.yaml`. Tracker: `features/registry.yaml` · `docs/parity/gnomarchi-gap-map.json` · honesty notes: [`docs/parity/gaps-and-improvements.html`](docs/parity/gaps-and-improvements.html).
 

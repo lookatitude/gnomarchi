@@ -1,5 +1,5 @@
-# ISO status (v0.0.1-beta.2)
+# ISO status (v0.0.1-beta.3)
 
-Demoted: live ISO is WIP / experimental and **not** shipped on GitHub Releases.
-Supported path: overlay + release tarball. Registry owners: mark ISO accordingly;
-do not claim a published ISO asset for this tag.
+ISO **builder** ships on GitHub Releases (`gnomarchi-iso-builder-<VERSION>.tar.gz`).
+Pre-built `.iso` images are not published. Build locally with `scripts/build-iso.sh`
+(needs `archiso` + root). Supported install path remains overlay + source tarball.

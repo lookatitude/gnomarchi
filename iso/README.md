@@ -1,29 +1,41 @@
 # gnomarchi ISO (archiso)
 
-**Status: WIP / experimental — not shipped on GitHub Releases for v0.0.1-beta.2.**
+**Status (v0.0.1-beta.3):** ISO **builder** ships on GitHub Releases as
+`gnomarchi-iso-builder-<VERSION>.tar.gz`. A pre-built `.iso` binary is not
+uploaded (large, Arch-host build). Supported install remains overlay + source
+tarball; use this builder when you want a guided live USB.
 
-The supported install path for that release is **overlay + release tarball**
-(`install/overlay.sh` / curl|bash), not a published live ISO asset.
-
-Guided Arch live ISO (when built locally). After base install, the live session
-runs `install/overlay.sh` (same stages as curl|bash overlay). System updates use
+Guided Arch live ISO. After base install, the live session runs
+`install/overlay.sh` (same stages as curl|bash overlay). System updates use
 official Arch only: `gnomarchi update` → `sudo pacman -Syu` (no custom
 `[gnomarchi]` repo required).
 
-## Build (experimental)
+## Build
 
-Requires root, `archiso`, and a full `mkarchiso` run. Not part of CI.
+Requires root, `archiso`, and a full `mkarchiso` run. Not part of default CI
+(validate-only: `.github/workflows/iso-validate.yml`).
+
+From a checkout:
 
 ```bash
 sudo pacman -S --needed archiso
-sudo ./iso/build.sh
+sudo ./scripts/build-iso.sh
+# or: sudo ./iso/build.sh
 ```
 
-`build.sh` copies archiso `releng`, appends `iso/packages.x86_64`, embeds this
+From the release asset `gnomarchi-iso-builder-*.tar.gz`:
+
+```bash
+tar xf gnomarchi-iso-builder-*.tar.gz && cd gnomarchi-iso-builder-*
+sudo pacman -S --needed archiso
+sudo ./build-iso.sh
+```
+
+`iso/build.sh` copies archiso `releng`, appends `iso/packages.x86_64`, embeds this
 repo under `/root/gnomarchi-src`, and writes `/root/gnomarchi-install.sh` which
 exports `GNOMARCHI_ROOT` and runs `install/overlay.sh all`.
 
-Output: `iso/out/gnomarchi-*.iso`
+Output: `iso/out/gnomarchi-*.iso` — write to USB with `dd` / Ventoy / balenaEtcher.
 
 ```bash
 sudo rm -rf iso/mkarchiso-tmp iso/work-releng
