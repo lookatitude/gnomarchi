@@ -24,7 +24,7 @@ conflicts=('gnomarchi')
 # Release asset name uses the git tag without the leading v (e.g. v0.0.1-beta.3 → 0.0.1-beta.3).
 _tagver=0.0.1-beta.3
 source=("${pkgname}-${_tagver}.tar.gz::https://github.com/lookatitude/gnomarchi/releases/download/v${_tagver}/gnomarchi-${_tagver}.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('2a3ba4a65884e5be1b6dbb1af4f6912bf54140c3a4887e9a1e7500d39f11f897')
 
 package() {
   cd "${srcdir}/gnomarchi-${_tagver}"
