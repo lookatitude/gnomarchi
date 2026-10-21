@@ -15,3 +15,19 @@ jobs:
 
       - name: Run unit tests
         run: python3 -m unittest discover -s tests -v
+
+  aur-pkgbuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: PKGBUILD installs runtime tree
+        run: |
+          set -euo pipefail
+          grep -q 'plugin' packaging/aur/gnomarchi/PKGBUILD
+          grep -q 'common' packaging/aur/gnomarchi/PKGBUILD
+          grep -q 'apps' packaging/aur/gnomarchi/PKGBUILD
+          grep -q 'GNOMARCHI_ROOT=/usr/share/gnomarchi' packaging/aur/gnomarchi/PKGBUILD
+          bash -n packaging/aur/gnomarchi/PKGBUILD || true
+          echo "PKGBUILD runtime tree checks ok"

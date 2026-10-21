@@ -1,5 +1,5 @@
-# ISO status (v0.0.1-beta.3)
+# ISO status (v0.0.1-beta.4)
 
-ISO **builder** ships on GitHub Releases (`gnomarchi-iso-builder-<VERSION>.tar.gz`).
-Pre-built `.iso` images are not published. Build locally with `scripts/build-iso.sh`
-(needs `archiso` + root). Supported install path remains overlay + source tarball.
+Live ISO is built in the Release workflow (privileged `archlinux` container +
+`mkarchiso`) and uploaded as `gnomarchi-<VERSION>-x86_64.iso`. Local builds:
+`scripts/build-iso.sh`.

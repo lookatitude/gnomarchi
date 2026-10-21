@@ -21,4 +21,8 @@ bash "${GNOMARCHI_ROOT}/install/overlay.sh" all
 SCRIPT
 chmod +x "${WORK}/airootfs/root/gnomarchi-install.sh"
 mkdir -p "${OUT}"
-sudo mkarchiso -v -w "${ROOT}/mkarchiso-tmp" -o "${OUT}" "${WORK}"
+MKARCHISO=(mkarchiso)
+if [[ "$(id -u)" -ne 0 ]]; then
+  MKARCHISO=(sudo mkarchiso)
+fi
+"${MKARCHISO[@]}" -v -w "${ROOT}/mkarchiso-tmp" -o "${OUT}" "${WORK}"

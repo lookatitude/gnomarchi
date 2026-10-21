@@ -8,13 +8,13 @@
 schema_version: gnomarchi.feature_registry.v1
 last_full_review: "2026-10-20T23:22"
 upstream: omarchy
-operator_note: "2026-10-21: status=done is adaptation tracking; maturity is product readiness. ISO builder ships on Releases; pre-built .iso not published. Arch official packages default (not custom repo)."
+operator_note: "2026-10-21: status=done is adaptation tracking; maturity is product readiness. Live ISO built on Releases; Arch official packages default (not custom repo)."
 features:
   - id: omarchy.install.iso
     title: Guided ISO install
     status: done
     maturity: shipped
-    maturity_note: "ISO builder on GitHub Releases (gnomarchi-iso-builder-*.tar.gz); local mkarchiso via scripts/build-iso.sh; no published .iso binary"
+    maturity_note: "Release workflow publishes gnomarchi-*-x86_64.iso via mkarchiso; local scripts/build-iso.sh"
     phase: P8
     gnomarchi_path: "scripts/build-iso.sh + iso/build.sh + iso/packages.x86_64 + gnomarchi-install.sh"
     last_reviewed: "2026-10-21"

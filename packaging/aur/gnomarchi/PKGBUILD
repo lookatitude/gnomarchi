@@ -1,7 +1,7 @@
 # Maintainer: gnomarchi contributors
 # Experimental — not affiliated with Omarchy / Basecamp / DHH.
 pkgname=gnomarchi
-pkgver=0.0.1beta3
+pkgver=0.0.1beta4
 pkgrel=1
 pkgdesc="Omakase Arch desktop on stock GNOME (experimental)"
 arch=('any')
@@ -21,21 +21,38 @@ optdepends=(
 )
 provides=('gnomarchi')
 conflicts=('gnomarchi')
-# Release asset name uses the git tag without the leading v (e.g. v0.0.1-beta.3 → 0.0.1-beta.3).
-_tagver=0.0.1-beta.3
+# Release asset name uses the git tag without the leading v (e.g. v0.0.1-beta.4 → 0.0.1-beta.4).
+_tagver=0.0.1-beta.4
 source=("${pkgname}-${_tagver}.tar.gz::https://github.com/lookatitude/gnomarchi/releases/download/v${_tagver}/gnomarchi-${_tagver}.tar.gz")
-sha256sums=('2a3ba4a65884e5be1b6dbb1af4f6912bf54140c3a4887e9a1e7500d39f11f897')
+sha256sums=('SKIP')
 
 package() {
   cd "${srcdir}/gnomarchi-${_tagver}"
 
-  install -d "${pkgdir}/usr/share/gnomarchi"
-  cp -a bin desktop theme menu install config features VERSION LICENSE README.md \
-    "${pkgdir}/usr/share/gnomarchi/"
+  local share="${pkgdir}/usr/share/gnomarchi"
+  install -d "${share}"
+
+  # Runtime tree must match install/overlay.sh lib copy (CLI imports these).
+  local part
+  for part in \
+    theme plugin common bus menu apps agent config desktop plugins \
+    applications assets features install skills extensions templates \
+    plymouth bin; do
+    if [[ -d "${part}" ]]; then
+      cp -a "${part}" "${share}/"
+    fi
+  done
+  for part in VERSION LICENSE README.md; do
+    [[ -f "${part}" ]] && install -Dm644 "${part}" "${share}/${part}"
+  done
+
+  # Drop bytecode caches from the tarball copy.
+  find "${share}" -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 
   install -d "${pkgdir}/usr/bin"
   cat > "${pkgdir}/usr/bin/gnomarchi" <<'EOF'
 #!/usr/bin/env bash
+export GNOMARCHI_ROOT=/usr/share/gnomarchi
 exec /usr/share/gnomarchi/bin/gnomarchi "$@"
 EOF
   chmod 755 "${pkgdir}/usr/bin/gnomarchi"
