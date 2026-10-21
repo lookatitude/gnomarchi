@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workflow depth vs Omarchy manual</title>
+<style>
+:root{--bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb;--warn:#d97706;--danger:#dc2626;--ok:#059669}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;--warn:#fbbf24;--danger:#f87171;--ok:#34d399}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:48rem;margin:0 auto;padding:2rem 1.25rem}
+h1{font-size:1.7rem;margin:0 0 .35rem} .sub{color:var(--muted);margin:0 0 1.25rem}
+.callout{border:1px solid var(--border);border-left:3px solid var(--accent);background:var(--card);padding:.85rem 1rem;border-radius:8px;margin:1rem 0}
+.callout.warn{border-left-color:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:.88rem;margin:1rem 0}
+th,td{border-bottom:1px solid var(--border);padding:.45rem .55rem;text-align:left;vertical-align:top}
+th{background:var(--card)} .id{font-family:ui-monospace,Menlo,monospace;color:var(--accent);font-size:.85em}
+.sev-h{color:var(--danger);font-weight:600} .sev-m{color:var(--warn);font-weight:600}
+code{font-size:.86em}
+</style>
+</head>
+<body>
+<main>
+<h1>Are workflows “complete”?</h1>
+<p class="sub">Short answer: <strong>partial</strong>. Deep <code>theme.effect.*</code> / <code>plugin.effect.*</code> assert GTK paths on the VM; visual shots landed but acceptance still <em>in progress</em> — see <a href="visual-proof.html">visual-proof.html</a>.</p>
+
+<div class="callout warn">
+  <p><strong>Progress.</strong> F2/F5 fixed; F1 via <code>theme.effect.*</code>. Shots landed under <code>docs/screenshots/parity-proof/</code> — gallery <a href="visual-proof.html">visual-proof.html</a>; still <em>in progress</em> (not marked proven). Re-capture: <code>PARITY_CAPTURE=1</code> · <a href="PROOF.md">PROOF.md</a>.</p>
+</div>
+
+<section>
+<h2>Findings</h2>
+<table>
+<thead><tr><th>ID</th><th>Sev</th><th>Gap</th></tr></thead>
+<tbody>
+<tr><td class="id">F1</td><td class="sev-h">High</td><td><strong>In progress:</strong> <code>theme.effect.*</code> asserts + theme jpgs captured (<a href="visual-proof.html#theme">gallery</a>) — review not closed.</td></tr>
+<tr><td class="id">F2</td><td class="sev-h">High</td><td><strong>Fixed</strong> (emit) + theme shots captured; Nautilus visual review still in progress.</td></tr>
+<tr><td class="id">F3</td><td class="sev-m">Med</td><td><strong>Captured:</strong> <code>plugin.live.*</code> + enable-starts-indicator; 6 plugin shots. Residual: per-item SNI names not on bus (<a href="visual-proof.html#plugins">gallery</a>).</td></tr>
+<tr><td class="id">F4</td><td class="sev-m">Med</td><td><strong>Captured (high-value):</strong> agents/panels/apps/menu/notice shots + <code>desktop.proof.*</code> green. Gaming/ISO still smoke (<a href="visual-proof.html#desktop">gallery</a>).</td></tr>
+<tr><td class="id">F5</td><td class="sev-m">Med</td><td><strong>Fixed:</strong> pack accent hex → nearest GNOME <code>accent-color</code> enum; color-scheme from pack mode.</td></tr>
+<tr><td class="id">F6</td><td class="sev-h">High</td><td><strong>Fixed (Arch path):</strong> Omarchy <code>Yaru-*</code> icon themes are not in Arch repos — <code>theme/icon_apply.py</code> maps to Papirus (+ optional <code>papirus-folders</code>), installs <code>applications/icons</code> into hicolor, and webapps set <code>Icon=</code>. Overlay installs <code>papirus-icon-theme</code>.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section>
+<h2>What theme change actually does (gnomarchi)</h2>
+<ol>
+<li>Load pack palette → emit GTK3/4 CSS, Ghostty, nvim, btop, Chromium flags, Shell CSS, agent skins, starship, wallpaper.</li>
+<li>gsettings: color-scheme, wallpaper URIs, primary-color; <strong>now</strong> icon-theme from <code>icons.theme</code>.</li>
+<li>Write <code>~/.local/state/gnomarchi/last-apply.json</code> (+ Theme.Changed bus stamp).</li>
+</ol>
+<p>Omarchy does the Hyprland/Quickshell equivalent; paths differ, effects must still be verified on GNOME/GTK.</p>
+</section>
+
+<section>
+<h2>Required deep workflows (A1)</h2>
+<p>Assert after <code>theme set &lt;id&gt;</code>:</p>
+<ul>
+<li>GTK css contains pack accent/background</li>
+<li>Ghostty config contains palette hex</li>
+<li>gsettings <code>picture-uri</code> points at generated wallpaper</li>
+<li>gsettings <code>icon-theme</code> matches <code>icons.theme</code></li>
+<li><code>last-apply.json</code> pack id + paths exist</li>
+</ul>
+<p>Catalog additions: <code>theme.effect.*</code> in <code>tests/parity/workflows/catalog.yaml</code>. Runner: <code>scripts/parity-workflows-run.py --only theme.effect</code>.</p>
+</section>
+
+<section>
+<h2>Still not “full Omarchy port”</h2>
+<p>D1′ substitutes remain (PaperWM≠Hyprland, Hype→mpv, …). “Complete” for gnomarchi means every manual chapter has a <em>GTK-path</em> deep workflow, not Hyprland identity.</p>
+</section>
+</main>
+</body>
+</html>

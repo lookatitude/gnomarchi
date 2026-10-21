@@ -23,6 +23,13 @@ def lock_now() -> int:
     return 1
 
 
+def screensaver() -> int:
+    """Launch ASCII branding screensaver (alongside GNOME lock)."""
+    from desktop import branding
+
+    return branding.launch_viewer("screensaver", fullscreen=True)
+
+
 def stay_awake(on: bool | None = None) -> int:
     if on is None:
         on = not modes.stay_awake_enabled()

@@ -4,8 +4,10 @@
 #
 # Replace Server URL with your hosted mirror. Do not commit private keys.
 # Signing: docs/security/packaging-signing.md
-# Dev-only Optional TrustAll — require signatures before any public mirror.
+#
+# Public mirrors MUST ship package and database signatures (.sig).
+# Never use Optional TrustAll (or TrustAll) in a public-facing config.
 
 [gnomarchi]
-SigLevel = Optional TrustAll
+SigLevel = Required TrustedOnly
 Server = https://example.invalid/gnomarchi/repo/$arch

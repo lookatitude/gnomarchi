@@ -1,0 +1,350 @@
+{
+  "schema": "gnomarchi.dual_vm_suite.v1",
+  "cases": [
+    {
+      "id": "manual.navigation",
+      "chapter": "navigation / hotkeys navigating",
+      "kind": "adapted_parity",
+      "omarchy": "Hyprland workspaces, dwindle/scroll/float, scratchpad, multi-monitor focus moves via Super+arrows/tabs/numbers",
+      "gnomarchi": "Install \u203a PaperWM (install/tiling.sh); stock GNOME overview/workspaces",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.top-bar",
+      "chapter": "the-top-bar",
+      "kind": "adapted_parity",
+      "omarchy": "Quickshell top bar with tray, center clock, workspace digits, draggable edge position",
+      "gnomarchi": "GNOME panel + dash-to-panel via gnomarchi shell bar-position; StatusNotifier plugins",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.bar-panels",
+      "chapter": "the-top-bar panels",
+      "kind": "adapted_parity",
+      "omarchy": "Super+Ctrl+A/B/W/D/P plus calendar/world-clock Quickshell panels",
+      "gnomarchi": "apps/panels.py + gnomarchi panel {audio,network,bluetooth,power,display,calendar,wifi}; overlay hotkeys for A/B/W/D/P",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.themes",
+      "chapter": "themes",
+      "kind": "adapted_parity",
+      "omarchy": "22 theme packs; Super+Ctrl+Shift+Space carousel previews and applies whole desktop",
+      "gnomarchi": "theme/packs (24) + apps/theme-picker + theme/emitters.py",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.backgrounds",
+      "chapter": "backgrounds / style",
+      "kind": "adapted_parity",
+      "omarchy": "Super+Ctrl+Space cycles per-theme backgrounds; video wallpapers",
+      "gnomarchi": "theme/backgrounds.py; theme bg next|video on|off; menu Style",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.hotkeys-core",
+      "chapter": "hotkeys",
+      "kind": "adapted_parity",
+      "omarchy": "Large Hyprland binding set for navigate/system/apps/clipboard/capture/style/toggles/reminders/notices",
+      "gnomarchi": "install/overlay.sh custom-keybindings (9 binds: menu/agent/theme/bg/5 panels)",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.clipboard",
+      "chapter": "clipboard / universal clipboard",
+      "kind": "adapted_parity",
+      "omarchy": "Super+C/X/V unified clipboard; Super+Ctrl+V clipboard manager",
+      "gnomarchi": "apps/clipboard.py (GPaste) + menu Trigger \u203a Clipboard; no launch hotkeys",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.reminders",
+      "chapter": "reminders",
+      "kind": "adapted_parity",
+      "omarchy": "Super+Ctrl+R add; Alt variants list/clear; notification firing",
+      "gnomarchi": "apps/remind.py + gnomarchi remind *; menu Trigger entries; no hotkeys",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.notices",
+      "chapter": "notices",
+      "kind": "adapted_parity",
+      "omarchy": "Hotkeys show time/battery/weather as notifications",
+      "gnomarchi": null,
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.capture",
+      "chapter": "capture",
+      "kind": "adapted_parity",
+      "omarchy": "Print/OCR/record/color-picker/dictation suite with rich hotkeys",
+      "gnomarchi": "apps/capture.py; menu Trigger capture; install/capture; no Print-Screen custom binds beyond CLI",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.toggles",
+      "chapter": "toggles",
+      "kind": "adapted_parity",
+      "omarchy": "Idle lock, nightlight, bar hide, gaps, display off/mirror hotkeys",
+      "gnomarchi": "desktop/modes.py + gnomarchi mode + gnomarchi.modes plugin; caffeine",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.cli",
+      "chapter": "CLI (omarchy command)",
+      "kind": "adapted_parity",
+      "omarchy": "omarchy theme/menu/capture/share/agent/\u2026 unified CLI",
+      "gnomarchi": "bin/gnomarchi (theme,update,capture,remind,clipboard,mode,panel,font,install,app,plugin,menu,default,agent,bus,shell)",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.terminal",
+      "chapter": "terminal / Ghostty",
+      "kind": "adapted_parity",
+      "omarchy": "Default terminal (foot historically; Ghostty installable) with theme and split binds",
+      "gnomarchi": "Ghostty via overlay/ISO; theme/emit_ghostty; Super+Return not bound",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.neovim",
+      "chapter": "neovim",
+      "kind": "adapted_parity",
+      "omarchy": "omarchy-nvim / LazyVim with Space maps, lazygit, theme sync",
+      "gnomarchi": "theme/emit_nvim only; stock neovim; no LazyVim bundle",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.ai",
+      "chapter": "AI / agents",
+      "kind": "adapted_parity",
+      "omarchy": "Agent picker, Make something, usage, crash diagnose, mise CLIs",
+      "gnomarchi": "agent/* + apps/agents-window + plugins/gnomarchi.agents*",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.dev-tools",
+      "chapter": "dev tools",
+      "kind": "adapted_parity",
+      "omarchy": "mise, docker, tmux, herdr, lazygit preinstalled/configured",
+      "gnomarchi": "mise in overlay; registry claims docker/tmux/herdr but ISO/VM lack packages",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.shell-tools",
+      "chapter": "shell-tools",
+      "kind": "adapted_parity",
+      "omarchy": "fzf/ff, zoxide, ripgrep, eza/ls aliases, fd, bat, tldr, yt-dlp, try",
+      "gnomarchi": null,
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.tuis",
+      "chapter": "tuis",
+      "kind": "adapted_parity",
+      "omarchy": "Lazygit, btop/Activity, Herdr, Fastfetch/About, Cliamp; Install \u203a TUI",
+      "gnomarchi": "theme emit_btop; V-19 expects btop but VM missing; no Herdr/cliamp/fastfetch/Install\u203aTUI",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.guis",
+      "chapter": "guis",
+      "kind": "adapted_parity",
+      "omarchy": "Nautilus, Disktree, Obsidian, Omawrite, Pinta, Aether, LocalSend, LibreOffice, Hype, Signed, Omacalc, Signal, mpv, Omacut, Monologue",
+      "gnomarchi": "Nautilus+mpv; apps/gnoma-{write,cut,calc}; icons exist; rest absent",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.browsers",
+      "chapter": "browsers",
+      "kind": "adapted_parity",
+      "omarchy": "Chromium default + private window hotkeys",
+      "gnomarchi": "chromium in ISO/overlay; no Super+Shift+Return bind",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.commercial",
+      "chapter": "commercial-apps-services",
+      "kind": "adapted_parity",
+      "omarchy": "Install \u203a Service: 1Password, Bitwarden, Spotify, Dropbox, Tailscale, ONCE, NordVPN with hotkeys",
+      "gnomarchi": "plugins/first-party/gnomarchi.tailscale only; discord icon asset; no Service menu",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.web-apps",
+      "chapter": "web-apps",
+      "kind": "adapted_parity",
+      "omarchy": "Frameless Chromium webapps + hotkeys for HEY/ChatGPT/Grok/WhatsApp/Google/X/YouTube/Zoom/Discord; Install \u203a Web App",
+      "gnomarchi": "applications/icons/* only; no launcher/desktop generators",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.gaming",
+      "chapter": "gaming",
+      "kind": "adapted_parity",
+      "omarchy": "Steam/Lutris/retro gaming install paths",
+      "gnomarchi": "install/gaming.sh + menu Install \u203a Gaming; not on default ISO/VM",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.pdfs",
+      "chapter": "PDFs / Signed / Filling out PDFs",
+      "kind": "adapted_parity",
+      "omarchy": "Document Viewer + Signed PDF signer/filler first-party app",
+      "gnomarchi": null,
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.windows-vm",
+      "chapter": "Windows VM",
+      "kind": "adapted_parity",
+      "omarchy": "Guided Windows guest via virt stack",
+      "gnomarchi": "install/windows-vm.sh + menu Install \u203a Windows VM",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.updates",
+      "chapter": "updates",
+      "kind": "adapted_parity",
+      "omarchy": "omarchy update + ALPM guard + bar update chip",
+      "gnomarchi": "gnomarchi update; plugins/gnomarchi.system-update",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.dotfiles",
+      "chapter": "dotfiles",
+      "kind": "adapted_parity",
+      "omarchy": "Curated ~/.config/omarchy + hypr/tmux/nvim seeds with migrate helpers",
+      "gnomarchi": "config/shell.toml + overlay staging of aliases; no full dotfile product",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.shell-plugins",
+      "chapter": "shell plugins",
+      "kind": "adapted_parity",
+      "omarchy": "Quickshell plugin clone/validate marketplace",
+      "gnomarchi": "plugin/lifecycle multi-runtime; menu Install \u203a Plugins; first-party StatusNotifier set",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.monitors",
+      "chapter": "monitors",
+      "kind": "adapted_parity",
+      "omarchy": "Scaling hotkeys Super+/ ; mirror/laptop display toggles",
+      "gnomarchi": "gnomarchi panel display \u2192 GNOME Settings/gcc",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.input",
+      "chapter": "input",
+      "kind": "adapted_parity",
+      "omarchy": "Keyboard/layout, fcitx5, compose emojis, CapsLock emoji chords",
+      "gnomarchi": null,
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.networking",
+      "chapter": "networking",
+      "kind": "adapted_parity",
+      "omarchy": "Bar wifi/bt panels, Tailscale, firewall open for LocalSend",
+      "gnomarchi": "panel network/bluetooth; tailscale plugin; no ufw/LocalSend story",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.sleep",
+      "chapter": "sleep / idle",
+      "kind": "adapted_parity",
+      "omarchy": "Idle lock toggle, caffeine/stay awake, suspend via system menu",
+      "gnomarchi": "gnomarchi mode + caffeine extension",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.fonts",
+      "chapter": "fonts",
+      "kind": "adapted_parity",
+      "omarchy": "Install \u203a Style \u203a Font curated monospace set",
+      "gnomarchi": "gnomarchi font install/set; menu Install/Style \u203a Font (7 fonts)",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.prompt",
+      "chapter": "prompt",
+      "kind": "adapted_parity",
+      "omarchy": "Themed shell prompt (often starship) synced with theme",
+      "gnomarchi": "theme pack id starship is a color pack only; no prompt emitter",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.branding",
+      "chapter": "branding",
+      "kind": "adapted_parity",
+      "omarchy": "Plymouth unlock art, logos, boot theme",
+      "gnomarchi": "plymouth/gnomarchi + assets/brand/logo.png; install/plymouth.sh",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.custom-themes",
+      "chapter": "custom themes / Aether",
+      "kind": "adapted_parity",
+      "omarchy": "Aether extracts palette from wallpaper into full theme; community theme install",
+      "gnomarchi": "agent make-something theme; no Aether app",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.menu",
+      "chapter": "menu / navigation menu",
+      "kind": "adapted_parity",
+      "omarchy": "Super+Space nested omarchy-menu Go tree Install/Setup/Style/Trigger/Remove",
+      "gnomarchi": "menu/default.jsonc + gnomarchi menu open",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.share-localsend",
+      "chapter": "guis LocalSend / share",
+      "kind": "adapted_parity",
+      "omarchy": "Super+Ctrl+S share menu; omarchy share *; Nautilus Send via LocalSend",
+      "gnomarchi": null,
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.first-party-apps",
+      "chapter": "guis oma*/gnoma*",
+      "kind": "adapted_parity",
+      "omarchy": "omacalc/omawrite/omacut (+ Hype/Signed/Monologue)",
+      "gnomarchi": "apps/gnoma-{calc,write,cut} + applications/desktop; gnomarchi app *",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.theme-chooser-every-theme",
+      "chapter": "themes (chooser must show/preview EVERY theme)",
+      "kind": "adapted_parity",
+      "omarchy": "Carousel visits every installed pack with visual preview before apply",
+      "gnomarchi": "apps/theme-picker/gnomarchi_theme_picker.py lists theme list; preview.png or palette draw",
+      "status_claimed": "done"
+    },
+    {
+      "id": "manual.install-iso-overlay",
+      "chapter": "install",
+      "kind": "adapted_parity",
+      "omarchy": "Guided ISO + curl|bash overlay",
+      "gnomarchi": "iso/ + install/overlay.sh + install/arch-extras.sh",
+      "status_claimed": "done"
+    },
+    {
+      "id": "n/a.hyprland-session",
+      "chapter": "session / Hyprland",
+      "kind": "d1_substitute",
+      "omarchy": "Hyprland + UWSM session",
+      "gnomarchi": "GNOME Shell + GDM (D1\u2032); forbids hyprland packages",
+      "status_claimed": "done"
+    },
+    {
+      "id": "n/a.quickshell",
+      "chapter": "shell Quickshell",
+      "kind": "d1_substitute",
+      "omarchy": "Unified Quickshell desktop shell + plugin IPC",
+      "gnomarchi": "GNOME panel + StatusNotifier + gnomarchi-bus",
+      "status_claimed": "done"
+    }
+  ],
+  "count": 43
+}

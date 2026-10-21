@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Omarchy → Gnomarchi closeness plan</title>
+<style>
+:root{--bg:#fff;--fg:#1a1d21;--muted:#5b6570;--border:#e4e7ec;--card:#f7f8fa;--accent:#2563eb;--ok:#059669;--warn:#d97706;--danger:#dc2626;--p0:#b45309;--p1:#1d4ed8;--p2:#6b7280}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1216;--fg:#e6e8eb;--muted:#9aa4b0;--border:#232a33;--card:#161b22;--accent:#6ea8ff;--ok:#34d399;--warn:#fbbf24;--danger:#f87171;--p0:#fb923c;--p1:#93c5fd;--p2:#9ca3af}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.layout{display:grid;grid-template-columns:14rem 1fr;max-width:92rem;margin:0 auto}
+aside{position:sticky;top:0;height:100vh;overflow:auto;padding:1.25rem 1rem;border-right:1px solid var(--border);font-size:.78rem}
+aside a{display:block;color:var(--muted);text-decoration:none;padding:.2rem 0}
+aside a:hover{color:var(--accent)}
+main{padding:1.75rem 1.5rem 3rem}
+h1{font-size:1.7rem;margin:0 0 .35rem}
+.sub{color:var(--muted);margin:0 0 1rem}
+.callout{border:1px solid var(--border);border-left:3px solid var(--accent);background:var(--card);padding:.85rem 1rem;border-radius:8px;margin:1rem 0}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0}
+.chip{font-size:.75rem;padding:.18rem .5rem;border-radius:999px;border:1px solid var(--border);background:var(--card)}
+h2{margin:2rem 0 .75rem;font-size:1.2rem;border-bottom:1px solid var(--border);padding-bottom:.3rem}
+.gap{margin:0 0 1.1rem;padding:1rem;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+.gap h3{margin:0 0 .4rem;font-size:1rem}
+.meta{display:flex;flex-wrap:wrap;gap:.35rem;margin:0 0 .55rem}
+.tag{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:.12rem .4rem;border-radius:999px;border:1px solid var(--border)}
+.tag.p0{color:var(--p0)} .tag.p1{color:var(--p1)} .tag.p2{color:var(--p2)}
+.tag.kind{color:var(--muted)}
+.tag.open{color:var(--danger)} .tag.partial{color:var(--warn)} .tag.shipped{color:var(--ok)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:52rem){.cols{grid-template-columns:1fr}.layout{grid-template-columns:1fr}aside{position:static;height:auto;border:0;border-bottom:1px solid var(--border)}}
+.cols div{font-size:.88rem}
+.cols strong{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:.2rem}
+.plan{margin:.55rem 0 0;font-size:.9rem}
+.plan ol{margin:.35rem 0 0;padding-left:1.2rem}
+.plan li{margin:.2rem 0}
+.proof{font-size:.8rem;color:var(--muted);margin:.45rem 0 0}
+code{font-size:.82em}
+footer{margin:2rem 0;color:var(--muted);font-size:.85rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem;margin:1rem 0}
+th,td{border:1px solid var(--border);padding:.4rem .55rem;text-align:left;vertical-align:top}
+th{background:var(--card)}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside>
+  <div class="toc-title">Contents</div>
+  <a href="#summary">Summary</a>
+  <a href="#constraints">D1′ constraints</a>
+  <a href="#waves">Delivery waves</a>
+  <a href="#p0">P0 — screenshot gaps</a>
+  <a href="#p1">P1 — visual closeness</a>
+  <a href="#p2">P2 — depth &amp; wraps</a>
+  <a href="#matrix">Full gap matrix</a>
+  <a href="#proof">Proof bar</a>
+</aside>
+<main>
+<header>
+  <h1>Omarchy → Gnomarchi closeness plan</h1>
+  <p class="sub">Per-gap build plan to close visual and product distance seen in screenshot pairs. Constraint: D1′ GNOME adaptation (no Hyprland/Quickshell ports).</p>
+  <div class="chips">
+    <span class="chip">2026-10-21</span>
+    <span class="chip">sources: visual-proof + gap-map + guest inventory</span>
+    <span class="chip">companion: visual-proof.html</span>
+  </div>
+</header>
+
+<div class="callout" id="summary">
+  <p><strong>Verdict.</strong> Three screenshot gaps are real product holes, not capture noise: (1) Starship config is written but never hooked into zsh, (2) theme unlock PNGs exist but Style→Unlock / GDM / lock wallpaper never select them, (3) Omarchy branding surfaces (plymouth set, ASCII screensaver, about glint, logo presentation) are only partially sketched. Close those first; then tray polish, icons, fonts, screensaver, and app wraps.</p>
+  <p><strong>Status 2026-10-21 (later):</strong> W0–W3 + optionals closed (Obsidian/Pinta, boot preview, SNI tint, notice CSS, PaperWM borders, about glint, tmux/bat, paired gnomarchi-only). papirus-folders tint on theme set; notice history + dismiss; capture menu; LocalSend share + Nautilus script; calendar under-clock; nvim font sourced; theme new --from-wallpaper; gaming/windows-vm/input/custom/plymouth proofs captured. Regen gallery after <code>parity-capture-w3-residuals.sh</code>.</p>
+</div>
+
+<section id="constraints">
+  <h2>D1′ constraints (do not violate)</h2>
+  <ul>
+    <li>No Quickshell or Hyprland ports — substitute with GNOME Shell + AppIndicator + GTK emitters.</li>
+    <li>Login is <strong>GDM</strong>, not SDDM — map Omarchy SDDM branding to GDM greeter CSS + background.</li>
+    <li>Boot art is Plymouth; lock/screensaver is GNOME (plus optional ASCII terminal screensaver app).</li>
+    <li>Provenance: unlock/backgrounds already in packs under CREDITS; keep attribution.</li>
+  </ul>
+</section>
+
+<section id="waves">
+  <h2>Delivery waves</h2>
+  <table>
+    <tr><th>Wave</th><th>Goal</th><th>Exit proof</th></tr>
+    <tr><td>W0</td><td>Prompt + unlock select + branding CLI</td><td>Themed zsh shot; Style→Unlock applies lock/GDM art; branding menu works</td></tr>
+    <tr><td>W1</td><td>Login/boot/screensaver presentation</td><td>Plymouth + GDM + ASCII screensaver pair vs M-16/M-20</td></tr>
+    <tr><td>W2</td><td>Tray/icons/fonts/menu hierarchy</td><td>Gallery pairs flip unreviewed→validated</td></tr>
+    <tr><td>W3</td><td>App wraps + missing installs</td><td>LocalSend, capture, gaming, about glint</td></tr>
+  </table>
+</section>
+
+<section id="p0">
+  <h2>P0 — Gaps visible in screenshots right now</h2>
+
+  <article class="gap" id="g-prompt">
+    <h3>G1 — Zsh / CLI has no theme applied</h3>
+    <div class="meta">
+      <span class="tag p0">P0</span>
+      <span class="tag shipped">shipped</span>
+      <span class="tag kind">emitter + shell hook</span>
+      <span class="tag kind">manual.prompt</span>
+    </div>
+    <div class="cols">
+      <div><strong>Omarchy</strong> Starship prompt themed with pack; always on in interactive zsh.</div>
+      <div><strong>Gnomarchi today</strong> <code>emit_starship</code> writes <code>~/.config/starship.toml</code> on theme set, but overlay never appends <code>eval "$(starship init zsh)"</code> (guest confirmed: no starship in zshrc). Ghostty colors apply; prompt does not.</div>
+    </div>
+    <div class="plan">
+      <strong>Plan</strong>
+      <ol>
+        <li><strong>Shell hook (overlay + <code>gnomarchi shell ensure</code>):</strong> idempotently append starship init to <code>~/.zshrc</code> / <code>~/.bashrc</code>; install <code>starship</code> in overlay defaults if missing.</li>
+        <li><strong>Richer emitter:</strong> expand <code>emit_starship</code> to Omarchy-minimal format (directory + git + character) using full pack palette (accent/red/muted/green); optional <code>gnomarchi prompt {minimal|full|reset}</code>.</li>
+        <li><strong>Terminal wrap:</strong> ensure Ghostty opens login shell so zshrc runs; document <code>ghostty -e zsh -l</code> for proof shots.</li>
+        <li><strong>fastfetch optional:</strong> theme-tinted fastfetch config on shell start (Omarchy about/branding adjacency).</li>
+      </ol>
+    </div>
+    <p class="proof">Proof: Ghostty shot showing accent ❯ + directory color changing tokyo-night→nord. Gallery <code>manual.prompt</code>.</p>
+  </article>
+
+  <article class="gap" id="g-unlock">
+    <h3>G2 — Selecting graphics for login / unlock pages</h3>
+    <div class="meta">
+      <span class="tag p0">P0</span>
+      <span class="tag shipped">shipped</span>
+      <span class="tag kind">theme emitter + menu + GDM</span>
+      <span class="tag kind">manual.themes / branding</span>
+    </div>
+    <div class="cols">
+      <div><strong>Omarchy</strong> Style→Unlock picks per-theme unlock art; plymouth set syncs SDDM login colors+logo; screensaver ASCII from image.</div>
+      <div><strong>Gnomarchi today</strong> Packs ship <code>unlock.png</code> / <code>preview-unlock.png</code> but nothing applies them. Lock dialog only gets CSS colors via shell CSS. Screensaver still Adwaita timed XML. No Style→Unlock chooser.</div>
+    </div>
+    <div class="plan">
+      <strong>Plan</strong>
+      <ol>
+        <li><strong>Unlock emitter:</strong> on <code>theme set</code>, copy pack <code>unlock.png</code> → <code>~/.config/gnomarchi/branding/unlock.png</code> and set <code>org.gnome.desktop.screensaver picture-uri</code> + lock screen background (GNOME 46+: <code>org.gnome.desktop.screensaver</code> / background keys; also mutter lock via same wallpaper when possible).</li>
+        <li><strong>Unlock chooser app:</strong> <code>gnomarchi theme unlock pick</code> GTK grid of all pack unlock previews (reuse theme-picker pattern); writes active unlock + applies immediately; menu Style→Unlock.</li>
+        <li><strong>GDM greeter theme:</strong> ship <code>gdm/gnomarchi.css</code> + background under <code>/usr/share/gnome-shell/theme/</code> or user-themes path; <code>gnomarchi branding gdm apply</code> (sudo) sets greeter logo + colors from active pack (Omarchy SDDM analogue).</li>
+        <li><strong>Plymouth bridge:</strong> <code>gnomarchi plymouth set &lt;bg&gt; &lt;fg&gt; &lt;logo.png&gt;</code> already sketched — wire menu Style→Boot art; preview via <code>plymouthd</code> or static preview PNG.</li>
+      </ol>
+    </div>
+    <p class="proof">Proof: pair vs <code>M-16-unlock-art</code>; GDM greeter VM screenshot; Style→Unlock carousel.</p>
+  </article>
+
+  <article class="gap" id="g-branding">
+    <h3>G3 — Branding presentation (logo, about, screensaver ASCII)</h3>
+    <div class="meta">
+      <span class="tag p0">P0</span>
+      <span class="tag shipped">shipped</span>
+      <span class="tag kind">CLI + GTK apps + visual effect</span>
+      <span class="tag kind">manual.branding / sleep</span>
+    </div>
+    <div class="cols">
+      <div><strong>Omarchy</strong> Branding menu: screensaver/about ASCII from image or FIGlet; glint animation; plymouth preview/set/reset; unified logo across boot/login/about.</div>
+      <div><strong>Gnomarchi today</strong> <code>assets/brand/logo.png</code> + plymouth theme files; no <code>~/.config/gnomarchi/branding/</code> tree; no about ASCII window; no screensaver launcher; notice toast is only live brand cue.</div>
+    </div>
+    <div class="plan">
+      <strong>Plan</strong>
+      <ol>
+        <li><strong>Branding store:</strong> <code>~/.config/gnomarchi/branding/{screensaver,about}.txt</code> + <code>logo.png</code>; seed from <code>docs/brand</code> / FIGlet “gnomarchi”.</li>
+        <li><strong>CLI:</strong> <code>gnomarchi branding screensaver|about {image|text|reset}</code>; <code>gnomarchi transcode ascii</code> (Pillow/braille) wrapping Omarchy-compatible flags.</li>
+        <li><strong>Screensaver app:</strong> GTK4 fullscreen black + monospace ASCII + optional green glint CSS animation; hotkey + idle hook via <code>gnomarchi idle screensaver</code> (alongside GNOME lock).</li>
+        <li><strong>About window:</strong> menu About opens same art smaller + version/ISO honesty line; glint effect when chars are single-width.</li>
+        <li><strong>Presentation polish:</strong> themed notice header icon; Agents/menu window default icons from brand mark; first-login welcome using logo.</li>
+      </ol>
+    </div>
+    <p class="proof">Proof: pair vs <code>M-20-screensaver</code> / <code>M-13-about</code>; branding menu walkthrough.</p>
+  </article>
+</section>
+
+<section id="p1">
+  <h2>P1 — Visual closeness (screenshot gallery)</h2>
+
+  <article class="gap">
+    <h3>G4 — Tray panels depth (audio/network/bluetooth)</h3>
+    <div class="meta"><span class="tag p1">P1</span><span class="tag shipped">shipped</span><span class="tag kind">GTK mini panels</span></div>
+    <div class="plan"><ol>
+      <li>Keep top-right framing (done); add volume slider (wpctl set-volume), nmcli connect list, bluetoothctl scan toggles — not only status text.</li>
+      <li>Optional: open GNOME Quick Settings as alternate shot; document as Shell-native path.</li>
+      <li>Calendar popup should prefer center-under-clock (xdotool clock geometry) to match Omarchy.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G5 — Icon set / folder tint</h3>
+    <div class="meta"><span class="tag p1">P1</span><span class="tag shipped">shipped</span><span class="tag kind">emitter + AUR helper</span></div>
+    <div class="plan"><ol>
+      <li>Default Papirus-Dark on theme set (shipped); add <code>papirus-folders</code> optional for accent folder colors per pack.</li>
+      <li>Ensure webapp/desktop Icons= point at staged hicolor marks.</li>
+      <li>Proof: Files + dock icons vs Omarchy Yaru shot.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G6 — Fonts applied in Ghostty/nvim</h3>
+    <div class="meta"><span class="tag p1">P1</span><span class="tag shipped">shipped</span><span class="tag kind">emitter</span></div>
+    <div class="plan"><ol>
+      <li>On <code>gnomarchi font set</code>, write Ghostty <code>font-family</code> + nvim guifont + GNOME monospace.</li>
+      <li>Menu Style→Font already listed — capture proof shot.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G7 — Menu hierarchy vs flat palette</h3>
+    <div class="meta"><span class="tag p1">P1</span><span class="tag shipped">shipped</span><span class="tag kind">GTK app</span></div>
+    <div class="plan"><ol>
+      <li>Add drill-down mode to palette (root categories like Omarchy Go…) with Back; keep flat filter as search.</li>
+      <li>Default open shows root only; Enter dives; Esc pops.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G8 — Background / wallpaper chooser presentation</h3>
+    <div class="meta"><span class="tag p1">P1</span><span class="tag shipped">shipped</span><span class="tag kind">theme-picker</span></div>
+    <div class="plan"><ol>
+      <li>Style→Background grid of pack backgrounds (not only <code>bg next</code>).</li>
+      <li>Apply unlock independently from desktop wallpaper (G2).</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G9 — Empty gallery features (capture, gaming, input, custom themes, windows-vm, shell-tools, dotfiles)</h3>
+    <div class="meta"><span class="tag p1">P1</span><span class="tag shipped">shipped</span><span class="tag kind">capture + install wraps</span></div>
+    <div class="plan"><ol>
+      <li>Capture UX: wrap gnome-screenshot / kooha / tesseract OCR path; tray or hotkey; proof shot.</li>
+      <li>Install gaming/windows-vm when requested — screenshots only after overlay extras.</li>
+      <li>Custom theme: keep <code>theme new</code>; optional Aether-like “from wallpaper” using color thief → scaffold pack.</li>
+      <li>Input: fcitx5 install + Settings deep-link shot.</li>
+    </ol></div>
+  </article>
+</section>
+
+<section id="p2">
+  <h2>P2 — Plugins, wraps, effects</h2>
+
+  <article class="gap">
+    <h3>G10 — StatusNotifier / tray chips polish</h3>
+    <div class="meta"><span class="tag p2">P2</span><span class="tag shipped">shipped</span><span class="tag kind">plugin</span></div>
+    <div class="plan"><ol>
+      <li>Weather/update/tailscale/agents: themed icons from pack accent; click → mini panel not raw notify.</li>
+      <li>Modes plugin mirrors Omarchy toggles (night light, caffeine) with visual state.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G11 — First-party app wraps (gnoma-* / share / signed)</h3>
+    <div class="meta"><span class="tag p2">P2</span><span class="tag shipped">shipped</span><span class="tag kind">app wrap</span></div>
+    <div class="plan"><ol>
+      <li>Theme GTK CSS already global — ensure apps use Adwaita + accent.</li>
+      <li>LocalSend + share menu (Super+Ctrl+S) wrap; Nautilus send-to.</li>
+      <li>gnoma-hype/signed/monologue desktop entries + screenshots.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G12 — Terminal stack theme cohesion</h3>
+    <div class="meta"><span class="tag p2">P2</span><span class="tag shipped">shipped</span><span class="tag kind">emitter</span></div>
+    <div class="plan"><ol>
+      <li>Ghostty + starship + btop + nvim already emit — add tmux status colors; bat theme symlink.</li>
+      <li>One <code>theme set</code> must visibly retint all five in a single desktop proof.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G13 — PaperWM / navigation presentation</h3>
+    <div class="meta"><span class="tag p2">P2</span><span class="tag shipped">shipped</span><span class="tag kind">extension</span></div>
+    <div class="plan"><ol>
+      <li>Opt-in PaperWM already; add themed window borders via shell CSS; overview-off capture policy.</li>
+    </ol></div>
+  </article>
+
+  <article class="gap">
+    <h3>G14 — Notice / toast branding</h3>
+    <div class="meta"><span class="tag p2">P2</span><span class="tag shipped">shipped</span><span class="tag kind">visual effect</span></div>
+    <div class="plan"><ol>
+      <li>Custom notification CSS (accent border); history window for notice list (Omarchy M-19b).</li>
+    </ol></div>
+  </article>
+</section>
+
+<section id="matrix">
+  <h2>Full gap matrix (all features)</h2>
+  <table>
+    <tr><th>ID</th><th>Feature</th><th>Closeness work</th><th>Approach</th><th>Pri</th></tr>
+    <tr><td>G1</td><td>prompt</td><td>Hook starship into zsh; richer toml</td><td>shell hook + emitter</td><td>P0</td></tr>
+    <tr><td>G2</td><td>unlock / login graphics</td><td>Chooser + apply lock/GDM/plymouth</td><td>emitter + GTK + sudo gdm</td><td>P0</td></tr>
+    <tr><td>G3</td><td>branding</td><td>ASCII screensaver/about + logo pipeline</td><td>CLI + GTK effect</td><td>P0</td></tr>
+    <tr><td>G4</td><td>bar-panels</td><td>Interactive tray popups</td><td>panels.py</td><td>P1</td></tr>
+    <tr><td>G5</td><td>icons / branding icons</td><td>Papirus-folders + hicolor</td><td>emitter</td><td>P1</td></tr>
+    <tr><td>G6</td><td>fonts</td><td>Ghostty/nvim apply on set</td><td>emitter</td><td>P1</td></tr>
+    <tr><td>G7</td><td>menu</td><td>Hierarchical Go… UI</td><td>palette.py</td><td>P1</td></tr>
+    <tr><td>G8</td><td>backgrounds</td><td>Background grid chooser</td><td>theme-picker</td><td>P1</td></tr>
+    <tr><td>G9</td><td>capture/gaming/…</td><td>Fill empty gallery rows</td><td>wraps + capture</td><td>P1</td></tr>
+    <tr><td>G10</td><td>shell-plugins</td><td>Themed SNI chips</td><td>plugin</td><td>P2</td></tr>
+    <tr><td>G11</td><td>first-party / share</td><td>LocalSend + gnoma rest</td><td>app wrap</td><td>P2</td></tr>
+    <tr><td>G12</td><td>terminal/tuis/neovim</td><td>Unified retint proof</td><td>emitters</td><td>P2</td></tr>
+    <tr><td>G13</td><td>navigation</td><td>PaperWM presentable</td><td>extension + CSS</td><td>P2</td></tr>
+    <tr><td>G14</td><td>notices</td><td>History + accent toast</td><td>CSS + small GTK</td><td>P2</td></tr>
+    <tr><td>—</td><td>top-bar / updates / ai</td><td>Mostly shipped; polish chips</td><td>plugin</td><td>P2</td></tr>
+    <tr><td>—</td><td>n/a.hyprland / quickshell</td><td>Keep substitute narrative</td><td>docs only</td><td>—</td></tr>
+  </table>
+</section>
+
+<section id="proof">
+  <h2>Proof bar</h2>
+  <p>Every closed gap must land as a validated Omarchy|Gnomarchi pair in <a href="visual-proof.html">visual-proof.html</a> with framing tag (<code>tray-popup</code> / <code>centered</code> / <code>fullscreen</code>). Capture via <code>PARITY_CAPTURE=1 scripts/parity-capture-desktop-proof.sh</code> after each wave.</p>
+  <p><strong>W0 acceptance (do these first):</strong></p>
+  <ol>
+    <li>New Ghostty session shows starship colors that change with <code>gnomarchi theme set</code>.</li>
+    <li>Style→Unlock (or CLI) changes lock/GDM background to pack unlock art.</li>
+    <li>Style→Screensaver / About can set ASCII from image and present branded fullscreen/window.</li>
+  </ol>
+</section>
+
+<footer>
+  Plan artifact for implementation lanes. Does not replace gap-map maturity flags — update those when each wave ships.
+</footer>
+</main>
+</div>
+</body>
+</html>

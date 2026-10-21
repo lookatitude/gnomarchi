@@ -1,6 +1,8 @@
 # gnomarchi packaging
 
-Custom pacman repository is the default install path (overlay + future ISO). AUR PKGBUILDs are the fallback.
+**Supported beta path:** GitHub Releases source tarball + AUR `PKGBUILD` with pinned `sha256sums`. Arch official packages remain the default for system updates (`features/registry.yaml` `operator_note`).
+
+A custom pacman repository is **optional** and must be signed (packages + database `.sig`, client `SigLevel = Required`) before any public use. See `docs/security/packaging-signing.md`.
 
 ## Layout
 
@@ -13,18 +15,21 @@ packaging/
     pkgs/             # drop built .pkg.tar.zst here (gitignored in real use)
   aur/
     gnomarchi/
-      PKGBUILD        # stub for AUR submission
+      PKGBUILD        # AUR submission; pinned release tarball checksums
 ```
 
-## Custom repo (primary)
+## AUR / GitHub Releases (supported beta)
+
+1. Tag and publish via `.github/workflows/release.yml` (builds `gnomarchi-<VERSION>.tar.gz` + `.sha256`).
+2. Refresh PKGBUILD checksums: `./scripts/update-pkgbuild-checksums.sh` (reads `VERSION`, downloads the release asset, rewrites `sha256sums`).
+3. Keep `pkgver` / `_tagver` / git tag aligned (e.g. `pkgver=0.0.1beta1`, `_tagver=0.0.1-beta.1`, tag `v0.0.1-beta.1`).
+
+## Custom repo (optional, must be signed)
 
 1. Build packages (CI or local `makepkg`).
 2. Place artifacts under `repo/pkgs/`.
 3. Run `./packaging/repo/build-repo.sh` to refresh `gnomarchi.db.tar.gz`.
-4. Host the directory over HTTPS; clients drop `pacman-gnomarchi.conf.example` into `/etc/pacman.d/` and `Include` it from `/etc/pacman.conf`.
+4. Sign packages and the database; host `.sig` files beside them.
+5. Clients use `pacman-gnomarchi.conf.example` (`SigLevel = Required TrustedOnly`) after importing the operator key.
 
-Signing and trust checklist: owned by T6-security. This tree does **not** publish or distribute keys.
-
-## AUR (fallback)
-
-`aur/gnomarchi/PKGBUILD` builds from the git sources when the custom repo is unavailable. Keep version scheme aligned with repo packages.
+This tree does **not** publish or distribute private keys.

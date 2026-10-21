@@ -135,6 +135,16 @@ class PluginValidateTests(unittest.TestCase):
             msg = enable_plugin(target)
             self.assertIn("ok-add", msg.lower() + str(target))
 
+    def test_hypr_path_hook_rejected(self) -> None:
+        sys.path.insert(0, str(REPO))
+        from plugin.lifecycle import check_hooks_no_sudo
+
+        errs = check_hooks_no_sudo({"on_enable": "cp x ~/.config/hypr/hyprland.conf"})
+        self.assertTrue(errs)
+        errs2 = check_hooks_no_sudo({"on_enable": "quickshell --reload"})
+        self.assertTrue(errs2)
+
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -1,187 +1,225 @@
 # gnomarchi feature registry — parity tracker vs Omarchy
 # status: native | port | adapt | rebuild | defer | triage | done
+#   status=done tracks GNOME adaptation completeness on the gap map.
+# maturity: adapted | shipped | proven
+#   adapted = GNOME substitute exists (most current done rows)
+#   shipped = in release tarball / overlay path users can run
+#   proven  = CI or VM acceptance evidence
 schema_version: gnomarchi.feature_registry.v1
-last_full_review: "2026-10-20T22:58"
+last_full_review: "2026-10-20T23:22"
 upstream: omarchy
-operator_note: "2026-10-20: no deferrals; Arch official packages default (not custom repo)"
+operator_note: "2026-10-20: status=done is adaptation tracking; maturity is product readiness. ISO is adapted/WIP, not proven. Arch official packages default (not custom repo)."
 features:
   - id: omarchy.install.iso
     title: Guided ISO install
     status: done
+    maturity: adapted
+    maturity_note: "WIP — iso/build.sh exists; no published ISO artifact / guided proof (not proven)"
     phase: P8
     gnomarchi_path: "iso/build.sh + iso/packages.x86_64 + gnomarchi-install.sh"
     last_reviewed: "2026-10-20"
   - id: omarchy.install.overlay
     title: Overlay / curl|bash install
     status: done
+    maturity: shipped
     phase: P6
     gnomarchi_path: "install/overlay.sh + install/arch-extras.sh"
     last_reviewed: "2026-10-20"
   - id: omarchy.update.alpm
     title: omarchy update + ALPM guard
     status: done
+    maturity: shipped
     phase: P6
     gnomarchi_path: "gnomarchi update → pacman -Syu (Arch official)"
     last_reviewed: "2026-10-20"
   - id: omarchy.session.hyprland
     title: Hyprland compositor session
     status: done
+    maturity: adapted
+    maturity_note: "D1′ substitute: GNOME Shell + GDM (not Hyprland)"
     phase: P6
     gnomarchi_path: "GNOME Shell + GDM (D1′)"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.quickshell
     title: Unified Quickshell desktop shell
     status: done
+    maturity: adapted
+    maturity_note: "D1′ substitute: GNOME panel + StatusNotifier + Shell extension + GTK overlays"
     phase: P2
     gnomarchi_path: "GNOME panel + StatusNotifier + Shell extension + GTK overlays"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.plugin-system
     title: Shell plugin add/clone/validate
     status: done
+    maturity: shipped
     phase: P3
     gnomarchi_path: "multi-runtime plugin lifecycle"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.bar-drag
     title: Drag bar to any edge
     status: done
+    maturity: adapted
     phase: P5
     gnomarchi_path: "dash-to-panel + gnomarchi shell bar-position; Setup › Bar position"
     last_reviewed: "2026-10-20"
   - id: omarchy.wm.tiling-layouts
     title: Dwindle / scroll / scratchpad tiling
     status: done
+    maturity: adapted
     phase: P5
     gnomarchi_path: "Install › PaperWM (gnome-shell-extension-paperwm / AUR); stock GNOME default"
     last_reviewed: "2026-10-20"
   - id: omarchy.theme.system
     title: Whole-desktop themes + carousel
     status: done
+    maturity: shipped
     phase: P1
     gnomarchi_path: "theme packs + apps/theme-picker"
     last_reviewed: "2026-10-20"
   - id: omarchy.theme.backgrounds-cycle
     title: Per-theme background cycle
     status: done
+    maturity: shipped
     phase: P1
     gnomarchi_path: "theme/backgrounds.py"
     last_reviewed: "2026-10-20"
   - id: gnomarchi.ext.user-themes
     title: Default user-themes Shell extension
     status: done
+    maturity: shipped
     phase: P1
     gnomarchi_path: "gnome-shell-extensions + overlay enable"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.bar-widgets
     title: Bar widgets (tray/update/mic/workspaces/…)
     status: done
+    maturity: adapted
     phase: P3
     gnomarchi_path: "StatusNotifier chips + GNOME QS + dash-to-panel"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.bar-indicators
     title: Center indicators (Dnd/NightLight/…)
     status: done
+    maturity: adapted
     phase: P4
     gnomarchi_path: "plugins/first-party/gnomarchi.modes + gnomarchi mode; caffeine Arch pkg"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.panels
     title: Audio/network/bluetooth/power/clock panels
     status: done
+    maturity: adapted
     phase: P4
     gnomarchi_path: "gnomarchi panel {audio,network,bluetooth,power,display,calendar} → gcc or GTK mini"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.notifications-osd-lock
     title: Notifications / OSD / lock / polkit
     status: done
+    maturity: adapted
     phase: P4
     gnomarchi_path: "emit_gnome_shell_colors notifications/OSD/lock/polkit + GNOME native"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.clipboard-reminders
     title: Clipboard history + reminders
     status: done
+    maturity: adapted
     phase: P5
     gnomarchi_path: "gnomarchi clipboard (gpaste) + remind CLI + menu Trigger"
     last_reviewed: "2026-10-20"
   - id: omarchy.shell.video-wallpaper
     title: OWE video wallpapers + intros
     status: done
+    maturity: adapted
     phase: P4
     gnomarchi_path: "emit_video_wallpaper backgrounds/*.mp4 + mpv unit; theme bg video on|off"
     last_reviewed: "2026-10-20"
   - id: omarchy.theme.unlock-art
     title: Theme unlock / boot decrypt art
     status: done
+    maturity: adapted
     phase: P8
     gnomarchi_path: "plymouth/gnomarchi + assets/brand/logo.png; overlay stage_plymouth"
     last_reviewed: "2026-10-20"
   - id: omarchy.menu.unified
     title: Nested menu + launcher
     status: done
+    maturity: shipped
     phase: P2
     gnomarchi_path: "menu/default.jsonc"
     last_reviewed: "2026-10-20"
   - id: omarchy.agents.stack
     title: Agents, Make something, crash diagnose
     status: done
+    maturity: shipped
     phase: P5
     gnomarchi_path: "agent/*"
     last_reviewed: "2026-10-20"
   - id: gnomarchi.agents.mise
     title: mise lazy agent CLIs
     status: done
+    maturity: adapted
     phase: P5
     gnomarchi_path: "agent/mise.py"
     last_reviewed: "2026-10-20"
   - id: gnomarchi.agents.usage
     title: Agent usage meters + 15m timer
     status: done
+    maturity: adapted
     phase: P5
     gnomarchi_path: "agent/usage.py"
     last_reviewed: "2026-10-20"
   - id: gnomarchi.panel.indicators
     title: StatusNotifier first-party widgets
     status: done
+    maturity: adapted
     phase: P3
     gnomarchi_path: "plugins/first-party gnomarchi.{agents,weather,system-update,tailscale,modes}"
     last_reviewed: "2026-10-20"
   - id: gnomarchi.panel.agents-extension
     title: In-panel agents chip Shell extension
     status: done
+    maturity: adapted
     phase: P3
     gnomarchi_path: "plugins/first-party/gnomarchi.agents-panel"
     last_reviewed: "2026-10-20"
   - id: omarchy.capture.suite
     title: Screenshot/OCR/QR/record
     status: done
+    maturity: shipped
     phase: P4
     gnomarchi_path: "gnomarchi capture shot|ocr|qr|record (gnome-screenshot/tesseract/zbar/kooha)"
     last_reviewed: "2026-10-20"
   - id: omarchy.dev.tooling
     title: mise/docker/nvim/tmux/herdr
     status: done
+    maturity: adapted
     phase: P5
     gnomarchi_path: "mise agents + Ghostty + nvim emit"
     last_reviewed: "2026-10-20"
   - id: omarchy.apps.oma-*
     title: Omawrite/Omacut/Omacalc
     status: done
+    maturity: adapted
     phase: P5
     gnomarchi_path: "apps/gnoma-{write,cut,calc} + applications/desktop/*.desktop; gnomarchi app *"
     last_reviewed: "2026-10-20"
   - id: omarchy.gaming.windows-vm
     title: Gaming setup + Windows VM
     status: done
+    maturity: adapted
     phase: P9
     gnomarchi_path: "Install › Gaming (steam/lutris) + Windows VM (virt-manager/qemu)"
     last_reviewed: "2026-10-20"
   - id: omarchy.theme.backgrounds-provenance
     title: Theme wallpaper/background asset licenses
     status: done
+    maturity: shipped
     phase: P1
     gnomarchi_path: "theme/packs/*/backgrounds + CREDITS; logos → assets/brand"
     last_reviewed: "2026-10-20"
   - id: omarchy.apps.icons-marks
     title: Bundled third-party application icons
     status: done
+    maturity: shipped
     phase: P4
     gnomarchi_path: "applications/icons/ + assets/agents/"
     last_reviewed: "2026-10-20"

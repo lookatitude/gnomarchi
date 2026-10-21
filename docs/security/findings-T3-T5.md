@@ -10,7 +10,7 @@
 | F1 confirm-on-add | **closed** | `gnomarchi plugin add` + summary; default no; `--confirm` after print |
 | F2 no-sudo hooks | **closed** | `check_hooks_no_sudo` in validate |
 | F3 enable-after-validate | **closed** | `plugin enable` validates first; Shell-extension refused |
-| F4 T5 packaging/overlay | **partial** | Overlay confirms + wipe refuse landed; SigLevel Optional TrustAll still weak for prod |
+| F4 T5 packaging/overlay | **closed** (residual) | Overlay confirms + wipe refuse; example conf now Required TrustedOnly; keys remain operator-owned |
 
 ## F1 — T3: confirm-on-add (closed)
 
@@ -24,12 +24,13 @@
 
 - Implemented: `enable_plugin` → validate then adapter `enable_stub`; Shell-extension blocked.
 
-## F4 — T5: packaging / overlay trust surface (partial)
+## F4 — T5: packaging / overlay trust surface (residual closed for example config)
 
-- Closed: `install/overlay.sh` confirm gates; wipe/destroy refused; no Hyprland; packaging stubs without key publish.
-- Residual: `packaging/repo/pacman-gnomarchi.conf.example` uses `SigLevel = Optional TrustAll` — tighten to required signatures before public repo (see `docs/security/packaging-signing.md`).
+- Closed: `install/overlay.sh` confirm gates; wipe/destroy refused; no Hyprland.
+- Closed (example config): `packaging/repo/pacman-gnomarchi.conf.example` uses `SigLevel = Required TrustedOnly`; never TrustAll in public configs (`docs/security/packaging-signing.md`).
+- Still operator-owned: real GPG key generation, package `.sig` hosting, and fingerprint publish — not invented or committed in-tree.
 
 ## Opens
 
-- T5/ops: tighten SigLevel before publishing a public mirror
+- T5/ops: generate/publish operator signing key before any real public mirror URL
 - T7: acceptance for refuse-without-confirm, refuse-sudo-hook, overlay wipe refuse, registry completeness

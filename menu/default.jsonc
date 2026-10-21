@@ -9,6 +9,11 @@
       "label": "Install",
       "children": [
         {
+          "id": "install.paperwm",
+          "label": "PaperWM tiling (opt-in)",
+          "action": { "type": "cli", "argv": ["gnomarchi", "install", "tiling", "--yes"] }
+        },
+        {
           "id": "install.ai",
           "label": "AI",
           "children": [
@@ -57,11 +62,6 @@
               "id": "install.dev.mise",
               "label": "Install mise tools (lazy agents)",
               "action": { "type": "cli", "argv": ["gnomarchi", "agent", "setup"] }
-            },
-            {
-              "id": "install.dev.paperwm",
-              "label": "PaperWM tiling",
-              "action": { "type": "cli", "argv": ["gnomarchi", "install", "tiling", "--yes"] }
             },
             {
               "id": "install.dev.shell-tools",
@@ -389,9 +389,39 @@
           "action": { "type": "cli", "argv": ["gnomarchi", "theme", "new", "my-theme"] }
         },
         {
+          "id": "style.theme-from-wallpaper",
+          "label": "New theme from wallpaper…",
+          "action": {
+            "type": "cli",
+            "argv": [
+              "gnomarchi",
+              "theme",
+              "new",
+              "from-wallpaper",
+              "--from-wallpaper",
+              "/usr/share/backgrounds/gnome/adwaita-d.jpg"
+            ]
+          }
+        },
+        {
           "id": "style.background",
+          "label": "Background…",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "bg", "pick"] }
+        },
+        {
+          "id": "style.background.next",
           "label": "Next background",
           "action": { "type": "cli", "argv": ["gnomarchi", "theme", "bg", "next"] }
+        },
+        {
+          "id": "style.unlock",
+          "label": "Unlock",
+          "action": { "type": "cli", "argv": ["gnomarchi", "theme", "unlock", "pick"] }
+        },
+        {
+          "id": "style.gdm",
+          "label": "GDM greeter background",
+          "action": { "type": "cli", "argv": ["gnomarchi", "branding", "gdm", "apply"] }
         },
         {
           "id": "style.video-on",
@@ -402,6 +432,53 @@
           "id": "style.video-off",
           "label": "Video wallpaper off",
           "action": { "type": "cli", "argv": ["gnomarchi", "theme", "bg", "video", "off"] }
+        },
+        {
+          "id": "style.screensaver",
+          "label": "Screensaver",
+          "children": [
+            {
+              "id": "style.screensaver.show",
+              "label": "Show screensaver",
+              "action": { "type": "cli", "argv": ["gnomarchi", "branding", "screensaver", "show"] }
+            },
+            {
+              "id": "style.screensaver.reset",
+              "label": "Reset screensaver ASCII",
+              "action": { "type": "cli", "argv": ["gnomarchi", "branding", "screensaver", "reset"] }
+            },
+            {
+              "id": "style.screensaver.text",
+              "label": "FIGlet gnomarchi → screensaver",
+              "action": { "type": "cli", "argv": ["gnomarchi", "branding", "screensaver", "text"] }
+            }
+          ]
+        },
+        {
+          "id": "style.about",
+          "label": "About",
+          "children": [
+            {
+              "id": "style.about.show",
+              "label": "Show about",
+              "action": { "type": "cli", "argv": ["gnomarchi", "branding", "about", "show"] }
+            },
+            {
+              "id": "style.about.reset",
+              "label": "Reset about ASCII",
+              "action": { "type": "cli", "argv": ["gnomarchi", "branding", "about", "reset"] }
+            },
+            {
+              "id": "style.about.text",
+              "label": "FIGlet gnomarchi → about",
+              "action": { "type": "cli", "argv": ["gnomarchi", "branding", "about", "text"] }
+            },
+            {
+              "id": "style.about.logo",
+              "label": "Logo status",
+              "action": { "type": "cli", "argv": ["gnomarchi", "branding", "logo", "status"] }
+            }
+          ]
         },
         {
           "id": "style.font",
@@ -497,27 +574,27 @@
         },
         {
           "id": "trigger.hype",
-          "label": "gnoma Hype",
+          "label": "Hype → mpv (substitute)",
           "action": { "type": "cli", "argv": ["gnomarchi", "app", "hype"] }
         },
         {
           "id": "trigger.signed",
-          "label": "gnoma Signed",
+          "label": "Signed → Xournal++ (substitute)",
           "action": { "type": "cli", "argv": ["gnomarchi", "app", "signed"] }
         },
         {
           "id": "trigger.monologue",
-          "label": "gnoma Monologue",
+          "label": "Monologue → whisper/ffmpeg (substitute)",
           "action": { "type": "cli", "argv": ["gnomarchi", "app", "monologue"] }
         },
         {
           "id": "trigger.herdr",
-          "label": "Herdr (agent tmux)",
+          "label": "Herdr → tmux (substitute)",
           "action": { "type": "cli", "argv": ["gnomarchi", "herdr", "attach"] }
         },
         {
           "id": "trigger.cliamp",
-          "label": "Cliamp (cmus)",
+          "label": "Cliamp → cmus (substitute)",
           "action": { "type": "cli", "argv": ["gnomarchi", "cliamp"] }
         },
         {
@@ -534,6 +611,11 @@
           "id": "trigger.lock",
           "label": "Lock screen",
           "action": { "type": "cli", "argv": ["gnomarchi", "idle", "lock"] }
+        },
+        {
+          "id": "trigger.capture-menu",
+          "label": "Capture menu",
+          "action": { "type": "cli", "argv": ["gnomarchi", "capture", "menu"] }
         },
         {
           "id": "trigger.capture-shot",
@@ -579,6 +661,16 @@
           "id": "trigger.remind-add",
           "label": "Add reminder (5m)",
           "action": { "type": "cli", "argv": ["gnomarchi", "remind", "add", "Check this", "--in", "5m"] }
+        },
+        {
+          "id": "trigger.notice-history",
+          "label": "Notice history",
+          "action": { "type": "cli", "argv": ["gnomarchi", "notice", "history"] }
+        },
+        {
+          "id": "trigger.notice-dismiss",
+          "label": "Dismiss notice toasts",
+          "action": { "type": "cli", "argv": ["gnomarchi", "notice", "dismiss"] }
         },
         {
           "id": "trigger.notice-time",

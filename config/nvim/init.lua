@@ -12,4 +12,9 @@ if vim.fn.filereadable(colors) == 1 then
   vim.cmd("source " .. colors)
 end
 
+local font = vim.fn.stdpath("config") .. "/gnomarchi-font.vim"
+if vim.fn.filereadable(font) == 1 then
+  vim.cmd("source " .. font)
+end
+
 vim.keymap.set("n", "<leader>ff", ":edit .<CR>", { desc = "browse cwd" })

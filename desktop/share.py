@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
+import textwrap
 from pathlib import Path
 
 
@@ -11,16 +13,17 @@ def _localsend() -> str | None:
     for cand in ("localsend", "localsend_app", "LocalSend"):
         if shutil.which(cand):
             return cand
-    # Flatpak
+    # Flatpak (system or --user)
     if shutil.which("flatpak"):
-        proc = subprocess.run(
-            ["flatpak", "list", "--app", "--columns=application"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if "org.localsend.localsend_app" in (proc.stdout or ""):
-            return "flatpak"
+        for scope in ([], ["--user"], ["--system"]):
+            proc = subprocess.run(
+                ["flatpak", "list", *scope, "--app", "--columns=application"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if "org.localsend.localsend_app" in (proc.stdout or ""):
+                return "flatpak-user" if scope == ["--user"] else "flatpak"
     return None
 
 
@@ -33,8 +36,11 @@ def _launch_localsend(extra: list[str] | None = None) -> int:
             file=__import__("sys").stderr,
         )
         return 1
-    if bin_ == "flatpak":
-        cmd = ["flatpak", "run", "org.localsend.localsend_app", *(extra or [])]
+    if bin_ in ("flatpak", "flatpak-user"):
+        cmd = ["flatpak", "run"]
+        if bin_ == "flatpak-user":
+            cmd.append("--user")
+        cmd.extend(["org.localsend.localsend_app", *(extra or [])])
     else:
         cmd = [bin_, *(extra or [])]
     subprocess.Popen(cmd, start_new_session=True)
@@ -78,3 +84,30 @@ def install_hint() -> str:
         "LocalSend: flatpak install -y flathub org.localsend.localsend_app\n"
         "Or AUR: localsend-bin"
     )
+
+
+def install_nautilus_script() -> Path:
+    """Nautilus Scripts → Send with LocalSend (selected files)."""
+    home = Path(os.environ.get("HOME", "/tmp")).expanduser()
+    dest = home / ".local" / "share" / "nautilus" / "scripts" / "Send with LocalSend"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_text(
+        textwrap.dedent(
+            """\
+            #!/usr/bin/env bash
+            # gnomarchi: share selected Nautilus paths via LocalSend
+            set -euo pipefail
+            if [[ -n "${NAUTILUS_SCRIPT_SELECTED_FILE_PATHS:-}" ]]; then
+              while IFS= read -r path; do
+                [[ -z "$path" ]] && continue
+                gnomarchi share file "$path" || true
+              done <<< "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS"
+            else
+              gnomarchi share receive
+            fi
+            """
+        ),
+        encoding="utf-8",
+    )
+    dest.chmod(0o755)
+    return dest

@@ -1,0 +1,62 @@
+name: ISO validate
+
+on:
+  push:
+    paths:
+      - 'iso/**'
+      - '.github/workflows/iso-validate.yml'
+  pull_request:
+    paths:
+      - 'iso/**'
+      - '.github/workflows/iso-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Required files exist
+        run: |
+          set -euo pipefail
+          required=(
+            iso/packages.x86_64
+            iso/profiledef.gnomarchi.sh
+            iso/profile/profiledef.sh
+            iso/profile/packages.x86_64
+            iso/build.sh
+            iso/bootstrap-from-releng.sh
+            iso/airootfs-overlay/usr/local/bin/gnomarchi-guided-install
+          )
+          for f in "${required[@]}"; do
+            [[ -f "$f" ]] || { echo "missing: $f" >&2; exit 1; }
+            echo "ok: $f"
+          done
+
+      - name: Bash syntax (bash -n)
+        run: |
+          set -euo pipefail
+          scripts=(
+            iso/build.sh
+            iso/bootstrap-from-releng.sh
+            iso/profiledef.gnomarchi.sh
+            iso/profile/profiledef.sh
+            iso/airootfs-overlay/usr/local/bin/gnomarchi-guided-install
+          )
+          for s in "${scripts[@]}"; do
+            bash -n "$s"
+            echo "syntax ok: $s"
+          done
+
+      - name: Scripts are executable
+        run: |
+          set -euo pipefail
+          for s in iso/build.sh iso/bootstrap-from-releng.sh \
+            iso/airootfs-overlay/usr/local/bin/gnomarchi-guided-install; do
+            [[ -x "$s" ]] || { echo "not executable: $s" >&2; exit 1; }
+            echo "executable: $s"
+          done

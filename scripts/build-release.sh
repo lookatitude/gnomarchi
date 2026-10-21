@@ -13,7 +13,9 @@ STAGE="${OUT}/.stage/${NAME}"
 rm -rf "${OUT}/.stage"
 mkdir -p "${STAGE}" "${OUT}"
 
-# Source tree for the release tarball (no VCS noise, no huge capture dumps)
+# Source tree for the release tarball (no VCS noise, no huge capture dumps).
+# Evidence screenshot trees and theme intro MP4s stay in git for overlay/dev;
+# they are excluded from the distribution archive (see docs/parity/media-policy.md).
 rsync -a \
   --exclude '.git' \
   --exclude '.guild/runs' \
@@ -27,12 +29,15 @@ rsync -a \
   --exclude 'docs/screenshots/parity-v1' \
   --exclude 'docs/screenshots/parity-v2' \
   --exclude 'docs/screenshots/parity' \
+  --exclude 'theme/**/backgrounds/intros/*.mp4' \
   --exclude '.cursor' \
   --exclude 'venv' \
   --exclude '.venv' \
   ./ "${STAGE}/"
 
-# Prefer curated README shots; keep parity-v2 for evidence
+# Drop any intro MP4s that rsync glob may miss (filter rules are path-segment sensitive)
+find "${STAGE}/theme" -type f -path '*/backgrounds/intros/*.mp4' -delete 2>/dev/null || true
+
 tar -C "${OUT}/.stage" -czf "${OUT}/${NAME}.tar.gz" "${NAME}"
 (
   cd "${OUT}"

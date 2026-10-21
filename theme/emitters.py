@@ -311,15 +311,22 @@ def emit_gnome_shell_colors(colors: dict[str, str]) -> Path:
         f"  border-radius: 12px;\n"
         f"  border: 1px solid {muted};\n"
         f"}}\n"
-        f"/* notifications */\n"
-        f".notification-banner {{ background-color: {surface}; color: {fg}; border: 1px solid {accent}; }}\n"
-        f".notification-banner .notification-title {{ color: {fg}; }}\n"
+        f"/* notifications — accent border (Omarchy toast brand cue) */\n"
+        f".notification-banner {{\n"
+        f"  background-color: {surface}; color: {fg};\n"
+        f"  border: 2px solid {accent}; border-radius: 10px;\n"
+        f"  box-shadow: 0 4px 16px rgba(0,0,0,0.35);\n"
+        f"}}\n"
+        f".notification-banner .notification-title {{ color: {fg}; font-weight: 600; }}\n"
         f".notification-banner .notification-body {{ color: {muted}; }}\n"
         f".message-list-sections {{ background-color: {surface}; color: {fg}; }}\n"
-        f".message {{ background-color: {bg}; color: {fg}; }}\n"
+        f".message {{ background-color: {bg}; color: {fg}; border-left: 3px solid {accent}; }}\n"
         f".message:hover {{ background-color: {surface}; }}\n"
         f".calendar {{ background-color: {surface}; color: {fg}; }}\n"
         f".calendar-day-base:selected {{ background-color: {accent}; color: {bg}; }}\n"
+        f"/* PaperWM (when enabled) — themed window borders */\n"
+        f".paperwm-window-border {{ border-color: {accent}; }}\n"
+        f".paperwm-selection {{ border-color: {accent}; outline-color: {accent}; }}\n"
         f"/* OSD volume/brightness */\n"
         f".osd-window {{ background-color: {surface}; color: {fg}; border-radius: 12px; }}\n"
         f".osd-window .level {{ background-color: {accent}; }}\n"
@@ -507,12 +514,55 @@ def emit_wallpaper(pack: Path, colors: dict[str, str]) -> Path:
     return dest
 
 
+def accent_gsettings_name(hex_color: str) -> str:
+    """Map a pack accent hex to the nearest GNOME Shell accent-color enum value."""
+    # Reference centroids for org.gnome.desktop.interface accent-color
+    refs: dict[str, tuple[float, float, float]] = {
+        "blue": (0.45, 0.55, 0.90),
+        "teal": (0.20, 0.70, 0.65),
+        "green": (0.30, 0.75, 0.40),
+        "yellow": (0.95, 0.80, 0.25),
+        "orange": (0.95, 0.55, 0.20),
+        "red": (0.90, 0.25, 0.25),
+        "pink": (0.90, 0.40, 0.65),
+        "purple": (0.60, 0.35, 0.85),
+        "slate": (0.45, 0.50, 0.55),
+    }
+
+    def _rgb(h: str) -> tuple[float, float, float]:
+        s = h.strip().lstrip("#")
+        if len(s) == 3:
+            s = "".join(c * 2 for c in s)
+        if len(s) != 6:
+            return refs["blue"]
+        try:
+            return (int(s[0:2], 16) / 255.0, int(s[2:4], 16) / 255.0, int(s[4:6], 16) / 255.0)
+        except ValueError:
+            return refs["blue"]
+
+    r, g, b = _rgb(hex_color)
+    best = "blue"
+    best_d = 1e9
+    for name, (rr, gg, bb) in refs.items():
+        d = (r - rr) ** 2 + (g - gg) ** 2 + (b - bb) ** 2
+        if d < best_d:
+            best_d = d
+            best = name
+    return best
+
+
 def emit_gsettings(wallpaper: Path, colors: dict[str, str]) -> None:
     if not shutil.which("gsettings"):
         return
     uri = wallpaper.resolve().as_uri()
-    _run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", "prefer-dark"])
-    _run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", "blue"])
+    accent = accent_gsettings_name(colors.get("accent", colors.get("blue", "#7aa2f7")))
+    scheme = (
+        "prefer-light"
+        if str(colors.get("mode", "dark")).lower() in {"light", "latte"}
+        else "prefer-dark"
+    )
+    _run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", scheme])
+    _run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", accent])
     _run(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", uri])
     _run(["gsettings", "set", "org.gnome.desktop.background", "picture-uri-dark", uri])
     _run(["gsettings", "set", "org.gnome.desktop.background", "picture-options", "zoom"])
@@ -527,8 +577,131 @@ def emit_gsettings(wallpaper: Path, colors: dict[str, str]) -> None:
     )
 
 
+def emit_icon_theme(pack: Path) -> str | None:
+    """Apply pack icons.theme on GNOME/Arch (Yaru names → Papirus when needed)."""
+    from theme.icon_apply import apply_pack_icons
+
+    info = apply_pack_icons(pack)
+    return info.get("applied") or info.get("requested") or None
+
+
+def emit_tmux(colors: dict[str, str]) -> Path:
+    """Write ~/.config/tmux/gnomarchi.conf and ensure it's sourced from tmux.conf."""
+    home = Path(os.environ.get("HOME", "/tmp")).expanduser()
+    dest = home / ".config" / "tmux" / "gnomarchi.conf"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    bg = colors.get("background", "#0b1220")
+    fg = colors.get("foreground", "#e8eef7")
+    accent = colors.get("accent", "#3d8bfd")
+    muted = colors.get("muted", "#8b9bb4")
+    dest.write_text(
+        f"# generated by gnomarchi theme set\n"
+        f"set -g status-style \"bg={bg},fg={fg}\"\n"
+        f"set -g status-left-style \"fg={accent},bold\"\n"
+        f"set -g status-right-style \"fg={muted}\"\n"
+        f"set -g window-status-current-style \"fg={accent},bold\"\n"
+        f"set -g pane-active-border-style \"fg={accent}\"\n"
+        f"set -g pane-border-style \"fg={muted}\"\n"
+        f"set -g message-style \"bg={bg},fg={accent}\"\n"
+        f"set -g mode-style \"bg={accent},fg={bg}\"\n",
+        encoding="utf-8",
+    )
+    tmux_conf = home / ".config" / "tmux" / "tmux.conf"
+    alt = home / ".tmux.conf"
+    target = tmux_conf if tmux_conf.is_file() or not alt.is_file() else alt
+    if not target.parent.exists():
+        target = tmux_conf
+        target.parent.mkdir(parents=True, exist_ok=True)
+    marker = "source-file ~/.config/tmux/gnomarchi.conf"
+    existing = target.read_text(encoding="utf-8") if target.is_file() else ""
+    if marker not in existing:
+        body = (existing.rstrip() + "\n\n" if existing.strip() else "") + f"# gnomarchi\n{marker}\n"
+        target.write_text(body, encoding="utf-8")
+    return dest
+
+
+def emit_bat(colors: dict[str, str]) -> Path:
+    """Point bat at a theme close to the pack (or write a minimal theme file)."""
+    home = Path(os.environ.get("HOME", "/tmp")).expanduser()
+    dest = home / ".config" / "bat" / "config"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    # Map dark packs → TwoDark / Nord; light → GitHub
+    bg = colors.get("background", "#0b1220").lstrip("#")
+    try:
+        r, g, b = int(bg[0:2], 16), int(bg[2:4], 16), int(bg[4:6], 16)
+        lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0
+    except ValueError:
+        lum = 0.1
+    theme = "GitHub" if lum > 0.55 else "TwoDark"
+    line = f'--theme="{theme}"'
+    existing = dest.read_text(encoding="utf-8") if dest.is_file() else ""
+    if re.search(r"(?m)^\s*--theme=", existing):
+        body = re.sub(r"(?m)^\s*--theme=.*$", line, existing, count=1)
+    else:
+        body = (existing.rstrip() + "\n\n" if existing.strip() else "") + f"# gnomarchi\n{line}\n"
+    dest.write_text(body if body.endswith("\n") else body + "\n", encoding="utf-8")
+    # Hint file for last-apply
+    hint = home / ".config" / "bat" / "gnomarchi-theme"
+    hint.write_text(f"{theme}\n", encoding="utf-8")
+    return dest
+
+
+def emit_sni_icons(colors: dict[str, str]) -> list[Path]:
+    """Tinted tray icons under hicolor so AppIndicators pick up pack accent."""
+    home = Path(os.environ.get("HOME", "/tmp")).expanduser()
+    dest_dir = home / ".local" / "share" / "icons" / "hicolor" / "22x22" / "apps"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    accent = colors.get("accent", "#3d8bfd")
+    written: list[Path] = []
+    # Simple solid accent squares with a 1px darker edge — readable as tray chips.
+    for name in (
+        "gnomarchi-weather",
+        "gnomarchi-system-update",
+        "gnomarchi-tailscale",
+        "gnomarchi-agents",
+        "gnomarchi-modes",
+    ):
+        path = dest_dir / f"{name}.png"
+        _write_solid_png(path, 22, 22, accent)
+        written.append(path)
+    hicolor = home / ".local" / "share" / "icons" / "hicolor"
+    if shutil.which("gtk-update-icon-cache"):
+        _run(["gtk-update-icon-cache", "-f", str(hicolor)])
+    return written
+
+
+def _write_solid_png(path: Path, width: int, height: int, hex_color: str) -> None:
+    import struct
+    import zlib
+
+    r, g, b = _hex_rgb(hex_color)
+    rows = []
+    for y in range(height):
+        row = bytearray([0])  # filter none
+        for x in range(width):
+            edge = x == 0 or y == 0 or x == width - 1 or y == height - 1
+            if edge:
+                row.extend((max(0, r - 40), max(0, g - 40), max(0, b - 40), 255))
+            else:
+                row.extend((r, g, b, 255))
+        rows.append(bytes(row))
+    raw = b"".join(rows)
+
+    def chunk(tag: bytes, data: bytes) -> bytes:
+        return (
+            struct.pack(">I", len(data))
+            + tag
+            + data
+            + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+        )
+
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
+    path.write_bytes(png)
+
+
 def emit_starship(colors: dict[str, str]) -> Path:
-    """Write ~/.config/starship.toml palette from theme colors."""
+    """Write Omarchy-minimal ~/.config/starship.toml from pack palette."""
     home = Path(os.environ.get("HOME", "/tmp")).expanduser()
     dest = home / ".config" / "starship.toml"
     dest.parent.mkdir(parents=True, exist_ok=True)
@@ -536,14 +709,31 @@ def emit_starship(colors: dict[str, str]) -> Path:
     fg = colors.get("foreground", "#c0caf5")
     accent = colors.get("accent", "#7aa2f7")
     muted = colors.get("muted", "#565f89")
+    red = colors.get("red", "#f7768e")
+    green = colors.get("green", "#9ece6a")
+    # Omarchy-minimal: directory + git + character; pack accent/muted/green/red.
     body = (
         "# generated by gnomarchi theme set — do not edit by hand\n"
-        f'format = "$directory$git_branch$git_status$character"\n'
-        f'[directory]\nstyle = "bold {accent}"\n'
-        f'[character]\nsuccess_symbol = "[❯](bold {accent})"\n'
-        f'error_symbol = "[❯](bold {colors.get("red", "#f7768e")})"\n'
-        f'[git_branch]\nstyle = "bold {muted}"\n'
-        f'# palette hints: bg={bg} fg={fg}\n'
+        'format = "$directory$git_branch$git_status$character"\n'
+        "add_newline = false\n"
+        "\n"
+        "[directory]\n"
+        f'style = "bold {accent}"\n'
+        "truncation_length = 3\n"
+        "truncate_to_repo = true\n"
+        "\n"
+        "[git_branch]\n"
+        f'style = "bold {muted}"\n'
+        'symbol = " "\n'
+        "\n"
+        "[git_status]\n"
+        f'style = "bold {green}"\n'
+        "\n"
+        "[character]\n"
+        f'success_symbol = "[❯](bold {accent})"\n'
+        f'error_symbol = "[❯](bold {red})"\n'
+        "\n"
+        f"# palette hints: bg={bg} fg={fg} accent={accent} green={green}\n"
     )
     dest.write_text(body, encoding="utf-8")
     return dest
@@ -559,8 +749,17 @@ def apply_theme(pack: Path) -> dict[str, str]:
     shell = emit_gnome_shell_colors(colors)
     skins = emit_agent_skins(colors)
     starship = emit_starship(colors)
+    tmux = emit_tmux(colors)
+    bat = emit_bat(colors)
+    sni = emit_sni_icons(colors)
     wall = emit_wallpaper(pack, colors)
     emit_gsettings(wall, colors)
+    from theme.icon_apply import apply_pack_icons
+    from theme.unlock import apply_unlock
+
+    icon_info = apply_pack_icons(pack)
+    icon_theme = icon_info.get("applied") or icon_info.get("requested")
+    unlock = apply_unlock(pack)
     # Notify bus
     try:
         from bus.client import call
@@ -582,7 +781,13 @@ def apply_theme(pack: Path) -> dict[str, str]:
                 "shell": str(shell),
                 "skins": [str(s) for s in skins],
                 "starship": str(starship),
+                "tmux": str(tmux),
+                "bat": str(bat),
+                "sni_icons": [str(p) for p in sni],
                 "wallpaper": str(wall),
+                "unlock": str(unlock) if unlock else None,
+                "icon_theme": icon_theme,
+                "icon_apply": icon_info,
             },
             indent=2,
         )
@@ -594,5 +799,9 @@ def apply_theme(pack: Path) -> dict[str, str]:
         "ghostty": str(ghostty),
         "nvim": str(nvim),
         "starship": str(starship),
+        "tmux": str(tmux),
+        "bat": str(bat),
         "wallpaper": str(wall),
+        "unlock": str(unlock) if unlock else "",
+        "icon_theme": icon_theme or "",
     }

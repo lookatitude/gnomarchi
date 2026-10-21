@@ -25,6 +25,8 @@ DEFAULT_APP_PKGS=(
   ghostty
   neovim
   chromium
+  starship
+  zsh
 )
 AGENT_APP_PKGS=(
   mise
@@ -38,6 +40,7 @@ AGENT_APP_PKGS=(
   zbar
   mpv
   gpaste
+  papirus-icon-theme
 )
 # Shell UUIDs enabled after GNOME session tools exist (user-themes ships in gnome-shell-extensions).
 DEFAULT_SHELL_EXTENSIONS=(
@@ -85,6 +88,20 @@ confirm() {
   local ans
   read -r ans || true
   [[ "${ans}" == "y" || "${ans}" == "Y" || "${ans}" == "yes" ]] || die "aborted by user"
+}
+
+# Soft opt-in: default N, never aborts the overlay. Non-interactive (SKIP_CONFIRM)
+# stays off unless GNOMARCHI_ENABLE_PAPERWM=1 (explicit).
+offer_opt_in() {
+  local prompt="$1"
+  if [[ "${SKIP_CONFIRM}" == "1" ]]; then
+    [[ "${GNOMARCHI_ENABLE_PAPERWM:-0}" == "1" ]] && return 0
+    return 1
+  fi
+  printf '%s [y/N] ' "${prompt}"
+  local ans
+  read -r ans || true
+  [[ "${ans}" == "y" || "${ans}" == "Y" || "${ans}" == "yes" ]]
 }
 
 stage_detect() {
@@ -204,8 +221,8 @@ WRAPPER
 }
 
 stage_defaults() {
-  log "stage: seed default apps (Ghostty + nvim + Chromium + agent deps)"
-  confirm "Install default apps: ghostty neovim chromium (+ mise, appindicator, pacman-contrib)?"
+  log "stage: seed default apps (Ghostty + nvim + Chromium + starship + agent deps)"
+  confirm "Install default apps: ghostty neovim chromium starship (+ mise, appindicator, pacman-contrib)?"
   run sudo pacman -Sy --needed --noconfirm "${DEFAULT_APP_PKGS[@]}"
   local pkg
   for pkg in "${AGENT_APP_PKGS[@]}"; do
@@ -224,7 +241,7 @@ stage_defaults() {
 terminal = "ghostty"
 editor = "neovim"
 browser = "chromium"
-packages = ["ghostty", "neovim", "chromium"]
+packages = ["ghostty", "neovim", "chromium", "starship"]
 EOF
   log "wrote ${GNOMARCHI_CONFIG}/defaults.toml"
 }
@@ -248,6 +265,29 @@ EOF
     run gnomarchi theme set "${pack_id}" 2>/dev/null || warn "gnomarchi theme set skipped (CLI incomplete)"
   else
     log "theme pack '${pack_id}' seeded under ${GNOMARCHI_CONFIG}/themes; apply via 'gnomarchi theme set' when CLI is available"
+  fi
+}
+
+stage_icons() {
+  # Omarchy packs name Yaru-*; Arch has Papirus. theme set maps Yaru→Papirus+folders.
+  # Also installs applications/icons into ~/.local/share/icons/hicolor for launchers.
+  log "stage: icon theme + app icons (Papirus; Yaru not in Arch repos)"
+  if ! pacman -Q papirus-icon-theme &>/dev/null; then
+    confirm "Install papirus-icon-theme (Omarchy Yaru substitute on Arch)?"
+    run sudo pacman -Sy --needed --noconfirm papirus-icon-theme || warn "papirus-icon-theme install failed"
+  fi
+  # papirus-folders: AUR helper, else download upstream script into ~/.local/bin
+  if ! command -v papirus-folders >/dev/null 2>&1; then
+    if command -v yay >/dev/null 2>&1; then
+      run yay -S --needed --noconfirm papirus-folders || warn "papirus-folders AUR install failed"
+    elif command -v paru >/dev/null 2>&1; then
+      run paru -S --needed --noconfirm papirus-folders || warn "papirus-folders AUR install failed"
+    fi
+  fi
+  if [[ -x "${GNOMARCHI_ROOT}/bin/gnomarchi" ]] || command -v gnomarchi >/dev/null 2>&1; then
+    run env PYTHONPATH="${GNOMARCHI_ROOT}${PYTHONPATH:+:$PYTHONPATH}" \
+      python3 -c "from theme.icon_apply import install_app_icons, apply_pack_icons, ensure_papirus_folders_bin; from pathlib import Path; ensure_papirus_folders_bin(); install_app_icons(); p=Path('${GNOMARCHI_ROOT}/theme/packs/tokyo-night'); apply_pack_icons(p) if p.is_dir() else None" \
+      || warn "icon apply skipped"
   fi
 }
 
@@ -277,6 +317,23 @@ ALIASES
       fi
     fi
   done
+
+  # Starship prompt hook (G1 / manual.prompt) — idempotent
+  ensure_starship_rc() {
+    local shell="$1" rc="$2" line
+    line="eval \"\$(starship init ${shell})\""
+    if [[ -f "${rc}" ]] || [[ "${SKIP_CONFIRM}" == "1" ]]; then
+      touch "${rc}"
+      if ! grep -qE 'starship init|gnomarchi: starship' "${rc}" 2>/dev/null; then
+        printf '\n# gnomarchi: starship\n%s\n' "${line}" >> "${rc}"
+        log "appended starship init to ${rc}"
+      else
+        log "starship init already present in ${rc}"
+      fi
+    fi
+  }
+  ensure_starship_rc zsh "${HOME}/.zshrc"
+  ensure_starship_rc bash "${HOME}/.bashrc"
 
   # Enable first-party indicators + crash capture + agents panel when CLI works
   if command -v gnomarchi >/dev/null 2>&1 || [[ -x "${GNOMARCHI_ROOT}/bin/gnomarchi" ]]; then
@@ -383,7 +440,8 @@ EOF
       gnomarchi-mode-dnd gnomarchi-mode-night gnomarchi-calc gnomarchi-write
       gnomarchi-remind gnomarchi-capture-shot gnomarchi-capture-ocr
       gnomarchi-nvim gnomarchi-herdr gnomarchi-lock gnomarchi-files
-      gnomarchi-panel-calendar
+      gnomarchi-panel-calendar gnomarchi-share gnomarchi-capture-menu
+      gnomarchi-notice-history
     )
     local listed="'/"
     listed+="org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/${kb_paths[0]}/'"
@@ -480,26 +538,55 @@ EOF
     run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-calendar/" name 'gnomarchi calendar' || true
     run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-calendar/" command 'gnomarchi panel calendar' || true
     run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-panel-calendar/" binding '<Super><Control><Alt>d' || true
+    # Omarchy Super+Ctrl+S share / LocalSend receive
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-share/" name 'gnomarchi share' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-share/" command 'gnomarchi share receive' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-share/" binding '<Super><Control>s' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-menu/" name 'gnomarchi capture menu' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-menu/" command 'gnomarchi capture menu' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-capture-menu/" binding '<Super><Shift><Control>Print' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-history/" name 'gnomarchi notice history' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-history/" command 'gnomarchi notice history' || true
+    run gsettings set "${base}:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/gnomarchi-notice-history/" binding '<Super><Control><Shift>period' || true
   fi
 }
 
 stage_panel() {
-  log "stage: optional dash-to-panel (bottom/side bar) + PaperWM (Arch/AUR)"
+  log "stage: optional dash-to-panel (bottom/side bar; Arch/AUR)"
   local extras="${GNOMARCHI_ROOT}/install/arch-extras.sh"
   if [[ -f "${extras}" ]]; then
     confirm "Install dash-to-panel package (optional bottom/side bar; stock top bar stays default)?"
     run env GNOMARCHI_SKIP_CONFIRM="${SKIP_CONFIRM}" bash "${extras}" panel || warn "panel extras failed; Install › Desktop › panel later"
-    # PaperWM is the GNOME tiling path (Omarchy dwindle/scroll substitute).
-    confirm "Install PaperWM tiling layouts (Omarchy navigation parity on GNOME)?"
-    run env GNOMARCHI_SKIP_CONFIRM="${SKIP_CONFIRM}" bash "${extras}" tiling || warn "tiling extras failed; Install › Dev › PaperWM later"
     run env GNOMARCHI_SKIP_CONFIRM=1 bash "${extras}" shell-tools || warn "shell-tools extras failed"
   else
     [[ -f "${GNOMARCHI_ROOT}/install/panel.sh" ]] && run bash "${GNOMARCHI_ROOT}/install/panel.sh" || true
-    [[ -f "${GNOMARCHI_ROOT}/install/tiling.sh" ]] && run bash "${GNOMARCHI_ROOT}/install/tiling.sh" || true
   fi
   # Install only — do not enable dash-to-panel. Opt in with:
   #   gnomarchi shell bar-position bottom
   log "stock GNOME top bar remains default; enable bottom bar via gnomarchi shell bar-position bottom"
+}
+
+# F3: PaperWM is opt-in (default N). Stock GNOME overview stays the default session feel.
+stage_tiling_offer() {
+  log "stage: PaperWM tiling offer (opt-in, default N)"
+  cat <<'NOTE'
+
+  PaperWM is optional GNOME tiling (Omarchy dwindle/scroll substitute).
+  Default is stock GNOME overview — PaperWM is never force-enabled.
+
+NOTE
+  if offer_opt_in "Enable PaperWM tiling now?"; then
+    local extras="${GNOMARCHI_ROOT}/install/arch-extras.sh"
+    if [[ -f "${extras}" ]]; then
+      run env GNOMARCHI_SKIP_CONFIRM=1 bash "${extras}" tiling || warn "PaperWM install failed; retry: Install › PaperWM tiling"
+    elif [[ -f "${GNOMARCHI_ROOT}/install/tiling.sh" ]]; then
+      run bash "${GNOMARCHI_ROOT}/install/tiling.sh" || warn "tiling.sh failed"
+    else
+      warn "tiling helpers missing; Install › PaperWM tiling later"
+    fi
+  else
+    log "PaperWM skipped (default). Opt in later: Install › PaperWM tiling, or: gnomarchi install tiling --yes"
+  fi
 }
 
 stage_plymouth() {
@@ -528,10 +615,11 @@ stage_agent_invite() {
     3. gnomarchi default agent claude   # or: codex, opencode, grok, …
     4. Super+Space menu · Agents indicator · Make something
     5. gnomarchi update                 # sudo pacman -Syu (official Arch)
-    6. Install › Panel / Tiling / Gaming / Windows VM as needed
+    6. Optional PaperWM: Install › PaperWM tiling
+       (or: gnomarchi install tiling --yes / GNOMARCHI_ENABLE_PAPERWM=1)
 
-  Defaults: Ghostty · Neovim · Chromium · mise agents · panel widgets
-  Docs:     docs/install/vm-test.md · iso/README.md
+  Defaults: Ghostty · Neovim · Chromium · mise agents · stock GNOME overview
+  Docs:     docs/install/vm-test.md · docs/apps/substitutes.md · docs/gnome-shell-matrix.md
 ────────────────────────────────────────────────────────────
 
 INVITE
@@ -544,12 +632,13 @@ wipe_disk() {
 
 usage() {
   cat <<EOF
-Usage: $(basename "$0") [all|detect|gnome|gdm|gnomarchi|defaults|theme|agents|panel|plymouth|invite]
+Usage: $(basename "$0") [all|detect|gnome|gdm|gnomarchi|defaults|theme|agents|panel|tiling|plymouth|invite]
 
 Env:
   GNOMARCHI_DRY_RUN=1              print actions only
   GNOMARCHI_SKIP_CONFIRM=1         non-interactive (CI/VM automation only)
   GNOMARCHI_CONFIRM_DESTRUCTIVE=yes  allow steps that disable other DMs
+  GNOMARCHI_ENABLE_PAPERWM=1        with SKIP_CONFIRM, opt into PaperWM (else skipped)
   GNOMARCHI_PREFIX=/usr/local      CLI install prefix
 EOF
 }
@@ -579,9 +668,12 @@ main() {
     theme)
       stage_detect
       stage_theme_seed
+      stage_icons
       ;;
+    icons) stage_detect; stage_icons ;;
     agents) stage_detect; stage_agents ;;
     panel) stage_detect; stage_panel ;;
+    tiling) stage_detect; stage_tiling_offer ;;
     plymouth) stage_detect; stage_plymouth ;;
     invite) stage_agent_invite ;;
     all)
@@ -592,8 +684,10 @@ main() {
       stage_install_gnomarchi
       stage_defaults
       stage_theme_seed
+      stage_icons
       stage_agents
       stage_panel
+      stage_tiling_offer
       stage_plymouth
       stage_agent_invite
       ;;

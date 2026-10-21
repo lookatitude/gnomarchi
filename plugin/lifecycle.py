@@ -23,7 +23,9 @@ _HOOK_DENY = re.compile(
     r"(^|[\s:=])/etc(/|$)|"
     r"(^|[\s:=])/usr(/|$)|"
     r"pacman\.d/hooks|sudoers|/etc/systemd/system|"
-    r"\bpacman\b|\bapt(-get)?\b|\bdnf\b|\brpm\b"
+    r"\bpacman\b|\bapt(-get)?\b|\bdnf\b|\brpm\b|"
+    # D1′: plugins must not drive Hyprland / Quickshell configs
+    r"\.config/hypr|hyprland\.conf|\bhyprctl\b|\bquickshell\b|\bqs-ipc\b"
 )
 
 
@@ -135,21 +137,30 @@ def add_plugin(
         raise FileNotFoundError(f"plugin source not a directory: {src}")
 
     summary = summarize_plugin(src)
-    print("plugin add summary:")
+    print("plugin add summary (unsandboxed user-session code):")
     print(f"  id:          {summary['id']}")
     print(f"  name:        {summary['name']}")
     print(f"  runtime:     {summary['runtime']}")
     print(f"  permissions: {summary['permissions']}")
     print(f"  hooks:       {summary['hooks']}")
     print(f"  source:      {summary['source']}")
+    print("Review the summary before approving. Default is no.")
 
     approved = bool(confirm)
+    if confirm:
+        print("(--confirm: treating as approved after printed summary)")
     if not approved:
-        ask = prompt_confirm or (lambda: input("Add this plugin? [y/N] ").strip().lower())
+        ask = prompt_confirm or (
+            lambda: input(
+                "Add this plugin? Type y/yes to install, anything else cancels [y/N]: "
+            ).strip().lower()
+        )
         answer = ask()
         approved = answer in ("y", "yes")
     if not approved:
-        raise PermissionError("refused: confirm-on-add required (default no)")
+        raise PermissionError(
+            "refused: confirm-on-add required (default no; pass --confirm only after reviewing the summary)"
+        )
 
     errors = validate_plugin(src)
     if errors:

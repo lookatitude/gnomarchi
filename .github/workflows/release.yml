@@ -41,6 +41,19 @@ jobs:
           chmod +x scripts/build-release.sh
           ./scripts/build-release.sh
 
+      - name: Verify archive sha256
+        run: |
+          set -euo pipefail
+          cd dist
+          archive="$(echo gnomarchi-*.tar.gz | awk '{print $1}')"
+          sumfile="${archive}.sha256"
+          test -f "${archive}"
+          test -f "${sumfile}"
+          echo "Archive: ${archive}"
+          cat "${sumfile}"
+          sha256sum -c "${sumfile}"
+          echo "Verified SHA256 matches ${sumfile}"
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
